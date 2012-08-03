@@ -1,0 +1,43 @@
+body {
+    font-family: Monospace;
+    background-color: #f0f0f0;
+    margin: 0px;
+    overflow: hidden;
+}
+
+#renderContainer {
+    position: relative;
+}
+
+#display {
+    position: absolute;
+    z-index: 100;
+    font-size: 2em;
+    font-weight: bold;
+}
+
+.vertical {
+    float: top;
+}
+
+.yellow {
+    color: yellow;
+}
+
+.horizontal {
+    display: block;
+	float: left;
+}
+
+#slider {
+    position: relative;
+    display: block;
+	float: left;
+}
+
+.box {
+    padding-top: 550px;
+    padding-bottom: 50px;
+    padding-right: 50px;
+    padding-left: 50px;
+}
