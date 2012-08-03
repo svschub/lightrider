@@ -111,7 +111,7 @@
 		
 		setVisibility(lookDownGroup.mesh, true);
 		setVisibility(plane.cabin, false);
-		renderer.render(world.scene, lookDownGroup.camera, plane.lookDownImage, true);
+		renderer.render(world.scene, lookDownGroup.camera, plane.cockpit.lookDownImage, true);
 		
 		setVisibility(lookDownGroup.mesh, false);
 		setVisibility(plane.cabin, true);
