@@ -29,9 +29,14 @@ Cockpit.prototype = {
 		
 		this.lookDownImage = displayGeometry.lookDownImage;
 		
-		mesh.add(this.vorIndicator());
-		mesh.add(this.rollAngleIndicator());
-		mesh.add(this.pitchAngleIndicator());
+		this.vorIndicator = this.addVorIndicator();
+		mesh.add(this.vorIndicator.mesh);
+		
+		this.rollAngleIndicator = this.addRollAngleIndicator();
+		mesh.add(this.rollAngleIndicator.mesh);
+		
+		this.pitchAngleIndicator = this.addPitchAngleIndicator();
+		mesh.add(this.pitchAngleIndicator.mesh);
 		
 		var cockpitMesh = new THREE.Mesh(
 			new CockpitGeometry(),
@@ -70,161 +75,74 @@ Cockpit.prototype = {
 		return cross;
 	},
 	
-	vorIndicator: function () {
-		var indicator, indicatorBackplane,
-		    planeTopViewGeometry;
-		
-		indicator = new THREE.Object3D();
-		
-		indicatorBackplane = new THREE.Mesh(
-			new THREE.PlaneGeometry(0.1, 0.1),
-			new THREE.MeshBasicMaterial({
-				ambient: 0xFFFFFF,
-				color: 0xFFFFFF,
-				map: THREE.ImageUtils.loadTexture('textures/vor_indicator.jpg'),
-			})
-		);
-		indicator.add(indicatorBackplane);
+	addVorIndicator: function () {
+	    var indicator = new AngleIndicator({
+		    sketch: [
+				[0, 0, 0.028],
+				[-0.007, 0, 0.008],
+				[-0.025, 0, -0.002],
+				[-0.006, 0, -0.005],
+				[-0.019, 0, -0.018],
+				[-0.006, 0, -0.013],
+				[0.006, 0, -0.013],
+				[0.019, 0, -0.018],
+				[0.006, 0, -0.005],
+				[0.025, 0, -0.002],
+				[0.007, 0, 0.008],
+				[0, 0, 0.028],
+			],
+		    texture: 'textures/vor_indicator.jpg',
+		    position: new THREE.Vector3(-0.18, 0.79, 0.75),
+		});
 
-		planeTopViewGeometry = new THREE.Geometry();
-		planeTopViewGeometry.vertices = [
-		    new THREE.Vector3(0, 0, 0.028),
-		    new THREE.Vector3(-0.007, 0, 0.008),
-		    new THREE.Vector3(-0.025, 0, -0.002),
-		    new THREE.Vector3(-0.006, 0, -0.005),
-		    new THREE.Vector3(-0.019, 0, -0.018),
-		    new THREE.Vector3(-0.006, 0, -0.013),
-		    new THREE.Vector3(0.006, 0, -0.013),
-		    new THREE.Vector3(0.019, 0, -0.018),
-		    new THREE.Vector3(0.006, 0, -0.005),
-		    new THREE.Vector3(0.025, 0, -0.002),
-		    new THREE.Vector3(0.007, 0, 0.008),
-		    new THREE.Vector3(0, 0, 0.028),
-		];
-		this.planeTopView = new THREE.Line(
-			planeTopViewGeometry, 
-			new THREE.LineBasicMaterial({
-			    color: 0xFFFF00,
-				opacity: 1,
-				linewidth: 3,
-			})
-		);
-		this.planeTopView.position = new THREE.Vector3(0, 0.003, 0);
-		indicator.add(this.planeTopView);
+		return indicator;		
+	},
+	
+	addRollAngleIndicator: function () {
+	    var indicator = new AngleIndicator({
+		    sketch: [
+				[0, 0, 0.02],
+				[-0.004, 0, 0.005],
+				[-0.027, 0, -0.002],
+				[0.0, 0, -0.005],
+				[0.026, 0, -0.002],
+				[0.004, 0, 0.005],
+				[0, 0, 0.02],
+			],
+		    texture: 'textures/roll_indicator.jpg',
+		    position: new THREE.Vector3(0.18, 0.79, 0.75),
+		});
 
-		indicator.position = new THREE.Vector3(-0.18, 0.79, 0.75);
-		indicator.rotation.x = -Math.PI/2;
-		
 		return indicator;
 	},
 	
-	rollAngleIndicator: function () {
-		var indicator, indicatorBackplane,
-		    planeRearViewGeometry;
-		
-		indicator = new THREE.Object3D();
-		
-		indicatorBackplane = new THREE.Mesh(
-			new THREE.PlaneGeometry(0.1, 0.1),
-			new THREE.MeshBasicMaterial({
-				ambient: 0xFFFFFF,
-				color: 0xFFFFFF,
-				map: THREE.ImageUtils.loadTexture('textures/roll_indicator.jpg'),
-			})
-		);
-		indicator.add(indicatorBackplane);
+	addPitchAngleIndicator: function () {
+	    var indicator = new AngleIndicator({
+		    sketch: [
+				[-0.012, 0, 0.008],
+				[-0.016, 0, 0.005],
+				[-0.029, 0, -0.002],
+				[-0.01, 0, -0.004],
+				[0.024, 0, -0.003],
+				[0.024, 0, 0.018],			
+				[0.01, 0, 0.004],
+				[-0.005, 0, 0.004],
+				[-0.012, 0, 0.008],
+			],
+		    texture: 'textures/pitch_indicator.jpg',
+		    position: new THREE.Vector3(0.29, 0.77, 0.75),
+		});
 
-		planeRearViewGeometry = new THREE.Geometry();
-		planeRearViewGeometry.vertices = [
-		    new THREE.Vector3(0, 0, 0.02),
-		    new THREE.Vector3(-0.004, 0, 0.005),
-		    new THREE.Vector3(-0.027, 0, -0.002),
-		    new THREE.Vector3(0.0, 0, -0.005),
-		    new THREE.Vector3(0.026, 0, -0.002),
-		    new THREE.Vector3(0.004, 0, 0.005),
-		    new THREE.Vector3(0, 0, 0.02),
-		];
-		this.planeRearView = new THREE.Line(
-			planeRearViewGeometry, 
-			new THREE.LineBasicMaterial({
-			    color: 0xFFFF00,
-				opacity: 1,
-				linewidth: 3,
-			})
-		);
-		this.planeRearView.position = new THREE.Vector3(0, 0.003, 0);
-		indicator.add(this.planeRearView);
-
-		indicator.position = new THREE.Vector3(0.18, 0.79, 0.75);
-		indicator.rotation.x = -Math.PI/2;
-		
-		return indicator;
-	},
-	
-	pitchAngleIndicator: function () {
-		var indicator, indicatorBackplane,
-		    planeSideViewGeometry;
-		
-		indicator = new THREE.Object3D();
-		
-		indicatorBackplane = new THREE.Mesh(
-			new THREE.PlaneGeometry(0.1, 0.1),
-			new THREE.MeshBasicMaterial({
-				ambient: 0xFFFFFF,
-				color: 0xFFFFFF,
-				map: THREE.ImageUtils.loadTexture('textures/pitch_indicator.jpg'),
-			})
-		);
-		indicator.add(indicatorBackplane);
-
-		planeSideViewGeometry = new THREE.Geometry();
-		planeSideViewGeometry.vertices = [
-		    new THREE.Vector3(-0.012, 0, 0.008),
-		    new THREE.Vector3(-0.016, 0, 0.005),
-		    new THREE.Vector3(-0.029, 0, -0.002),
-		    new THREE.Vector3(-0.01, 0, -0.004),
-		    new THREE.Vector3(0.024, 0, -0.003),
-		    new THREE.Vector3(0.024, 0, 0.018),			
-		    new THREE.Vector3(0.01, 0, 0.004),
-		    new THREE.Vector3(-0.005, 0, 0.004),
-		    new THREE.Vector3(-0.012, 0, 0.008),
-		];
-		this.planeSideView = new THREE.Line(
-			planeSideViewGeometry, 
-			new THREE.LineBasicMaterial({
-			    color: 0xFFFF00,
-				opacity: 1,
-				linewidth: 3,
-			})
-		);
-		this.planeSideView.position = new THREE.Vector3(0, 0.003, 0);
-		indicator.add(this.planeSideView);
-
-		indicator.position = new THREE.Vector3(0.29, 0.77, 0.75);
-		indicator.rotation.x = -Math.PI/2;
-		
 		return indicator;
 	},
 
 	update: function (angles) {
-		this.planeTopView.lookAt(new THREE.Vector3(
-		    this.planeTopView.position.x-angles.sinYawAngle,
-		    this.planeTopView.position.y,
-		    this.planeTopView.position.z+angles.cosYawAngle
-		));
+        this.vorIndicator.updateDirection(-angles.sinYawAngle,+angles.cosYawAngle);
 
-		this.planeRearView.lookAt(new THREE.Vector3(
-		    this.planeRearView.position.x+angles.sinRollAngle,
-		    this.planeRearView.position.y,
-		    this.planeRearView.position.z+angles.cosRollAngle
-		));
+        this.rollAngleIndicator.updateDirection(+angles.sinRollAngle,+angles.cosRollAngle);
 
 		var cPa = angles.cosPitchAngle;
 		if (angles.cosRollAngle < 0) cPa = -cPa;
-		this.planeSideView.lookAt(new THREE.Vector3(
-		    this.planeSideView.position.x+angles.sinPitchAngle,
-		    this.planeSideView.position.y,
-		    this.planeSideView.position.z+cPa
-		));
+		this.pitchAngleIndicator.updateDirection(+angles.sinPitchAngle,+cPa);
 	}
 };
