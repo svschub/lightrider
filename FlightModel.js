@@ -4,7 +4,7 @@ FlightModel = function () {
 	this.speed = 0.0;
 
 	// Rollen:
-	this.rollMatrix = new THREE.Matrix4();
+	this.rollAction = new THREE.Quaternion();
     this.rollAxis = new THREE.Vector3(0,0,-1);
     this.rollAngleIncr = 0.0;
     this.sinRollAngle = 0.0;
@@ -12,7 +12,7 @@ FlightModel = function () {
 	this.rollSpeed = 0.0;
 	
 	// Neigen:
-	this.pitchMatrix = new THREE.Matrix4();
+	this.pitchAction = new THREE.Quaternion();
 	this.pitchAxis = new THREE.Vector3(1,0,0);
     this.pitchAngleIncr = 0.0;
     this.sinPitchAngle = 0.0;
@@ -20,7 +20,7 @@ FlightModel = function () {
 	this.pitchSpeed = 0.0;
 	
 	// Gieren:
-    this.yawMatrix = new THREE.Matrix4();
+	this.yawAction = new THREE.Quaternion();
 	this.yawAxis = new THREE.Vector3(0,1,0);
     this.yawAngleIncr = 0.0;
     this.sinYawAngle = 0.0;
@@ -40,9 +40,9 @@ FlightModel.prototype = {
 		}		
 	    if (this.rollSpeed !== 0.0) {
 		    this.rollAxis.normalize();
-   	        this.rollMatrix.makeRotationAxis(this.rollAxis, this.rollSpeed);	
-		    this.yawAxis = this.rollMatrix.multiplyVector3(this.yawAxis);
-		    this.pitchAxis = this.rollMatrix.multiplyVector3(this.pitchAxis);
+			this.rollAction.setFromAxisAngle(this.rollAxis, this.rollSpeed);
+			this.rollAction.multiplyVector3(this.yawAxis);
+			this.rollAction.multiplyVector3(this.pitchAxis);			
         }			
 	},
 	
@@ -53,9 +53,9 @@ FlightModel.prototype = {
 		}		
 	    if (this.pitchSpeed !== 0.0) {
 		    this.pitchAxis.normalize();
-   	        this.pitchMatrix.makeRotationAxis(this.pitchAxis, this.pitchSpeed);	
-		    this.yawAxis = this.pitchMatrix.multiplyVector3(this.yawAxis);
-		    this.rollAxis = this.pitchMatrix.multiplyVector3(this.rollAxis);
+			this.pitchAction.setFromAxisAngle(this.pitchAxis, this.pitchSpeed);
+			this.pitchAction.multiplyVector3(this.yawAxis);
+			this.pitchAction.multiplyVector3(this.rollAxis);			
         }
 	},
 
@@ -66,9 +66,9 @@ FlightModel.prototype = {
 		}		
 	    if (this.yawSpeed !== 0.0) {
 		    this.yawAxis.normalize();
-   	        this.yawMatrix.makeRotationAxis(this.yawAxis, this.yawSpeed);	
-		    this.rollAxis = this.yawMatrix.multiplyVector3(this.rollAxis);
-		    this.pitchAxis = this.yawMatrix.multiplyVector3(this.pitchAxis);
+			this.yawAction.setFromAxisAngle(this.yawAxis, this.yawSpeed);
+			this.yawAction.multiplyVector3(this.rollAxis);
+			this.yawAction.multiplyVector3(this.pitchAxis);			
 		}
     },
 
