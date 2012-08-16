@@ -6,7 +6,8 @@
 		keyPressed,
 		planeLoop,
 		lookDownGroup,
-		loopMilliseconds;
+		loopMilliseconds,
+		beta;
 
 	function initKeyboardEvents() {
 	    keyPressed = new Array(256);
@@ -39,6 +40,7 @@
 		world.add(lookDownGroup.mesh);
 		
         renderer = new THREE.WebGLRenderer();
+		renderer.enableScissorTest(false);
         renderer.setSize(canvasWidth, canvasHeight);
         $("#renderContainer").append(renderer.domElement);
 	
@@ -102,17 +104,24 @@
 		    position = plane.getPosition(),	
 	        speedMetersPerSecond=plane.getSpeed()*1000/loopMilliseconds,
 		    speedKmPerSecond=speedMetersPerSecond*3.6;
-			
-	    $("#speed").html("spd " + speedKmPerSecond.toFixed(1) + " km/h");
+		
+        if (beta < 0.1) {		
+	        $("#speed").html("spd " + speedKmPerSecond.toFixed(1) + " km/h");
+	    } else {
+	        $("#speed").html("spd " + beta.toFixed(4) + " c");
+		}
+		
 	    $("#altitude").html("alt " + plane.getAltitude().toFixed(1) + " m");
 
         lookDownGroup.setPosition(position);
 		lookDownGroup.setViewAngle(angles);
-		
-		setVisibility(lookDownGroup.mesh, true);
+
+        world.setBoostParameters(0.0);
+	    setVisibility(lookDownGroup.mesh, true);
 		setVisibility(plane.cabin, false);
 		renderer.render(world.scene, lookDownGroup.camera, plane.cockpit.lookDownImage, true);
 		
+        world.setBoostParameters(beta);
 		setVisibility(lookDownGroup.mesh, false);
 		setVisibility(plane.cabin, true);
         renderer.render(world.scene, plane.observer);
@@ -127,16 +136,19 @@
         initKeyboardEvents();
   	    initWorld();
 
+		beta = 0.0;
         $("#slider").slider({
 		    orientation: "vertical",
 		    min: 0.0,
 		    max: 1.0,
 		    step: 0.01,
             slide: function(e, ui) { 
-//                $("#beta").val(ui.value);
+		        beta = ui.value;
             }
 		});
 		
+		$("#slider .ui-slider-handle").unbind("keydown");
+				
 		loopMilliseconds = 30;
 		planeLoop = setInterval(movePlane, loopMilliseconds);
 	}
