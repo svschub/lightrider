@@ -33,14 +33,13 @@
 
 		plane = new FlightModel();
 		plane.position = new THREE.Vector3(0,10,13);
-		plane.setObserverViewport(canvasWidth, canvasHeight);
+		plane.observer.setViewport(canvasWidth, canvasHeight);
         world.add(plane.cabin);
 		
 		lookDownGroup = new LookDownGroup();
 		world.add(lookDownGroup.mesh);
 		
         renderer = new THREE.WebGLRenderer();
-		renderer.enableScissorTest(false);
         renderer.setSize(canvasWidth, canvasHeight);
         $("#renderContainer").append(renderer.domElement);
 	
@@ -103,15 +102,20 @@
   	    var angles = plane.getAngles(),
 		    position = plane.getPosition(),	
 	        speedMetersPerSecond=plane.getSpeed()*1000/loopMilliseconds,
-		    speedKmPerSecond=speedMetersPerSecond*3.6;
-		
-        if (beta < 0.1) {		
+		    speedKmPerSecond=speedMetersPerSecond*3.6,
+			viewConeAngle;
+			
+		if (beta < 0.1) {		
 	        $("#speed").html("spd " + speedKmPerSecond.toFixed(1) + " km/h");
 	    } else {
 	        $("#speed").html("spd " + beta.toFixed(4) + " c");
 		}
 		
 	    $("#altitude").html("alt " + plane.getAltitude().toFixed(1) + " m");
+
+		plane.observer.setBoostParameters(beta);
+		viewConeAngle = 360*plane.observer.getViewConeParameters().boostedViewConeAngle/Math.PI;
+	    $("#viewConeAngle").html("fov " + viewConeAngle.toFixed(1) + " deg");
 
         lookDownGroup.setPosition(position);
 		lookDownGroup.setViewAngle(angles);
@@ -124,7 +128,7 @@
         world.setBoostParameters(beta);
 		setVisibility(lookDownGroup.mesh, false);
 		setVisibility(plane.cabin, true);
-        renderer.render(world.scene, plane.observer);
+        renderer.render(world.scene, plane.observer.camera);
 	}
 
     function animate() {

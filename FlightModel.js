@@ -144,47 +144,6 @@ FlightModel.prototype = {
 		};
 	},
 	
-	createCabin: function () {
-		this.cabin = new THREE.Object3D();        
-
-	    this.cockpit = new Cockpit();
-		this.cabin.add(this.cockpit.mesh);
-		
-		this.observerGroup = new THREE.Object3D();
-		
-        this.observer = new THREE.PerspectiveCamera(45, 4/3, 0.3, 10000);
-        this.observer.position = new THREE.Vector3(0,0,0);
-        this.observer.lookAt(new THREE.Vector3(0,0,1));
-		this.observer.up = new THREE.Vector3(0,1,0);
-        this.observerGroup.add(this.observer);
-
-		this.horizon = new Horizon();
-	    this.horizon.geometry.setZ(5000);
-		this.horizon.observerFov = this.observer.fov;
-		this.horizon.observerAspect = this.observer.aspect;
-		this.horizon.observerNear = this.observer.near;
-		this.horizon.observerFar = this.observer.far;
-        this.observerGroup.add(this.horizon.mesh);
-		
-		this.observerGroup.position.y = 1;
-		
-		this.cabin.add(this.observerGroup);
-		
-		this.update();
-	},
-
-	setObserverFov: function (fov) {
-        this.observer.fov = fov;
-		this.horizon.observerFov = this.observer.fov;
-		this.observer.updateProjectionMatrix();
-	},
-
-	setObserverViewport: function (width, height) {
-        this.observer.aspect = width/height;
-		this.horizon.observerAspect = this.observer.aspect;
-		this.observer.updateProjectionMatrix();
-	},
-	
 	update: function () {
         this.cabin.position = this.getPosition();
 		this.cabin.up = this.getUpVector();
@@ -192,7 +151,19 @@ FlightModel.prototype = {
 
 		this.calculateAngles();
 
-		this.horizon.update(this.getAngles());
+		this.observer.update(this.getAngles());
         this.cockpit.update(this.getAngles());
-	}
+	},
+
+	createCabin: function () {
+		this.cabin = new THREE.Object3D();        
+
+	    this.cockpit = new Cockpit();
+		this.cabin.add(this.cockpit.mesh);
+
+        this.observer = new Observer();
+		this.cabin.add(this.observer.mesh);
+		
+		this.update();
+	},
 };
