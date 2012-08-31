@@ -2,6 +2,7 @@
 uniform float opacity;
 varying vec3 vLightFront;
 
+uniform int boostEnabled;
 uniform float beta;
 uniform float gamma;
 
@@ -208,5 +209,5 @@ void main() {
         gl_FragColor = mix( gl_FragColor, vec4( fogColor, gl_FragColor.w ), fogFactor );
     #endif
 
-//    gl_FragColor = gl_FragColor * vec4( beta, beta, beta, 1.0 );
+//  TODO: if boostEnabled: modify gl_FragColor according to Doppler effect
 }

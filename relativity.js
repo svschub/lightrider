@@ -7,7 +7,7 @@
 		planeLoop,
 		lookDownGroup,
 		loopMilliseconds,
-		beta;
+		beta, beta_next;
 
 	function initKeyboardEvents() {
 	    keyPressed = new Array(256);
@@ -97,11 +97,9 @@
 		
         plane.update();
 	}
-	
-    function render() {	
-  	    var angles = plane.getAngles(),
-		    position = plane.getPosition(),	
-	        speedMetersPerSecond=plane.getSpeed()*1000/loopMilliseconds,
+
+    function updateHudIndicators() {
+ 	    var speedMetersPerSecond=plane.getSpeed()*1000/loopMilliseconds,
 		    speedKmPerSecond=speedMetersPerSecond*3.6,
 			viewConeAngle;
 			
@@ -113,19 +111,31 @@
 		
 	    $("#altitude").html("alt " + plane.getAltitude().toFixed(1) + " m");
 
-		plane.observer.setBoostParameters(beta);
-		viewConeAngle = 360*plane.observer.getViewConeParameters().boostedViewConeAngle/Math.PI;
+		viewConeAngle = 360*plane.observer.referenceViewConeAngle/Math.PI;
 	    $("#viewConeAngle").html("fov " + viewConeAngle.toFixed(1) + " deg");
+    }
+	
+    function render() {	
+  	    var angles = plane.getAngles(),
+		    position = plane.getPosition();
+			
+		if (beta_next != beta) {
+			beta = beta_next;
+			world.setBoostParameters(beta);
+			plane.observer.setBoostParameters(beta);
+		}
 
+		updateHudIndicators();
+		
         lookDownGroup.setPosition(position);
 		lookDownGroup.setViewAngle(angles);
 
-        world.setBoostParameters(0.0);
+        world.disableBoost();
 	    setVisibility(lookDownGroup.mesh, true);
 		setVisibility(plane.cabin, false);
 		renderer.render(world.scene, lookDownGroup.camera, plane.cockpit.lookDownImage, true);
 		
-        world.setBoostParameters(beta);
+        world.enableBoost();
 		setVisibility(lookDownGroup.mesh, false);
 		setVisibility(plane.cabin, true);
         renderer.render(world.scene, plane.observer.camera);
@@ -136,39 +146,22 @@
         render();
     }
 
-	function init() {	
-        initKeyboardEvents();
-  	    initWorld();
+	function init() {				
+		initKeyboardEvents();
+		initWorld();
 
-		beta = 0.0;
-        $("#slider").slider({
-		    orientation: "vertical",
-		    min: 0.0,
-		    max: 1.0,
-		    step: 0.01,
-            slide: function(e, ui) { 
-		        beta = ui.value;
-            }
+		beta = -1000.0;
+		beta_next = 0.0;
+		
+		var slider = new BetaSlider({
+			halfScale: 0.9,
+			handle: function (value) {
+			    beta_next = Math.min(value, 0.9999);
+			},
 		});
 		
-		$("#slider .ui-slider-handle").unbind("keydown");
-				
 		loopMilliseconds = 30;
 		planeLoop = setInterval(movePlane, loopMilliseconds);
-	}
-
-	function setVisibility (object3d, visible) {
-	    if (object3d instanceof THREE.Object3D) {
-	        object3d.visible = visible;
-
-		    if (object3d.children === undefined) {
- 		        return;
-		    }
-
-			for (var i=0; i < object3d.children.length; i++) {
-				setVisibility(object3d.children[i], visible);
-			}
-		}
 	}
 	
 	init();

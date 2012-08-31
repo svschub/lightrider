@@ -17,6 +17,7 @@ body {
 }
 
 .vertical {
+    display: block;
     float: top;
 }
 
@@ -29,10 +30,36 @@ body {
 	float: left;
 }
 
-#slider {
+#betaSlider {
     position: relative;
     display: block;
 	float: left;
+	height: 200px;
+	background: #b0b0b0;
+	color: #ff0000;
+}
+
+#betaScale {
+    position: relative;
+    display: block;
+	float: left;
+	background: #efefef;
+}
+
+#betaScaleTitle {
+    position: absolute; 
+	z-index: 100;
+    font-family: Monospace;
+    font-size: 24pt;
+    font-weight: bold;
+}
+
+.betaScaleBorders {
+    position: absolute; 
+	z-index: 100;
+    font-family: Monospace;
+    font-size: 20pt;
+    font-weight: bold;
 }
 
 .box {

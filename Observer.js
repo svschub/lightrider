@@ -8,17 +8,14 @@ Observer = function () {
     this.mesh.add(this.camera);
 
 	this.horizon = new Horizon();
-	this.horizon.geometry.setZ(5000);
-	this.horizon.observerFov = this.camera.fov;
-	this.horizon.observerAspect = this.camera.aspect;
-	this.horizon.observerNear = this.camera.near;
-	this.horizon.observerFar = this.camera.far;
+	this.horizon.setZ(5000);
+	this.horizon.setFrustumParametersFromCamera(this.camera);
     this.mesh.add(this.horizon.mesh);
 
 	this.mesh.position.y = 1;
 
-    this.calculateViewConeParameters();
-    this.setBoostParameters(0);
+    this.updateObserverViewCone();
+	this.setBoostParameters(0);
 };
 
 Observer.prototype = {
@@ -26,19 +23,19 @@ Observer.prototype = {
 
 	setFov: function (fov) {
         this.camera.fov = fov;
-		this.horizon.observerFov = this.camera.fov;
+		this.horizon.setFrustumParametersFromCamera(this.camera);
 		this.camera.updateProjectionMatrix();
-		this.calculateViewConeParameters();
+		this.updateObserverViewCone();
 	},
 
 	setViewport: function (width, height) {
         this.camera.aspect = width/height;
-		this.horizon.observerAspect = this.camera.aspect;
+		this.horizon.setFrustumParametersFromCamera(this.camera);
 		this.camera.updateProjectionMatrix();
-		this.calculateViewConeParameters();
+		this.updateObserverViewCone();
 	},
 	
-	calculateViewConeParameters: function () {
+	updateObserverViewCone: function () {
 	    var h = 2*Math.tan(Math.PI*this.camera.fov/360)*this.camera.near,
 		    w = h*this.camera.aspect,
 			rNear = 0.5*Math.sqrt(h*h + w*w),
@@ -46,30 +43,22 @@ Observer.prototype = {
 
 		this.viewConeAngle = Math.atan(rNear/this.camera.near);
         this.viewSphereRadius = Math.sqrt(rFar*rFar + this.camera.far*this.camera.far);		
+
+        this.horizon.updateObserverViewCone({
+		    viewConeAngle: this.viewConeAngle,
+			viewSphereRadius: this.viewSphereRadius,
+		});
 	},
 
 	setBoostParameters: function (beta) {
 	    this.beta = beta;
-		this.boostedViewConeAngle = this.getBoostedAngle(this.viewConeAngle, this.beta);		
+		this.referenceViewConeAngle = getBoostedAngle(this.viewConeAngle, -this.beta);		
+
+		this.horizon.setBoostParameters(this.beta);
+		this.horizon.setReferenceViewConeAngle(this.referenceViewConeAngle);
 	},
 	
-	getViewConeParameters: function () {
-		return {
-		    viewConeAngle: this.viewConeAngle,
-			boostedViewConeAngle: this.boostedViewConeAngle,
-			viewSphereRadius: this.viewSphereRadius,
-		};
-	},
-
 	update: function (angles) {
 		this.horizon.update(angles);
-	},
-
-	getBoostedAngle: function (angle, beta) {
-		var boostedAngle = Math.atan(Math.sqrt(1-beta*beta)*Math.sin(angle)/(Math.cos(angle)-beta));
-		if (boostedAngle <= 0) {
-		    boostedAngle += Math.PI;
-		}
-		return boostedAngle;
 	},
 };

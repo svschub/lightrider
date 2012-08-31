@@ -152,7 +152,7 @@ FlightModel.prototype = {
 		this.calculateAngles();
 
 		this.observer.update(this.getAngles());
-        this.cockpit.update(this.getAngles());
+        this.cockpit.update(this.getAngles());		
 	},
 
 	createCabin: function () {

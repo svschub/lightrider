@@ -13,27 +13,34 @@
     <body>
 	    <div>
 		    <div id="renderContainer" class="horizontal"></div>
-            <div class="horizontal box">
-			    <div id="slider"></div>
+			<div class="horizontal box">
+				<div id="betaSlider"></div>
+				<canvas id="betaScale" width="100" height="200">
+					Browser does not support canvas!
+				</canvas>
 			</div>
 		    <div id="display">
 		        <div class="vertical yellow" id="speed"></div>
 			    <div class="vertical yellow" id="altitude"></div>
 			    <div class="vertical yellow" id="viewConeAngle"></div>
 		    </div>
+		    <div id="betaScaleTitle" class="betaScaleBorders">v/c</div>
+		    <div id="betaScale0" class="betaScaleBorders">0</div>
+		    <div id="betaScale1" class="betaScaleBorders">1</div>
 		</div>
 			
         <script type="text/javascript" src="../../js/jquery/jquery-1.7.1.min.js"></script>
         <script type="text/javascript" src="../../js/jquery/ui/jquery-ui-1.8.21.custom.min.js"></script>
         <script type="text/javascript" src="../../js/three/Three.js"></script>
 				
-        <script type="text/javascript" src="readFile.js"></script>
+        <script type="text/javascript" src="common.js"></script>
+        <script type="text/javascript" src="boost.js"></script>
+        <script type="text/javascript" src="BetaSlider.js"></script>
         <script type="text/javascript" src="CockpitGeometry.js"></script>
         <script type="text/javascript" src="LookDownGroup.js"></script>
         <script type="text/javascript" src="DisplayGeometry.js"></script>
         <script type="text/javascript" src="AngleIndicator.js"></script>
         <script type="text/javascript" src="Cockpit.js"></script>
-        <script type="text/javascript" src="HorizonGeometry.js"></script>
         <script type="text/javascript" src="Horizon.js"></script>
         <script type="text/javascript" src="Observer.js"></script>
         <script type="text/javascript" src="World.js"></script>

@@ -1,6 +1,7 @@
 
 varying vec3 vLightFront;
 
+uniform int boostEnabled;
 uniform float beta;
 uniform float gamma;
 
@@ -256,9 +257,12 @@ void main() {
 
     #ifndef USE_MORPHTARGETS
         #ifndef USE_SKINNING
-//            gl_Position = projectionMatrix * mvPosition;			
-			float ct = length(mvPosition.xyz);
-            gl_Position = projectionMatrix * vec4(mvPosition.x, mvPosition.y, gamma*mvPosition.z - gamma*beta*ct, mvPosition.w);
+		    if (boostEnabled == 0) { 
+                gl_Position = projectionMatrix * mvPosition;
+            } else {			
+			    float ct = length(mvPosition.xyz);
+                gl_Position = projectionMatrix * vec4(mvPosition.x, mvPosition.y, gamma*mvPosition.z - gamma*beta*ct, mvPosition.w);
+			}
         #endif
     #endif
 
