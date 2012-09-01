@@ -8,31 +8,48 @@ Horizon = function () {
 	this.boundingRadius = 1;
 	this.granularity = 16;
 	this.horizonArcZshift = 100;  // TODO
+				
+	this.relativisticUniforms = {
+		"beta": { type: "f", value: 0.0 },
+		"gamma": { type: "f", value: 1.0 },
+	};
+	
+	this.horizonArcMaterial =  new THREE.ShaderMaterial({
+	    uniforms: THREE.UniformsUtils.merge([
+			        this.relativisticUniforms,
+					{ "horizonArcColor": { type: "c", value: this.skyColor, }, },
+		]),
+	    vertexShader:   readFile("shaders/covariantHorizonArc.vs"),
+	    fragmentShader: readFile("shaders/covariantHorizonArc.fs"),
+	});
 
-	this.horizonMaterial = new THREE.MeshBasicMaterial({
-		color: 0xFFFFFF,
-	    shading: THREE.FlatShading, 
-		vertexColors: THREE.VertexColors
+	this.horizonBackgroundMaterial =  new THREE.ShaderMaterial({
+	    uniforms: THREE.UniformsUtils.merge([
+			        this.relativisticUniforms,
+					{ "horizonBackgroundColor": { type: "c", value: this.groundColor, }, },
+		]),
+	    vertexShader:   readFile("shaders/covariantHorizonBackground.vs"),
+	    fragmentShader: readFile("shaders/covariantHorizonBackground.fs"),
 	});
 
 	this.mesh = new THREE.Object3D();
 	
-	this.horizonBackground = this.createRectangle();
+	this.horizonBackground = this.createRectangle(this.horizonBackgroundMaterial);
 	this.mesh.add(this.horizonBackground);
 
 	this.horizonArc = this.createHorizonArc();
 	this.horizonArc.position.z = -this.horizonArcZshift;
 	this.mesh.add(this.horizonArc);
 
-	this.verticalRect = this.createRectangle();
+	this.verticalRect = this.createRectangle(this.horizonArcMaterial);
 	this.verticalRect.position.z = -this.horizonArcZshift;
 	this.mesh.add(this.verticalRect);
 
-	this.horizontalRect = this.createRectangle();
+	this.horizontalRect = this.createRectangle(this.horizonArcMaterial);
 	this.horizontalRect.position.z = -this.horizonArcZshift;
 	this.mesh.add(this.horizontalRect);
 
-	this.edgeRect = this.createRectangle();
+	this.edgeRect = this.createRectangle(this.horizonArcMaterial);
 	this.edgeRect.position.z = -this.horizonArcZshift;
 	this.mesh.add(this.edgeRect);
 };
@@ -125,7 +142,7 @@ Horizon.prototype = {
 		this.gamma = 1/Math.sqrt(1-beta*beta);
 	},
 
-	createRectangle: function () {
+	createRectangle: function (rectangleMaterial) {
 	    var rectangle, rectangleGeometry, rectangleFace;
 
 		rectangleGeometry = new THREE.Geometry();
@@ -159,7 +176,7 @@ Horizon.prototype = {
         rectangleGeometry.faceVertexUvs[0] = [];
 		rectangleGeometry.computeCentroids();
 				
-		rectangle = new THREE.Mesh(rectangleGeometry, this.horizonMaterial);
+		rectangle = new THREE.Mesh(rectangleGeometry, rectangleMaterial);
 		
 	    rectangle.doubleSided = true;
 		rectangle.visible = true;
@@ -213,7 +230,7 @@ Horizon.prototype = {
 	    this.horizonArcGeometry.faceVertexUvs[0] = [];		
 	    this.horizonArcGeometry.computeCentroids();
 		
-		horizonArc = new THREE.Mesh(this.horizonArcGeometry, this.horizonMaterial);
+		horizonArc = new THREE.Mesh(this.horizonArcGeometry, this.horizonArcMaterial);
 		
 	    horizonArc.doubleSided = true;
 		
@@ -231,6 +248,22 @@ Horizon.prototype = {
 		geometry.colorsNeedUpdate = true;
 	},
 
+	updateHorizonArcColor: function (color) {
+		this.updateColor(this.horizonArc, color);
+		this.horizonArcColor = color;
+		this.horizonArcMaterial.uniforms.horizonArcColor.value = color;
+	},
+	
+	updateHorizonBackgroundColor: function () {
+		if (this.horizonArcColor === this.skyColor) {
+			this.updateColor(this.horizonBackground, this.groundColor);
+			this.horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = this.groundColor;
+		} else {
+			this.updateColor(this.horizonBackground, this.skyColor);
+			this.horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = this.skyColor;
+		}
+	},
+	
     isCurvatureNeglegible: function (v0, vn, center) {
 	    var curvature, v0n, vr, vc, length;
 		
@@ -552,8 +585,7 @@ Horizon.prototype = {
 				angles
 		    );
 		    this.horizonArcGeometry.vertices[2*n+1].copy(vRect);
-			this.updateColor(this.horizonArc, this.groundColor);
-			this.horizonArcColor = this.groundColor;
+			this.updateHorizonArcColor(this.groundColor);
 		} else {
             vRect = this.findRectificationVertex(
 			    this.horizonArcGeometry.vertices[0], 
@@ -562,11 +594,9 @@ Horizon.prototype = {
 			);	
 		    this.horizonArcGeometry.vertices[2*n+1].copy(vRect);
 			if (angles.sinPitchAngle > 0) {
-				this.updateColor(this.horizonArc, this.skyColor);
-				this.horizonArcColor = this.skyColor;
+				this.updateHorizonArcColor(this.skyColor);
 			} else {
-				this.updateColor(this.horizonArc, this.groundColor);
-				this.horizonArcColor = this.groundColor;
+				this.updateHorizonArcColor(this.groundColor);
 			}
 		}
 
@@ -611,25 +641,15 @@ Horizon.prototype = {
 		this.horizonArcGeometry.vertices[2*this.granularity].copy(center);		
 		
 		if (angles.sinPitchAngle > 0) {
-		    this.updateColor(this.horizonArc, this.skyColor);
-			this.horizonArcColor = this.skyColor;
+		    this.updateHorizonArcColor(this.skyColor);
 		} else {
-		    this.updateColor(this.horizonArc, this.groundColor);
-			this.horizonArcColor = this.groundColor;
+		    this.updateHorizonArcColor(this.groundColor);
 		}
 
    	    this.horizonArcGeometry.verticesNeedUpdate = true;
 		this.horizonArc.visible = true;
 	},
 
-	updateHorizonBackgroundColor: function () {
-		if (this.horizonArcColor === this.skyColor) {
-			this.updateColor(this.horizonBackground, this.groundColor);
-		} else {
-			this.updateColor(this.horizonBackground, this.skyColor);
-		}
-	},
-	
 	update: function (angles) {
 	    var cosReferenceViewConeAngle = Math.cos(this.referenceViewConeAngle);
 		
