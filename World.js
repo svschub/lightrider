@@ -26,7 +26,9 @@ World = function () {
     pointLight.position.z = 10;
     this.scene.add(pointLight);		
 		
-	setObjectProperties(this.scene, {frustumCulled: false});
+	THREE.SceneUtils.traverseHierarchy(this.scene, function (child) {
+	    child.frustumCulled = false;
+	});
 	
 	this.setBoostParameters(0);
 };
@@ -135,7 +137,6 @@ World.prototype = {
 				})
 			);
 			column.position.x = i*dx - (number-1)*dx/2;
-//		    column.frustumCulled = false;
 
 			columnRow.add(column);
 		}
@@ -178,7 +179,6 @@ World.prototype = {
 			})
 		);
         building.position.y = 3;
-//		building.frustumCulled = false;
 		palace.add(building);
 
 		roof = new THREE.Mesh(
@@ -190,7 +190,6 @@ World.prototype = {
 		);
 		roof.rotation.x = Math.PI/2;
         roof.position.y = 6.25;
-//		roof.frustumCulled = false;
 		palace.add(roof);
 		
 		top = new THREE.Mesh(
@@ -201,7 +200,6 @@ World.prototype = {
 			})
 		);
         top.position.y = 8;
-//		top.frustumCulled = false;
 		palace.add(top);
 
 		return palace;
@@ -220,7 +218,6 @@ World.prototype = {
 			})
 		);
 		building.position.y = 2;
-//		building.frustumCulled = false;
         church.add(building);
 		
 		tower = new THREE.Mesh(
@@ -231,7 +228,6 @@ World.prototype = {
 			})
 		);
 		tower.position = new THREE.Vector3(0,4.5,5.5);
-//		tower.frustumCulled = false;
 		church.add(tower);
 
 		var r=0.2;
@@ -245,7 +241,6 @@ World.prototype = {
 		);
 		towerRoof.rotation.y = Math.PI/4;
 		towerRoof.position = new THREE.Vector3(0,10.5,5.5);
-//		towerRoof.frustumCulled = false;
 		church.add(towerRoof);
 
 		crossVerticalBar = new THREE.Mesh(
@@ -257,7 +252,6 @@ World.prototype = {
 		);
 		crossVerticalBar.rotation.x = Math.PI/2;
 		crossVerticalBar.position = new THREE.Vector3(0,14,5.5);
-//		crossVerticalBar.frustumCulled = false;
         church.add(crossVerticalBar);
 
 		crossHorizontalBar = new THREE.Mesh(
@@ -269,7 +263,6 @@ World.prototype = {
 		);
 		crossHorizontalBar.rotation.y = Math.PI/2;
 		crossHorizontalBar.position = new THREE.Vector3(0,15,5.5);
-//		crossHorizontalBar.frustumCulled = false;
         church.add(crossHorizontalBar);
 		
 		return church;
@@ -285,7 +278,6 @@ World.prototype = {
 				color: 0x777777,
 			})
 		);
-//		runway.frustumCulled = false;
 		
 		return runway;
 	}	

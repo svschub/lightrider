@@ -5,12 +5,18 @@ Horizon = function () {
     this.skyColor = new THREE.Color(0x3355AA);
 	this.groundColor = new THREE.Color(0x446600);
 			
-	this.mesh = new THREE.Object3D();
-	
 	this.boundingRadius = 1;
 	this.granularity = 16;
 	this.horizonArcZshift = 100;  // TODO
 
+	this.horizonMaterial = new THREE.MeshBasicMaterial({
+		color: 0xFFFFFF,
+	    shading: THREE.FlatShading, 
+		vertexColors: THREE.VertexColors
+	});
+
+	this.mesh = new THREE.Object3D();
+	
 	this.horizonBackground = this.createRectangle();
 	this.mesh.add(this.horizonBackground);
 
@@ -153,14 +159,7 @@ Horizon.prototype = {
         rectangleGeometry.faceVertexUvs[0] = [];
 		rectangleGeometry.computeCentroids();
 				
-		rectangle = new THREE.Mesh(
-			rectangleGeometry, 
-			new THREE.MeshBasicMaterial({
-				color: 0xFFFFFF,
-			    shading: THREE.FlatShading, 
-				vertexColors: THREE.VertexColors
-			})
-		);
+		rectangle = new THREE.Mesh(rectangleGeometry, this.horizonMaterial);
 		
 	    rectangle.doubleSided = true;
 		rectangle.visible = true;
@@ -214,14 +213,7 @@ Horizon.prototype = {
 	    this.horizonArcGeometry.faceVertexUvs[0] = [];		
 	    this.horizonArcGeometry.computeCentroids();
 		
-		horizonArc = new THREE.Mesh(
-			this.horizonArcGeometry, 
-			new THREE.MeshBasicMaterial({
-				color: 0xFFFFFF,
-			    shading: THREE.FlatShading, 
-				vertexColors: THREE.VertexColors
-			})
-		);
+		horizonArc = new THREE.Mesh(this.horizonArcGeometry, this.horizonMaterial);
 		
 	    horizonArc.doubleSided = true;
 		

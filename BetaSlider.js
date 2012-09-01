@@ -57,18 +57,18 @@ BetaSlider.prototype = {
         this.scale.moveTo(0, 4);
         this.scale.lineTo(lineWidth, 4);
         this.scale.stroke();	
-		$("#betaScale0").css({
-		    left: scalePosition.left + 30, 
-			top: scalePosition.top + this.scaleHeight - 19,
-		});
-		
-		this.scale.beginPath();
-        this.scale.moveTo(0, this.scaleHeight-4);
-        this.scale.lineTo(lineWidth, this.scaleHeight-4);
-        this.scale.stroke();			
 		$("#betaScale1").css({
 		    left: scalePosition.left + 30, 
 			top: scalePosition.top - 11,
+		});
+		
+		this.scale.beginPath();
+        this.scale.moveTo(0, this.scaleHeight-2);
+        this.scale.lineTo(lineWidth, this.scaleHeight-2);
+        this.scale.stroke();			
+		$("#betaScale0").css({
+		    left: scalePosition.left + 30, 
+			top: scalePosition.top + this.scaleHeight - 16,
 		});
 	},
 	

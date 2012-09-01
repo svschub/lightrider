@@ -24,31 +24,7 @@ function readFile(fileName) {
 }
 
 function setVisibility (object3d, visible) {
-    if (object3d instanceof THREE.Object3D) {
-        object3d.visible = visible;
-
-	    if (object3d.children === undefined) {
-	        return;
-	    }
-
-		for (var i=0; i < object3d.children.length; i++) {
-			setVisibility(object3d.children[i], visible);
-		}
-	}
-}
-
-function setObjectProperties (object3d, properties) {
-    if (object3d instanceof THREE.Object3D) {
-        for (property in properties) {
-		    object3d[property] = properties[property];
-		}
-
-	    if (object3d.children === undefined) {
-	        return;
-	    }
-
-		for (var i=0; i < object3d.children.length; i++) {
-			setObjectProperties(object3d.children[i], properties);
-		}
-	}
+	THREE.SceneUtils.traverseHierarchy(object3d, function (child) {
+	    child.visible = visible;
+	});
 }
