@@ -1,9 +1,9 @@
 
-varying vec3 vLightFront;
-
 uniform int boostEnabled;
 uniform float beta;
 uniform float gamma;
+
+varying vec3 vLightFront;
 
 #ifdef DOUBLE_SIDED
     varying vec3 vLightBack;
@@ -12,16 +12,6 @@ uniform float gamma;
 #ifdef USE_MAP
     varying vec2 vUv;
     uniform vec4 offsetRepeat;
-#endif
-
-#ifdef USE_LIGHTMAP
-    varying vec2 vUv2;
-#endif
-
-#ifdef USE_ENVMAP
-    varying vec3 vReflect;
-    uniform float refractionRatio;
-    uniform bool useRefract;
 #endif
 
 uniform vec3 ambient;
@@ -69,30 +59,11 @@ uniform vec3 ambientLightColor;
     #endif
 #endif
 
-#ifdef USE_SHADOWMAP
-    varying vec4 vShadowCoord[ MAX_SHADOWS ];
-    uniform mat4 shadowMatrix[ MAX_SHADOWS ];
-#endif
-
 void main() {
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
 	#ifdef USE_MAP
         vUv = uv * offsetRepeat.zw + offsetRepeat.xy;
-    #endif
-
-	#ifdef USE_LIGHTMAP
-        vUv2 = uv2;
-    #endif
-
-	#ifdef USE_ENVMAP
-        vec4 mPosition = objectMatrix * vec4( position, 1.0 );
-        vec3 nWorld = mat3( objectMatrix[ 0 ].xyz, objectMatrix[ 1 ].xyz, objectMatrix[ 2 ].xyz ) * normal;
-        if ( useRefract ) {
-            vReflect = refract( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ), refractionRatio );
-        } else {
-            vReflect = reflect( normalize( mPosition.xyz - cameraPosition ), normalize( nWorld.xyz ) );
-        }
     #endif
 
 	#ifdef USE_COLOR
@@ -264,15 +235,5 @@ void main() {
                 gl_Position = projectionMatrix * vec4(mvPosition.x, mvPosition.y, gamma*mvPosition.z - gamma*beta*ct, mvPosition.w);
 			}
         #endif
-    #endif
-
-	#ifdef USE_SHADOWMAP
-        for( int i = 0; i < MAX_SHADOWS; i ++ ) {
-            #ifdef USE_MORPHTARGETS
-                vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( morphed, 1.0 );
-            #else
-                vShadowCoord[ i ] = shadowMatrix[ i ] * objectMatrix * vec4( position, 1.0 );
-            #endif
-        }
     #endif
 }

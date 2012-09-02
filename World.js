@@ -99,8 +99,16 @@ World.prototype = {
 		
 		if (material.map) {
 		    materialUniforms.map.texture = THREE.ImageUtils.loadTexture(material.map);
-			vertexShaderCode = "#define USE_MAP\n" + this.vertexShaderCode;
-			fragmentShaderCode = "#define USE_MAP\n" + this.fragmentShaderCode;
+
+			vertexShaderCode = [
+			    "#define USE_MAP",
+				this.vertexShaderCode,
+			].join("\n");
+			
+			fragmentShaderCode = [
+			    "#define USE_MAP",
+				this.fragmentShaderCode,
+			].join("\n");
 		}
 
 		this.material.push({

@@ -9,29 +9,8 @@ Horizon = function () {
 	this.granularity = 16;
 	this.horizonArcZshift = 100;  // TODO
 				
-	this.relativisticUniforms = {
-		"beta": { type: "f", value: 0.0 },
-		"gamma": { type: "f", value: 1.0 },
-	};
+    this.initShaders();
 	
-	this.horizonArcMaterial =  new THREE.ShaderMaterial({
-	    uniforms: THREE.UniformsUtils.merge([
-			        this.relativisticUniforms,
-					{ "horizonArcColor": { type: "c", value: this.skyColor, }, },
-		]),
-	    vertexShader:   readFile("shaders/covariantHorizonArc.vs"),
-	    fragmentShader: readFile("shaders/covariantHorizonArc.fs"),
-	});
-
-	this.horizonBackgroundMaterial =  new THREE.ShaderMaterial({
-	    uniforms: THREE.UniformsUtils.merge([
-			        this.relativisticUniforms,
-					{ "horizonBackgroundColor": { type: "c", value: this.groundColor, }, },
-		]),
-	    vertexShader:   readFile("shaders/covariantHorizonBackground.vs"),
-	    fragmentShader: readFile("shaders/covariantHorizonBackground.fs"),
-	});
-
 	this.mesh = new THREE.Object3D();
 	
 	this.horizonBackground = this.createRectangle(this.horizonBackgroundMaterial);
@@ -57,6 +36,49 @@ Horizon = function () {
 Horizon.prototype = {
     constructor: Horizon,
 
+	initShaders: function () {
+		var horizonVertexShaderCode = readFile("shaders/covariantHorizon.vs"),
+		    horizonFragmentShaderCode = readFile("shaders/covariantLambert.fs"),
+			relativityUniforms = {
+			    "beta": { type: "f", value: 0.0 },
+			    "gamma": { type: "f", value: 1.0 },
+		    };
+		
+		this.horizonArcMaterial = new THREE.ShaderMaterial({
+			uniforms: THREE.UniformsUtils.merge([
+				THREE.UniformsUtils.clone(THREE.ShaderLib['lambert'].uniforms),
+				relativityUniforms,
+				{ "horizonArcColor": { type: "c", value: this.skyColor, }, },
+			]),
+			vertexShader: [
+			    "#define HORIZON_ARC",
+				horizonVertexShaderCode,
+			].join("\n"),
+			fragmentShader: [
+			    "#define HORIZON",
+				"#define USE_COLOR",
+				horizonFragmentShaderCode,
+			].join("\n"),
+		});
+
+		this.horizonBackgroundMaterial = new THREE.ShaderMaterial({
+			uniforms: THREE.UniformsUtils.merge([
+				THREE.UniformsUtils.clone(THREE.ShaderLib['lambert'].uniforms),
+				relativityUniforms,
+				{ "horizonBackgroundColor": { type: "c", value: this.groundColor, }, },
+			]),
+			vertexShader: [
+			    "#define HORIZON_BACKGROUND",
+				horizonVertexShaderCode,
+			].join("\n"),
+			fragmentShader: [
+			    "#define HORIZON",
+				"#define USE_COLOR",
+				horizonFragmentShaderCode,
+			].join("\n"),
+		});
+	},
+	
     setZ: function (z) {
 		this.mesh.position.z = z;
     },
