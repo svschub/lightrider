@@ -187,13 +187,6 @@ Horizon.prototype = {
 			this.horizonNormal.clone(),
 		];
 
-		rectangleFace.vertexColors = [
-			this.skyColor.clone(),
-			this.skyColor.clone(),
-			this.skyColor.clone(),
-			this.skyColor.clone(),
-		];
-		
 		rectangleGeometry.faces.push(rectangleFace);
         rectangleGeometry.faceVertexUvs[0] = [];
 		rectangleGeometry.computeCentroids();
@@ -242,11 +235,6 @@ Horizon.prototype = {
 				this.horizonNormal.clone(), 
 				this.horizonNormal.clone(),
 			];
-			arcSlice.vertexColors = [
-				this.skyColor.clone(),
-				this.skyColor.clone(),
-				this.skyColor.clone(),
-			];
 			this.horizonArcGeometry.faces.push(arcSlice);
 		}
 	    this.horizonArcGeometry.faceVertexUvs[0] = [];		
@@ -259,33 +247,17 @@ Horizon.prototype = {
 		return horizonArc;
 	},
 		
-	updateColor: function (object, color) {
-	    var geometry = object.geometry,
-		    faces = geometry.faces;
-        for (var i = 0; i < faces.length; i++) {
-			for (var j = 0; j < faces[i].vertexColors.length; j++) {
-			    faces[i].vertexColors[j].copy(color);
-		    }
-		}
-		geometry.colorsNeedUpdate = true;
-	},
-
 	updateHorizonArcColor: function (color) {
-		this.updateColor(this.horizonArc, color);
 		this.horizonArcColor = color;
 		this.horizonArcMaterial.uniforms.horizonArcColor.value = color;
-	},
-	
-	updateHorizonBackgroundColor: function () {
+
 		if (this.horizonArcColor === this.skyColor) {
-			this.updateColor(this.horizonBackground, this.groundColor);
 			this.horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = this.groundColor;
 		} else {
-			this.updateColor(this.horizonBackground, this.skyColor);
 			this.horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = this.skyColor;
 		}
 	},
-	
+		
     isCurvatureNeglegible: function (v0, vn, center) {
 	    var curvature, v0n, vr, vc, length;
 		
@@ -528,16 +500,6 @@ Horizon.prototype = {
 		this.horizontalRect.visible = false;
 		this.verticalRect.visible = false;
 		this.edgeRect.visible = false;
-
-        if (this.horizonArcColor === this.skyColor) {
-		    this.updateColor(this.horizontalRect, this.skyColor);
-		    this.updateColor(this.verticalRect, this.skyColor);
-		    this.updateColor(this.edgeRect, this.skyColor);
-		} else {
-		    this.updateColor(this.horizontalRect, this.groundColor);
-		    this.updateColor(this.verticalRect, this.groundColor);
-		    this.updateColor(this.edgeRect, this.groundColor);
-		}
 		
 		if (this.isTriangle(v0, vn, vR)) {
 		    this.triangularHorizonArcCompletion(angles, v0, vn, vR);
@@ -686,20 +648,17 @@ Horizon.prototype = {
 			// horizon ground plane cuts the view cone in the reference frame:
 	        this.calculatePitchCircle(angles);
             this.updateOpenHorizonArc(angles);
-			this.updateHorizonBackgroundColor();
 		} else {
 			if (cosReferenceViewConeAngle < 0) {
                 // horizon ground plane completely within the view cone of the reference frame draw 360 deg horizon ...
                 this.updateClosedHorizonArc(angles);
-				this.updateHorizonBackgroundColor();
 			} else {
 		        // view cone angle in reference frame < 180 deg:
 				if (angles.sinPitchAngle >= 0) {
-				    this.horizonArcColor = this.groundColor; 
+				    this.updateHorizonArcColor(this.groundColor); 
 				} else {
-				    this.horizonArcColor = this.skyColor; 
+				    this.updateHorizonArcColor(this.skyColor); 
 				}
-				this.updateHorizonBackgroundColor();
 			}
 		}
 	},
