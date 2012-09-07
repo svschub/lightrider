@@ -1,9 +1,18 @@
 
-uniform int boostEnabled;
+uniform int isBoostEnabled;
+uniform int isDopplerEffectEnabled;
+
 uniform float beta;
 uniform float gamma;
+uniform float tanObserverViewConeAngle;
+uniform sampler2D dopplerShift;
+uniform sampler2D DopplerMap;
+uniform vec4 rgbmin;
+uniform vec4 rgbrange;
 
 uniform float opacity;
+
+varying vec4 vertexPosition;
 
 varying vec3 vLightFront;
 
@@ -57,5 +66,39 @@ void main() {
         gl_FragColor.xyz = sqrt( gl_FragColor.xyz );
     #endif
 
-//  TODO: if boostEnabled: modify gl_FragColor according to Doppler effect
+	if ( (isBoostEnabled > 0) && (isDopplerEffectEnabled > 0) ) {
+	    float radius = length(vertexPosition.xy);
+		float tanAngle = abs(radius/vertexPosition.z);
+		float ratio = abs(tanAngle/tanObserverViewConeAngle);
+
+	    vec2 uvVec = vec2(ratio, 0);	
+	    vec4 shiftVec = texture2D(dopplerShift, uvVec);
+
+		vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+		vec4 rescaled_col = vec4(0.0, 0.0, 0.0, 1.0);
+
+		uvVec.x = shiftVec.r;
+
+		uvVec.y = 0.25;  // red
+		rescaled_col = rgbrange*texture2D( DopplerMap, uvVec ) + rgbmin;
+		col += gl_FragColor.r * rescaled_col;
+
+		uvVec.y = 0.5;  // green
+		rescaled_col = rgbrange*texture2D( DopplerMap, uvVec ) + rgbmin;
+		col += gl_FragColor.g * rescaled_col;
+
+		uvVec.y = 0.75;  // blue
+		rescaled_col = rgbrange*texture2D( DopplerMap, uvVec ) + rgbmin;
+		col += gl_FragColor.b * rescaled_col;
+		
+		col.rgb = clamp(col.rgb, 0.0, 1.0);
+		col.a = 1.0;
+		
+		gl_FragColor = col;
+
+//		gl_FragColor.rgb *= shiftVec.x;
+//		gl_FragColor.a = 1.0;
+
+//		gl_FragColor.rgb *= ratio;
+	}
 }

@@ -1,5 +1,5 @@
 
-FlightModel = function () {
+FlightModel = function (covariantMaterials) {
     this.position = new THREE.Vector3(0,0,0);
 	this.speed = 0.0;
 
@@ -27,7 +27,7 @@ FlightModel = function () {
 	this.cosYawAngle = 1.0;  // 0 .. 360
 	this.yawSpeed = 0.0;
 		
-	this.createCabin();
+	this.createCabin(covariantMaterials);
 };
 
 FlightModel.prototype = {
@@ -155,13 +155,13 @@ FlightModel.prototype = {
         this.cockpit.update(this.getAngles());		
 	},
 
-	createCabin: function () {
+	createCabin: function (covariantMaterials) {
 		this.cabin = new THREE.Object3D();        
 
 	    this.cockpit = new Cockpit();
 		this.cabin.add(this.cockpit.mesh);
 
-        this.observer = new Observer();
+        this.observer = new Observer(covariantMaterials);
 		this.cabin.add(this.observer.mesh);
 		
 		this.update();

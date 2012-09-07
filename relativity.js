@@ -7,7 +7,9 @@
 		planeLoop,
 		lookDownGroup,
 		loopMilliseconds,
-		beta, beta_next;
+		beta, beta_next,
+		dopplerShiftRescale, dopplerShiftRescale_next,
+		boost;
 
 	function initKeyboardEvents() {
 	    keyPressed = new Array(256);
@@ -29,9 +31,11 @@
     function initWorld() {
         var canvasWidth=1400, canvasHeight=800;
 		
-	    world = new World();
+		boost = new BoostFactory();
+		
+	    world = new World(boost);
 
-		plane = new FlightModel();
+		plane = new FlightModel(boost);
 		plane.position = new THREE.Vector3(0,10,13);
 		plane.observer.setViewport(canvasWidth, canvasHeight);
         world.add(plane.cabin);
@@ -111,7 +115,7 @@
 		
 	    $("#altitude").html("alt " + plane.getAltitude().toFixed(1) + " m");
 
-		viewConeAngle = 360*plane.observer.referenceViewConeAngle/Math.PI;
+		viewConeAngle = 360*boost.referenceViewConeAngle/Math.PI;
 	    $("#viewConeAngle").html("fov " + viewConeAngle.toFixed(1) + " deg");
     }
 	
@@ -119,10 +123,16 @@
   	    var angles = plane.getAngles(),
 		    position = plane.getPosition();
 			
+        if (dopplerShiftRescale_next != dopplerShiftRescale) {
+			dopplerShiftRescale = dopplerShiftRescale_next;
+			boost.dopplerShiftTable.update({
+				dopplerShiftRescale: dopplerShiftRescale,
+			});
+		}
+
 		if (beta_next != beta) {
 			beta = beta_next;
-			world.setBoostParameters(beta);
-			plane.observer.setBoostParameters(beta);
+			boost.setBoostParameters(beta);
 		}
 
 		updateHudIndicators();
@@ -130,12 +140,12 @@
         lookDownGroup.setPosition(position);
 		lookDownGroup.setViewAngle(angles);
 
-        world.disableBoost();
+        boost.disableBoost();
 	    setVisibility(lookDownGroup.mesh, true);
 		setVisibility(plane.cabin, false);
 		renderer.render(world.scene, lookDownGroup.camera, plane.cockpit.lookDownImage, true);
 		
-        world.enableBoost();
+        boost.enableBoost();
 		setVisibility(lookDownGroup.mesh, false);
 		setVisibility(plane.cabin, true);
         renderer.render(world.scene, plane.observer.camera);
@@ -158,6 +168,22 @@
 			handle: function (value) {
 			    beta_next = Math.min(value, 0.9999);
 			},
+		});
+		
+		$("#setDopplerEffect").attr('checked', false);
+		$("#setDopplerEffect").click(function () {
+			if ($(this).is(':checked')) {
+			    boost.enableDopplerEffect();
+			} else {
+			    boost.disableDopplerEffect();
+			};
+		});
+
+		dopplerShiftRescale = -1;
+		dopplerShiftRescale_next = parseFloat( $("#dopplerShiftRescale").val() );
+		
+		$("#dopplerShiftRescale").bind("change", function () {
+			dopplerShiftRescale_next = parseFloat( $("#dopplerShiftRescale").val() );
 		});
 		
 		loopMilliseconds = 30;

@@ -2,6 +2,8 @@
 uniform float beta;
 uniform float gamma;
 
+varying vec4 vertexPosition;
+
 #ifdef HORIZON_ARC
     uniform vec3 horizonArcColor;
 #endif
@@ -21,6 +23,6 @@ void main() {
         vColor = horizonBackgroundColor;
     #endif
 
-    vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
-    gl_Position  = projectionMatrix * mvPosition;
+    vertexPosition = modelViewMatrix * vec4( position, 1.0 );
+    gl_Position  = projectionMatrix * vertexPosition;
 }

@@ -18,6 +18,14 @@
 				<canvas id="betaScale" width="100" height="200">
 					Browser does not support canvas!
 				</canvas>
+				<div id="options">
+					<div>Doppler Effect</div>
+					<div><input type="checkbox" id="setDopplerEffect" value="yes" /></div>
+					<div class="verticalSpace"></div>
+					<div>Rescale Doppler</div>
+					<div><input type="text" id="dopplerShiftRescale" value="0.3" /></div>
+				</div>
+				<!-- div class="clearLeft" -->
 			</div>
 		    <div id="display">
 		        <div class="vertical yellow" id="speed"></div>
@@ -34,8 +42,9 @@
         <script type="text/javascript" src="../../js/three/Three.js"></script>
 				
         <script type="text/javascript" src="common.js"></script>
-        <script type="text/javascript" src="boost.js"></script>
         <script type="text/javascript" src="BetaSlider.js"></script>
+        <script type="text/javascript" src="DopplerShiftTable.js"></script>
+        <script type="text/javascript" src="BoostFactory.js"></script>
         <script type="text/javascript" src="CockpitGeometry.js"></script>
         <script type="text/javascript" src="LookDownGroup.js"></script>
         <script type="text/javascript" src="DisplayGeometry.js"></script>

@@ -10,19 +10,25 @@ body {
 }
 
 #display {
+	display: block;
     position: absolute;
     z-index: 100;
     font-size: 2em;
     font-weight: bold;
 }
 
-.vertical {
-    display: block;
-    float: top;
-}
-
 .yellow {
     color: yellow;
+}
+
+.verticalSpace {
+    display: block;
+    position: relative;
+	height: 50px;
+}
+
+.vertical {
+    display: block;
 }
 
 .horizontal {
@@ -30,11 +36,28 @@ body {
 	float: left;
 }
 
+.leftColumn {
+    display: block;
+	float: left;
+}
+
+.rightColumn {
+    display: block;
+	width: 200;
+}
+
+.clearLeft {
+    clear: left;
+}
+
 #betaSlider {
     position: relative;
     display: block;
 	float: left;
+
+    width: 10x;
 	height: 200px;
+
 	background: #b0b0b0;
 	color: #ff0000;
 }
@@ -43,6 +66,8 @@ body {
     position: relative;
     display: block;
 	float: left;
+
+	width: 100px;
 	background: #efefef;
 }
 
@@ -60,6 +85,15 @@ body {
     font-family: Monospace;
     font-size: 20pt;
     font-weight: bold;
+}
+
+#options {
+    position: relative;
+    display: block;
+	float: left;
+
+	width: 200px;
+	background: #efefef;
 }
 
 .box {

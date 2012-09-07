@@ -1,4 +1,4 @@
-Horizon = function () {
+Horizon = function (boost) {
 	this.horizonNormal = new THREE.Vector3(0, 0, -1);
     this.groundNormal = new THREE.Vector3(0, 1, 0);
 
@@ -8,7 +8,9 @@ Horizon = function () {
 	this.boundingRadius = 1;
 	this.granularity = 16;
 	this.horizonArcZshift = 100;  // TODO
-				
+
+	this.boost = boost;
+	
     this.initShaders();
 	
 	this.mesh = new THREE.Object3D();
@@ -38,44 +40,34 @@ Horizon.prototype = {
 
 	initShaders: function () {
 		var horizonVertexShaderCode = readFile("shaders/covariantHorizon.vs"),
-		    horizonFragmentShaderCode = readFile("shaders/covariantLambert.fs"),
-			relativityUniforms = {
-			    "beta": { type: "f", value: 0.0 },
-			    "gamma": { type: "f", value: 1.0 },
-		    };
-		
-		this.horizonArcMaterial = new THREE.ShaderMaterial({
-			uniforms: THREE.UniformsUtils.merge([
-				THREE.UniformsUtils.clone(THREE.ShaderLib['lambert'].uniforms),
-				relativityUniforms,
-				{ "horizonArcColor": { type: "c", value: this.skyColor, }, },
-			]),
-			vertexShader: [
-			    "#define HORIZON_ARC",
-				horizonVertexShaderCode,
-			].join("\n"),
-			fragmentShader: [
-			    "#define HORIZON",
-				"#define USE_COLOR",
-				horizonFragmentShaderCode,
-			].join("\n"),
-		});
+		    horizonFragmentShaderCode = readFile("shaders/covariantLambert.fs");
 
-		this.horizonBackgroundMaterial = new THREE.ShaderMaterial({
-			uniforms: THREE.UniformsUtils.merge([
-				THREE.UniformsUtils.clone(THREE.ShaderLib['lambert'].uniforms),
-				relativityUniforms,
-				{ "horizonBackgroundColor": { type: "c", value: this.groundColor, }, },
-			]),
+		this.horizonArcMaterial = this.boost.setMaterial({
 			vertexShader: [
-			    "#define HORIZON_BACKGROUND",
+				"#define HORIZON_ARC",
 				horizonVertexShaderCode,
 			].join("\n"),
 			fragmentShader: [
-			    "#define HORIZON",
+				"#define HORIZON",
 				"#define USE_COLOR",
 				horizonFragmentShaderCode,
 			].join("\n"),
+
+			uniforms: { "horizonArcColor": { type: "c", value: this.skyColor, }, },
+		});
+		
+		this.horizonBackgroundMaterial = this.boost.setMaterial({
+			vertexShader: [
+				"#define HORIZON_BACKGROUND",
+				horizonVertexShaderCode,
+			].join("\n"),
+			fragmentShader: [
+				"#define HORIZON",
+				"#define USE_COLOR",
+				horizonFragmentShaderCode,
+			].join("\n"),
+
+			uniforms: { "horizonBackgroundColor": { type: "c", value: this.groundColor, }, },
 		});
 	},
 	
@@ -124,7 +116,7 @@ Horizon.prototype = {
 
         v = new THREE.Vector3(0, -this.viewSphereRadius*angles.sinPitchAngle, this.viewSphereRadius*angles.cosPitchAngle);
 		vRef = new THREE.Vector3(-v.y*angles.sinRollAngle, v.y*angles.cosRollAngle, v.z);
-		vObs = getBoostedVertex(vRef, -this.beta, this.gamma);
+		vObs = this.boost.getObserverVertex(vRef);
 
 		vObs.multiplyScalar((this.getZ()-this.horizonArcZshift)/vObs.z);
 		
@@ -151,17 +143,9 @@ Horizon.prototype = {
 	updateObserverViewCone: function (viewconeparameters) {
 	    this.viewConeAngle = viewconeparameters.viewConeAngle;
 		this.viewSphereRadius = viewconeparameters.viewSphereRadius;
+
 		this.calculateBoundingCircle();
 		this.calculateAngularNormals();
-	},
-
-    setReferenceViewConeAngle: function (referenceViewConeAngle) {
-		this.referenceViewConeAngle = referenceViewConeAngle;        
-    },
-	
-	setBoostParameters: function (beta) {
-	    this.beta = beta;
-		this.gamma = 1/Math.sqrt(1-beta*beta);
 	},
 
 	createRectangle: function (rectangleMaterial) {
@@ -529,7 +513,7 @@ Horizon.prototype = {
 		
         for (var i=1; i <= n; i++) {
 			vObs.y += dy;
-            vRef = getBoostedVertex(vObs, this.beta, this.gamma);
+            vRef = this.boost.getReferenceVertex(vObs);
 			vRef.multiplyScalar(this.viewSphereRadius/vRef.length());
 			
 			h = -vRef.z*angles.sinPitchAngle/angles.cosPitchAngle;
@@ -539,7 +523,7 @@ Horizon.prototype = {
 			pRef.y = -dx*angles.sinRollAngle + h*angles.cosRollAngle;
 			pRef.z = vRef.z;
 			
-			pObs = getBoostedVertex(pRef,-this.beta,this.gamma);
+			pObs = this.boost.getObserverVertex(pRef);
 			pObs.multiplyScalar((this.getZ()-this.horizonArcZshift)/pObs.z);			
 
 			
@@ -551,7 +535,7 @@ Horizon.prototype = {
 			pRef.y = dx*angles.sinRollAngle + h*angles.cosRollAngle;
 			pRef.z = vRef.z;
 			
-			pObs = getBoostedVertex(pRef,-this.beta,this.gamma);
+			pObs = this.boost.getObserverVertex(pRef);
 			pObs.multiplyScalar((this.getZ()-this.horizonArcZshift)/pObs.z);
 			
   		    this.horizonArcGeometry.vertices[n+i].x = pObs.x;
@@ -604,7 +588,7 @@ Horizon.prototype = {
 			pCut.multiplyScalar(this.viewSphereRadius/pCut.length());
 			
             pRef.copy(pCut);
-			pObs = getBoostedVertex(pRef,-this.beta,this.gamma);
+			pObs = this.boost.getObserverVertex(pRef);
 			pObs.multiplyScalar((this.getZ()-this.horizonArcZshift)/pObs.z);
 
   		    this.horizonArcGeometry.vertices[i].x = pObs.x;
@@ -613,7 +597,7 @@ Horizon.prototype = {
 
             pRef.copy(pCut);
 			pRef.multiplyScalar(-1);
-			pObs = getBoostedVertex(pRef,-this.beta,this.gamma);
+			pObs = this.boost.getObserverVertex(pRef);
 			pObs.multiplyScalar((this.getZ()-this.horizonArcZshift)/pObs.z);
 
   		    this.horizonArcGeometry.vertices[i+this.granularity].x = pObs.x;
@@ -635,7 +619,7 @@ Horizon.prototype = {
 	},
 
 	update: function (angles) {
-	    var cosReferenceViewConeAngle = Math.cos(this.referenceViewConeAngle);
+	    var cosReferenceViewConeAngle = Math.cos(this.boost.referenceViewConeAngle);
 		
 		this.calculateGroundNormal(angles);
 

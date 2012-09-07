@@ -1,9 +1,9 @@
-World = function () {
+World = function (boost) {
     this.LOD = 4;  // level of detail
 	
     this.scene = new THREE.Scene();
 
-	this.initMaterialTable();
+	this.boost = boost;
 	
 	var church = this.church();
 	church.position = new THREE.Vector3(10,0,-15);
@@ -29,103 +29,10 @@ World = function () {
 	THREE.SceneUtils.traverseHierarchy(this.scene, function (child) {
 	    child.frustumCulled = false;
 	});
-	
-	this.setBoostParameters(0);
 };
 
 World.prototype = {
     constructor: World,
-
-	enableBoost: function () {		
-	    for (var i=0; i < this.material.length; i++) {
-			this.material[i].object.uniforms.boostEnabled.value = 1;
-		}
-	},
-
-	disableBoost: function () {		
-	    for (var i=0; i < this.material.length; i++) {
-			this.material[i].object.uniforms.boostEnabled.value = 0;
-		}
-	},
-
-	setBoostParameters: function (beta) {
-	    var gamma = 1/Math.sqrt(1-beta*beta);
-		
-	    for (var i=0; i < this.material.length; i++) {
-			this.material[i].object.uniforms.beta.value = beta;
-			this.material[i].object.uniforms.gamma.value = gamma;
-		}
-	},
-	
-	initMaterialTable: function () {
-	    this.material = [];
-	    this.vertexShaderCode = readFile("shaders/covariantLambert.vs");
-	    this.fragmentShaderCode = readFile("shaders/covariantLambert.fs");
-	}, 
-	
-	isMaterialEqual: function (material1, material2) {
-	    if (material1.map != material2.map) return false;
-        if (material1.ambient != material2.ambient)	return false;
-        if (material1.color != material2.color)	return false;
-        if (material1.shading != material2.shading)	return false;
-	    return true;
-	},
-	
-	setMaterial: function (material) {
-		var vertexShaderCode = this.vertexShaderCode,
-		    fragmentShaderCode = this.fragmentShaderCode;
-
-	    for (var i=0; i < this.material.length; i++) {
-		    if ( this.isMaterialEqual(material, this.material[i]) ) {
-				return this.material[i].object;
-			}
-		}
-		
-		var	materialUniforms = THREE.UniformsUtils.merge([
-			THREE.UniformsUtils.clone(THREE.ShaderLib['lambert'].uniforms),
-			{ 
-			    "boostEnabled": { type: "i", value: 0 },
-			    "beta": { type: "f", value: 1.0 },
-			    "gamma": { type: "f", value: 1.0 },
-			}, 
-		]);
-		
-		if (material.ambient) {
-            materialUniforms.ambient.value = new THREE.Color(material.ambient);
-		}
-		if (material.color) {
-            materialUniforms.diffuse.value = new THREE.Color(material.color);
-		}
-		
-		if (material.map) {
-		    materialUniforms.map.texture = THREE.ImageUtils.loadTexture(material.map);
-
-			vertexShaderCode = [
-			    "#define USE_MAP",
-				this.vertexShaderCode,
-			].join("\n");
-			
-			fragmentShaderCode = [
-			    "#define USE_MAP",
-				this.fragmentShaderCode,
-			].join("\n");
-		}
-
-		this.material.push({
-		    color: material.color,
-			map: material.map,
-			shading: material.shading,
-			object: new THREE.ShaderMaterial({
-			    uniforms:       materialUniforms,
-		        vertexShader:   vertexShaderCode,
-			    fragmentShader: fragmentShaderCode,
-			    shading:        material.shading,
-			    lights:         true,
-		    }),
-		});
-		
-		return this.material[this.material.length-1].object;
-	},
 	
 	add: function (object3d) {
         this.scene.add(object3d);
@@ -139,7 +46,7 @@ World.prototype = {
 		for (var i=0; i < number; i++) {
 			column = new THREE.Mesh(
 				new THREE.CylinderGeometry(radius, radius, height, 12, 4*this.LOD, false),
-				this.setMaterial({
+				this.boost.setMaterial({
 					color: 0x999999,
 					ambient: 0x777777,
 				})
@@ -181,7 +88,7 @@ World.prototype = {
 		
 		building = new THREE.Mesh(
 			new THREE.CubeGeometry(13, 6, 7, this.LOD*2, this.LOD, this.LOD),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xCCEECC,
 				color: 0xCCEECC,
 			})
@@ -191,7 +98,7 @@ World.prototype = {
 
 		roof = new THREE.Mesh(
 			new THREE.CubeGeometry(17, 11, 0.5, this.LOD*2, this.LOD*2, 1),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xCCEECC,
 				color: 0xCCEECC,
 			})
@@ -202,7 +109,7 @@ World.prototype = {
 		
 		top = new THREE.Mesh(
 			new THREE.CubeGeometry(6, 3, 4, this.LOD*2, this.LOD, this.LOD),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xCACA9C,
 				color: 0xCACA9C,
 			})
@@ -220,7 +127,7 @@ World.prototype = {
 		
 		building = new THREE.Mesh(
 			new THREE.CubeGeometry(6, 4, 8, this.LOD*2, this.LOD, this.LOD*2),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xCCEECC,
 				color: 0xCCEECC
 			})
@@ -230,7 +137,7 @@ World.prototype = {
 		
 		tower = new THREE.Mesh(
 			new THREE.CubeGeometry(3, 9, 3, this.LOD, this.LOD*2, this.LOD),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xCCEECC,
 				color: 0xCCEECC
 			})
@@ -241,7 +148,7 @@ World.prototype = {
 		var r=0.2;
 		towerRoof = new THREE.Mesh(
 			new THREE.CylinderGeometry(r,2.5,3, 16,4*this.LOD,false),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xFFAA99,
 				color: 0xFFAA99,
 		        shading: THREE.FlatShading, 
@@ -253,7 +160,7 @@ World.prototype = {
 
 		crossVerticalBar = new THREE.Mesh(
 			new THREE.CubeGeometry(r*1.41, r*1.41, 4, 1, 1, this.LOD),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xCACA9C,
 				color: 0xCACA9C
 			})
@@ -264,7 +171,7 @@ World.prototype = {
 
 		crossHorizontalBar = new THREE.Mesh(
 			new THREE.CubeGeometry(r*1.41, r*1.41, 2, 1, 1, this.LOD),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xCACA9C,
 				color: 0xCACA9C
 			})
@@ -281,7 +188,7 @@ World.prototype = {
 
 		runway = new THREE.Mesh(
 			new THREE.PlaneGeometry(10, 100, 2*this.LOD, 8*this.LOD),
-			this.setMaterial({
+			this.boost.setMaterial({
 				ambient: 0xAAAAAA,
 				color: 0x777777,
 			})
