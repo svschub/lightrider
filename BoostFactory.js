@@ -16,15 +16,15 @@ BoostFactory = function () {
 	    "beta": { type: "f", value: 0.0 },
 	    "gamma": { type: "f", value: 1.0 },
 	    "tanObserverViewConeAngle": { type: "f", value: 0.0 },
-		"DopplerMap": { type: "t", value: 1 },
 		"dopplerShift": { type: "t", value: 0 },
+		"dopplerMap": { type: "t", value: 1 },
 		"rgbmin" : { type: "v4", value: this.dopplerShiftTable.getRgbMinVector() },
 		"rgbrange" : { type: "v4", value: this.dopplerShiftTable.getRgbRangeVector() },
 	};
 
-	this.dopplerMap = THREE.ImageUtils.loadTexture('shaders/DopplerMap.png');
+	this.dopplerMap = THREE.ImageUtils.loadTexture('shaders/dopplerMap.png');
 
-    this.relativityUniforms.DopplerMap.texture = this.dopplerMap;
+    this.relativityUniforms.dopplerMap.texture = this.dopplerMap;
     this.relativityUniforms.dopplerShift.texture = this.dopplerShiftTable.texture;
 	
 	this.observerViewConeAngle = 0;
@@ -72,7 +72,7 @@ BoostFactory.prototype = {
 		this.dopplerShiftTable.update({
 			beta: this.beta, 
 			gamma: this.gamma, 
-			observerViewConeAngle: this.observerViewConeAngle,
+			tanObserverViewConeAngle: Math.tan(this.observerViewConeAngle),
 		});
 
 		this.calculateReferenceViewConeAngle();
@@ -142,7 +142,7 @@ BoostFactory.prototype = {
 			material.uniforms || {},
 		]);
 
-		uniforms.DopplerMap.texture = this.dopplerMap;		
+		uniforms.dopplerMap.texture = this.dopplerMap;		
 		uniforms.dopplerShift.texture = this.dopplerShiftTable.texture;
 
 		if (material.vertexShader) {

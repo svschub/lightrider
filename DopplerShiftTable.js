@@ -63,8 +63,8 @@ DopplerShiftTable.prototype = {
 
 		this.gamma = 1.0;
 
-		this.shiftRescale = 1.0;
-		this.shiftRescaleCalculated = -1.0;
+		this.dopplerShiftRescale = 1.0;
+		this.dopplerShiftRescaleCalculated = -1.0;
 	},
 	
 	enable: function () {
@@ -88,8 +88,8 @@ DopplerShiftTable.prototype = {
 
     calculateRelativisticValues: function () {	
 		var n = 3*this.tableSize,
-			tanAngle, dTanAngle, cosAngle, 
-		    tanAngleRef, cosAngleRef,
+			cosAngle, tanAngle, dTanAngle, 
+		    cosAngleRef, tanAngleRef, 
 			shift;
 		
 		tanAngle = 0;
@@ -102,7 +102,7 @@ DopplerShiftTable.prototype = {
 			if (tanAngleRef < 0) cosAngleRef = -cosAngleRef;
 
 			shift = this.gamma*(1 - this.beta*cosAngleRef);
-			shift = 1 + (shift - 1)*this.shiftRescale;
+			shift = 1 + (shift - 1)*this.dopplerShiftRescale;
 			
 			if (shift < this.shiftMin) shift = this.shiftMin;
 			if (shift > this.shiftMax) shift = this.shiftMax;
@@ -124,26 +124,17 @@ DopplerShiftTable.prototype = {
 
 	update: function (boostParameters) {
 	    if (typeof boostParameters !== "undefined") {
-	        if (boostParameters.beta) {
-				this.beta = boostParameters.beta;
-			}
-			if (boostParameters.gamma) {
-				this.gamma = boostParameters.gamma;
-			}
-			if (boostParameters.observerViewConeAngle) {
-				this.tanObserverViewConeAngle = Math.tan(boostParameters.observerViewConeAngle);
-			}
-			if (boostParameters.dopplerShiftRescale) {
-				this.shiftRescale = boostParameters.dopplerShiftRescale;
+			for (var property in boostParameters) {
+				this[property] = boostParameters[property];
 			}
         }
 		
 		if (this.isDopplerEffectEnabled) {
-		    if ( (this.beta != this.betaCalculated) || (this.shiftRescale != this.shiftRescaleCalculated) ) {
+		    if ( (this.beta != this.betaCalculated) || (this.dopplerShiftRescale != this.dopplerShiftRescaleCalculated) ) {
 		        this.calculateValues(); 
 
 				this.betaCalculated = this.beta;
-				this.shiftRescaleCalculated = this.shiftRescale;
+				this.dopplerShiftRescaleCalculated = this.dopplerShiftRescale;
 			}
 		}
 	},

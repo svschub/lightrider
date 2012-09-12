@@ -62,6 +62,15 @@ uniform vec3 ambientLightColor;
     #endif
 #endif
 
+vec4 boostedVertexPosition(in vec4 mvPosition) {
+	vec4 boostedVertex = mvPosition;
+	
+    if (isBoostEnabled != 0) { 
+		boostedVertex.z = gamma*( mvPosition.z - beta * length( mvPosition.xyz ) );
+	}
+	return boostedVertex;
+}
+
 void main() {
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
@@ -210,8 +219,7 @@ void main() {
     #ifdef USE_SKINNING
         vertexPosition = ( boneGlobalMatrices[ int( skinIndex.x ) ] * skinVertexA ) * skinWeight.x;
         vertexPosition += ( boneGlobalMatrices[ int( skinIndex.y ) ] * skinVertexB ) * skinWeight.y;
-        vertexPosition = modelViewMatrix * vertexPosition;
-		gl_Position = projectionMatrix * vertexPosition;
+        vertexPosition = boostedVertexPosition( modelViewMatrix * vertexPosition );
     #endif
 
 	#ifdef USE_MORPHTARGETS
@@ -227,19 +235,14 @@ void main() {
             morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];
         #endif
         morphed += position;
-		vertexPosition = modelViewMatrix * vec4( morphed, 1.0 );
-        gl_Position = projectionMatrix * vertexPosition;
-    #endif
+		vertexPosition = boostedVertexPosition( modelViewMatrix * vec4( morphed, 1.0 ) );
+    #endif  // #else, #elif
 
     #ifndef USE_MORPHTARGETS
         #ifndef USE_SKINNING
-		    if (isBoostEnabled == 0) { 
-				vertexPosition = mvPosition;
-            } else {			
-			    float ct = length(mvPosition.xyz);
-				vertexPosition = vec4(mvPosition.x, mvPosition.y, gamma*mvPosition.z - gamma*beta*ct, mvPosition.w);
-			}
-            gl_Position = projectionMatrix * vertexPosition;
+			vertexPosition = boostedVertexPosition( mvPosition );
         #endif
     #endif
+	
+	gl_Position = projectionMatrix * vertexPosition;
 }
