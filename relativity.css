@@ -10,7 +10,7 @@ body {
 }
 
 #display {
-	display: block;
+    display: block;
     position: absolute;
     z-index: 100;
     font-size: 2em;
@@ -24,7 +24,7 @@ body {
 .verticalSpace {
     display: block;
     position: relative;
-	height: 50px;
+    height: 50px;
 }
 
 .vertical {
@@ -33,17 +33,17 @@ body {
 
 .horizontal {
     display: block;
-	float: left;
+    float: left;
 }
 
 .leftColumn {
     display: block;
-	float: left;
+    float: left;
 }
 
 .rightColumn {
     display: block;
-	width: 200;
+    width: 200;
 }
 
 .clearLeft {
@@ -53,27 +53,27 @@ body {
 #betaSlider {
     position: relative;
     display: block;
-	float: left;
+    float: left;
 
     width: 10x;
-	height: 200px;
+    height: 200px;
 
-	background: #b0b0b0;
-	color: #ff0000;
+    background: #b0b0b0;
+    color: #ff0000;
 }
 
 #betaScale {
     position: relative;
     display: block;
-	float: left;
+    float: left;
 
-	width: 100px;
-	background: #efefef;
+    width: 100px;
+    background: #efefef;
 }
 
 #betaScaleTitle {
     position: absolute; 
-	z-index: 100;
+    z-index: 100;
     font-family: Monospace;
     font-size: 24pt;
     font-weight: bold;
@@ -81,7 +81,7 @@ body {
 
 .betaScaleBorders {
     position: absolute; 
-	z-index: 100;
+    z-index: 100;
     font-family: Monospace;
     font-size: 20pt;
     font-weight: bold;
@@ -90,10 +90,10 @@ body {
 #options {
     position: relative;
     display: block;
-	float: left;
+    float: left;
 
-	width: 200px;
-	background: #efefef;
+    width: 200px;
+    background: #efefef;
 }
 
 .box {

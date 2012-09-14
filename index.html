@@ -11,36 +11,36 @@
     </head>
 
     <body>
-	    <div>
-		    <div id="renderContainer" class="horizontal"></div>
-			<div class="horizontal box">
-				<div id="betaSlider"></div>
-				<canvas id="betaScale" width="100" height="200">
-					Browser does not support canvas!
-				</canvas>
-				<div id="options">
-					<div>Doppler Effect</div>
-					<div><input type="checkbox" id="setDopplerEffect" value="yes" /></div>
-					<div class="verticalSpace"></div>
-					<div>Rescale Doppler</div>
-					<div><input type="text" id="dopplerShiftRescale" value="0.3" /></div>
-				</div>
-				<!-- div class="clearLeft" -->
-			</div>
-		    <div id="display">
-		        <div class="vertical yellow" id="speed"></div>
-			    <div class="vertical yellow" id="altitude"></div>
-			    <div class="vertical yellow" id="viewConeAngle"></div>
-		    </div>
-		    <div id="betaScaleTitle" class="betaScaleBorders">v/c</div>
-		    <div id="betaScale0" class="betaScaleBorders">0</div>
-		    <div id="betaScale1" class="betaScaleBorders">1</div>
-		</div>
-			
+        <div>
+            <div id="renderContainer" class="horizontal"></div>
+            <div class="horizontal box">
+                <div id="betaSlider"></div>
+                <canvas id="betaScale" width="100" height="200">
+                    Browser does not support canvas!
+                </canvas>
+                <div id="options">
+                    <div>Doppler Effect</div>
+                    <div><input type="checkbox" id="setDopplerEffect" value="yes" /></div>
+                    <div class="verticalSpace"></div>
+                    <div>Rescale Doppler</div>
+                    <div><input type="text" id="dopplerShiftRescale" value="0.3" /></div>
+                </div>
+                <!-- div class="clearLeft" -->
+            </div>
+            <div id="display">
+                <div class="vertical yellow" id="speed"></div>
+                <div class="vertical yellow" id="altitude"></div>
+                <div class="vertical yellow" id="viewConeAngle"></div>
+            </div>
+            <div id="betaScaleTitle" class="betaScaleBorders">v/c</div>
+            <div id="betaScale0" class="betaScaleBorders">0</div>
+            <div id="betaScale1" class="betaScaleBorders">1</div>
+        </div>
+            
         <script type="text/javascript" src="../../js/jquery/jquery-1.7.1.min.js"></script>
         <script type="text/javascript" src="../../js/jquery/ui/jquery-ui-1.8.21.custom.min.js"></script>
         <script type="text/javascript" src="../../js/three/Three.js"></script>
-				
+                
         <script type="text/javascript" src="common.js"></script>
         <script type="text/javascript" src="BetaSlider.js"></script>
         <script type="text/javascript" src="DopplerShiftTable.js"></script>

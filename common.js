@@ -1,13 +1,13 @@
 
 function readFile(fileName) {  
     var shaderSource;
-		
+        
     $.ajax({
         url: "getFileContent.php",
         type: 'POST',
         data: {
-		    filename: fileName
-	    },
+            filename: fileName
+        },
         async: false,
         cache: false,
         timeout: 30000,
@@ -16,15 +16,15 @@ function readFile(fileName) {
             shaderSource = "";
         },
         success: function(response){
-		    shaderSource = response;
+            shaderSource = response;
         }
     });
 
-	return shaderSource;
+    return shaderSource;
 }
 
 function setVisibility (object3d, visible) {
-	THREE.SceneUtils.traverseHierarchy(object3d, function (child) {
-	    child.visible = visible;
-	});
+    THREE.SceneUtils.traverseHierarchy(object3d, function (child) {
+        child.visible = visible;
+    });
 }
