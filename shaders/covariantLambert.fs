@@ -44,56 +44,58 @@ void main() {
         #endif
     #endif
 
-	#ifdef ALPHATEST
+    #ifdef ALPHATEST
         if ( gl_FragColor.a < ALPHATEST ) discard;
     #endif
 
-	#ifndef HORIZON
-		#ifdef DOUBLE_SIDED
-			if ( gl_FrontFacing )
-				gl_FragColor.rgb *= vLightFront;
-			else
-				gl_FragColor.rgb *= vLightBack;
-		#else
-			gl_FragColor.rgb *= vLightFront;
-		#endif
+    #ifndef HORIZON
+        #ifdef DOUBLE_SIDED
+            if ( gl_FrontFacing )
+                gl_FragColor.rgb *= vLightFront;
+            else
+                gl_FragColor.rgb *= vLightBack;
+        #else
+            gl_FragColor.rgb *= vLightFront;
+        #endif
     #endif
 
-	#ifdef USE_COLOR
-		gl_FragColor = gl_FragColor * vec4( vColor, opacity );
-	#endif	
-	
-	#ifdef GAMMA_OUTPUT
+    #ifdef USE_COLOR
+        gl_FragColor = gl_FragColor * vec4( vColor, opacity );
+    #endif    
+    
+    #ifdef GAMMA_OUTPUT
         gl_FragColor.rgb = sqrt( gl_FragColor.rgb );
     #endif
 
-	if ( (isBoostEnabled > 0) && (isDopplerEffectEnabled > 0) ) {
-	    float radius = length( vertexPosition.xy );
-		float ratio = abs( radius/(vertexPosition.z*tanObserverViewConeAngle) );
+    if ( (isBoostEnabled > 0) && (isDopplerEffectEnabled > 0) ) {
+        vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
+        vec4 rescaled_col = vec4(0.0, 0.0, 0.0, 1.0);
 
-	    vec2 uvVec = vec2(ratio, 0);	
-	    vec4 shiftVec = texture2D( dopplerShift, uvVec );
+        // get normalized Doppler shift parameter by lookup:
+        float radius = length( vertexPosition.xy );
+        float ratio = abs( radius/(vertexPosition.z*tanObserverViewConeAngle) );
+        vec2 uvVec = vec2(ratio, 0);    
+        vec4 shiftVec = texture2D( dopplerShift, uvVec );
+        uvVec.s = shiftVec.r;
 
-		vec4 col = vec4(0.0, 0.0, 0.0, 1.0);
-		vec4 rescaled_col = vec4(0.0, 0.0, 0.0, 1.0);
+        // shift red channel:
+        uvVec.t = 0.25;
+        rescaled_col = rgbrange * texture2D( dopplerMap, uvVec ) + rgbmin;
+        col += gl_FragColor.r * rescaled_col;
 
-		uvVec.s = shiftVec.r;
+        // shift green channel:
+        uvVec.t = 0.5;
+        rescaled_col = rgbrange * texture2D( dopplerMap, uvVec ) + rgbmin;
+        col += gl_FragColor.g * rescaled_col;
 
-		uvVec.t = 0.25;  // red
-		rescaled_col = rgbrange * texture2D( dopplerMap, uvVec ) + rgbmin;
-		col += gl_FragColor.r * rescaled_col;
-
-		uvVec.t = 0.5;  // green
-		rescaled_col = rgbrange * texture2D( dopplerMap, uvVec ) + rgbmin;
-		col += gl_FragColor.g * rescaled_col;
-
-		uvVec.t = 0.75;  // blue
-		rescaled_col = rgbrange * texture2D( dopplerMap, uvVec ) + rgbmin;
-		col += gl_FragColor.b * rescaled_col;
-		
-		col.rgb = clamp(col.rgb, 0.0, 1.0);
-		col.a = 1.0;
-		
-		gl_FragColor = col;
-	}
+        // shift blue channel:
+        uvVec.t = 0.75;
+        rescaled_col = rgbrange * texture2D( dopplerMap, uvVec ) + rgbmin;
+        col += gl_FragColor.b * rescaled_col;
+        
+        col.rgb = clamp( col.rgb, 0.0, 1.0 );
+        col.a = 1.0;
+        
+        gl_FragColor = col;
+    }
 }

@@ -106,7 +106,7 @@ DopplerShiftTable.prototype = {
     },
 
     calculateValues: function () {
-        if (this.beta != 0) {
+        if (this.beta !== 0) {
             this.calculateRelativisticValues();
         } else {
             this.calculateNonrelativisticValues();
@@ -122,7 +122,7 @@ DopplerShiftTable.prototype = {
         }
         
         if (this.isDopplerEffectEnabled) {
-            if ( (this.beta != this.betaCalculated) || (this.dopplerShiftRescale != this.dopplerShiftRescaleCalculated) ) {
+            if ( (this.beta !== this.betaCalculated) || (this.dopplerShiftRescale !== this.dopplerShiftRescaleCalculated) ) {
                 this.calculateValues(); 
 
                 this.betaCalculated = this.beta;

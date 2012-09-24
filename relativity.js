@@ -120,7 +120,7 @@
     }
     
     function render() {    
-          var angles = plane.getAngles(),
+        var angles = plane.getAngles(),
             position = plane.getPosition();
             
         if (dopplerShiftRescale_next != dopplerShiftRescale) {
@@ -171,7 +171,7 @@
         });
         
         $("#setDopplerEffect").attr('checked', false);
-        $("#setDopplerEffect").click(function () {
+        $("#setDopplerEffect").bind("click", function () {
             if ($(this).is(':checked')) {
                 boost.enableDopplerEffect();
             } else {
@@ -181,9 +181,8 @@
 
         dopplerShiftRescale = -1;
         dopplerShiftRescale_next = parseFloat( $("#dopplerShiftRescale").val() );
-        
         $("#dopplerShiftRescale").bind("change", function () {
-            dopplerShiftRescale_next = parseFloat( $("#dopplerShiftRescale").val() );
+            dopplerShiftRescale_next = parseFloat( $(this).val() );
         });
         
         loopMilliseconds = 30;

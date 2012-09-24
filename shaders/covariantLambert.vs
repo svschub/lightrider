@@ -63,22 +63,22 @@ uniform vec3 ambientLightColor;
 #endif
 
 vec4 boostedVertexPosition(in vec4 mvPosition) {
-	vec4 boostedVertex = mvPosition;
-	
+    vec4 boostedVertex = mvPosition;
+    
     if (isBoostEnabled != 0) { 
-		boostedVertex.z = gamma*( mvPosition.z - beta * length( mvPosition.xyz ) );
-	}
-	return boostedVertex;
+        boostedVertex.z = gamma*( mvPosition.z - beta * length( mvPosition.xyz ) );
+    }
+    return boostedVertex;
 }
 
 void main() {
     vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
 
-	#ifdef USE_MAP
+    #ifdef USE_MAP
         vUv = uv * offsetRepeat.zw + offsetRepeat.xy;
     #endif
 
-	#ifdef USE_COLOR
+    #ifdef USE_COLOR
         #ifdef GAMMA_INPUT
             vColor = color * color;
         #else
@@ -86,7 +86,7 @@ void main() {
         #endif
     #endif
 
-	#ifdef USE_MORPHNORMALS
+    #ifdef USE_MORPHNORMALS
         vec3 morphedNormal = vec3( 0.0 );
         morphedNormal +=  ( morphNormal0 - normal ) * morphTargetInfluences[ 0 ];
         morphedNormal +=  ( morphNormal1 - normal ) * morphTargetInfluences[ 1 ];
@@ -98,11 +98,11 @@ void main() {
         vec3 transformedNormal = normalMatrix * normal;
     #endif
 
-	#ifndef USE_ENVMAP
+    #ifndef USE_ENVMAP
         vec4 mPosition = objectMatrix * vec4( position, 1.0 );
     #endif
 
-	vLightFront = vec3( 0.0 );
+    vLightFront = vec3( 0.0 );
     #ifdef DOUBLE_SIDED
         vLightBack = vec3( 0.0 );
     #endif
@@ -127,38 +127,38 @@ void main() {
                 vec3 directionalLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );
                 directionalLightWeighting = mix( directionalLightWeighting, directionalLightWeightingHalf, wrapRGB );
 
-				#ifdef DOUBLE_SIDED
+                #ifdef DOUBLE_SIDED
                     directionalLightWeightingBack = mix( directionalLightWeightingBack, directionalLightWeightingHalfBack, wrapRGB );
                 #endif
             #endif
 
-			vLightFront += directionalLightColor[ i ] * directionalLightWeighting;
-			#ifdef DOUBLE_SIDED
+            vLightFront += directionalLightColor[ i ] * directionalLightWeighting;
+            #ifdef DOUBLE_SIDED
                  vLightBack += directionalLightColor[ i ] * directionalLightWeightingBack;
             #endif
         }
     #endif
 
-	#if MAX_POINT_LIGHTS > 0
+    #if MAX_POINT_LIGHTS > 0
         for( int i = 0; i < MAX_POINT_LIGHTS; i ++ ) {
             vec4 lPosition = viewMatrix * vec4( pointLightPosition[ i ], 1.0 );
             vec3 lVector = lPosition.xyz - mvPosition.xyz;
             float lDistance = 1.0;
             if ( pointLightDistance[ i ] > 0.0 ) {
                 lDistance = 1.0 - min( ( length( lVector ) / pointLightDistance[ i ] ), 1.0 );
-			}
+            }
             lVector = normalize( lVector );
             float dotProduct = dot( transformedNormal, lVector );
             vec3 pointLightWeighting = vec3( max( dotProduct, 0.0 ) );
 
-			#ifdef DOUBLE_SIDED
+            #ifdef DOUBLE_SIDED
                 vec3 pointLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );
                 #ifdef WRAP_AROUND
                     vec3 pointLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );
                 #endif
             #endif
 
-			#ifdef WRAP_AROUND
+            #ifdef WRAP_AROUND
                 vec3 pointLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );
                 pointLightWeighting = mix( pointLightWeighting, pointLightWeightingHalf, wrapRGB );
                 #ifdef DOUBLE_SIDED
@@ -166,14 +166,14 @@ void main() {
                 #endif
             #endif
 
-			vLightFront += pointLightColor[ i ] * pointLightWeighting * lDistance;
-			#ifdef DOUBLE_SIDED
+            vLightFront += pointLightColor[ i ] * pointLightWeighting * lDistance;
+            #ifdef DOUBLE_SIDED
                 vLightBack += pointLightColor[ i ] * pointLightWeightingBack * lDistance;
             #endif
         }
-	#endif
+    #endif
 
-	#if MAX_SPOT_LIGHTS > 0
+    #if MAX_SPOT_LIGHTS > 0
         for( int i = 0; i < MAX_SPOT_LIGHTS; i ++ ) {
             vec4 lPosition = viewMatrix * vec4( spotLightPosition[ i ], 1.0 );
             vec3 lVector = lPosition.xyz - mvPosition.xyz;
@@ -184,18 +184,18 @@ void main() {
                 float lDistance = 1.0;
                 if ( spotLightDistance[ i ] > 0.0 ) {
                     lDistance = 1.0 - min( ( length( lVector ) / spotLightDistance[ i ] ), 1.0 );
-				}
+                }
                 float dotProduct = dot( transformedNormal, lVector );
                 vec3 spotLightWeighting = vec3( max( dotProduct, 0.0 ) );
 
                 #ifdef DOUBLE_SIDED
                     vec3 spotLightWeightingBack = vec3( max( -dotProduct, 0.0 ) );
                     #ifdef WRAP_AROUND
- 			            vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );
+                         vec3 spotLightWeightingHalfBack = vec3( max( -0.5 * dotProduct + 0.5, 0.0 ) );
                     #endif
                 #endif
 
-				#ifdef WRAP_AROUND
+                #ifdef WRAP_AROUND
                     vec3 spotLightWeightingHalf = vec3( max( 0.5 * dotProduct + 0.5, 0.0 ) );
                     spotLightWeighting = mix( spotLightWeighting, spotLightWeightingHalf, wrapRGB );
                     #ifdef DOUBLE_SIDED
@@ -211,7 +211,7 @@ void main() {
         }
     #endif
 
-	vLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;
+    vLightFront = vLightFront * diffuse + ambient * ambientLightColor + emissive;
     #ifdef DOUBLE_SIDED
         vLightBack = vLightBack * diffuse + ambient * ambientLightColor + emissive;
     #endif
@@ -222,7 +222,7 @@ void main() {
         vertexPosition = boostedVertexPosition( modelViewMatrix * vertexPosition );
     #endif
 
-	#ifdef USE_MORPHTARGETS
+    #ifdef USE_MORPHTARGETS
         vec3 morphed = vec3( 0.0 );
         morphed += ( morphTarget0 - position ) * morphTargetInfluences[ 0 ];
         morphed += ( morphTarget1 - position ) * morphTargetInfluences[ 1 ];
@@ -235,14 +235,14 @@ void main() {
             morphed += ( morphTarget7 - position ) * morphTargetInfluences[ 7 ];
         #endif
         morphed += position;
-		vertexPosition = boostedVertexPosition( modelViewMatrix * vec4( morphed, 1.0 ) );
-    #endif  // #else, #elif
+        vertexPosition = boostedVertexPosition( modelViewMatrix * vec4( morphed, 1.0 ) );
+    #endif
 
     #ifndef USE_MORPHTARGETS
         #ifndef USE_SKINNING
-			vertexPosition = boostedVertexPosition( mvPosition );
+            vertexPosition = boostedVertexPosition( mvPosition );
         #endif
     #endif
-	
-	gl_Position = projectionMatrix * vertexPosition;
+    
+    gl_Position = projectionMatrix * vertexPosition;
 }
