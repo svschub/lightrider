@@ -121,7 +121,7 @@ World.prototype = {
     },
     
     church: function () {
-        var church, tower, building;
+        var church, tower, towerRoof, building, crossHorizontalBar, crossVerticalBar;
 
         church = new THREE.Object3D();
         
