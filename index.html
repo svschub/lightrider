@@ -13,28 +13,39 @@
     <body>
         <div>
             <div id="renderContainer" class="horizontal"></div>
-            <div class="horizontal box">
-                <div id="betaSlider"></div>
-                <canvas id="betaScale" width="100" height="200">
-                    Browser does not support canvas!
-                </canvas>
-                <div id="options">
-                    <div>Doppler Effect</div>
-                    <div><input type="checkbox" id="setDopplerEffect" value="yes" /></div>
-                    <div class="verticalSpace"></div>
-                    <div>Rescale Doppler</div>
-                    <div><input type="text" id="dopplerShiftRescale" value="0.3" /></div>
+            <div id="instrumentContainer" class="horizontal">
+                <div class="horizontal">
+                    <div class="vertical scaleTitle">v/c</div>
+                    <div class="verticalSmallSpace"></div>
+                    <div class="vertical">
+                        <div class="horizontal">
+                            <div class="horizontal">
+                                <div class="verticalSmallSpace"></div>
+                                <div id="betaSlider" class="vertical"></div>
+                            </div>
+                            <canvas id="betaScale" class="horizontal" width="100" height="220">
+                                Browser does not support canvas!
+                            </canvas>
+                        </div>
+                    </div>
                 </div>
-                <!-- div class="clearLeft" -->
+                <div id="options" class="horizontal">
+                    <form action="" method="">
+                        <div class="verticalBigSpace"></div>
+                        <div class="mediumFont">Doppler Effect</div>
+                        <div><input type="checkbox" id="setDopplerEffect" value="yes" /></div>
+                        <div class="verticalSmallSpace"></div>
+                        <div class="mediumFont">Rescale Doppler</div>
+                        <div><input type="number" id="dopplerShiftRescale" class="mediumFont" min="-1.0" max="1.0" step="0.01" value="0.3"/></div>
+                    </form>
+                </div>
+                <div class="clearLeft"></div>
             </div>
-            <div id="display">
+            <div id="hudIndicators">
                 <div class="vertical yellow" id="speed"></div>
                 <div class="vertical yellow" id="altitude"></div>
                 <div class="vertical yellow" id="viewConeAngle"></div>
             </div>
-            <div id="betaScaleTitle" class="betaScaleBorders">v/c</div>
-            <div id="betaScale0" class="betaScaleBorders">0</div>
-            <div id="betaScale1" class="betaScaleBorders">1</div>
         </div>
             
         <script type="text/javascript" src="../../js/jquery/jquery-1.7.1.min.js"></script>

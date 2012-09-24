@@ -14,12 +14,14 @@ BetaSlider = function (properties) {
         
     $("#betaSlider .ui-slider-handle").unbind("keydown");
     
-    this.scaleHeight = 200;
+    this.sliderHeight = parseFloat($("#betaSlider").css("height"));
+
+    this.scaleHeight = parseFloat($("#betaScale").attr("height"));
+    this.scaleOffset = 0.5*(this.scaleHeight - this.sliderHeight);
     
     this.scale = $("#betaScale")[0].getContext('2d');
     this.scale.lineWidth = 3;
     this.scale.strokeStyle = "#000000";
-    this.scale.font = "normal 16pt Calibri";
     
     this.a = a;
     this.b = b;
@@ -34,53 +36,28 @@ BetaSlider.prototype = {
         return Math.log(beta/this.a + 1)/this.b;
     },
     
-    drawScaleEntry: function (beta, precision, lineWidth) {
-        var y = this.scaleHeight*(1.0-this.getScaleY(beta));
+    drawScaleEntry: function (beta, precision, lineWidth, fontsize) {
+        var y = this.scaleOffset + this.sliderHeight*(1.0-this.getScaleY(beta));
         
         this.scale.beginPath();
         this.scale.moveTo(0, y);
         this.scale.lineTo(lineWidth, y);
         this.scale.stroke();
         
-        this.scale.fillText(beta.toFixed(precision), 26, y + 6);
+        this.scale.fillText(beta.toFixed(precision), lineWidth + 13, y + fontsize/2 - 2);
     },
-    
-    drawScaleBorders: function (lineWidth) {
-        var scalePosition = $("#betaScale").position();
-        
-        $("#betaScaleTitle").css({
-            left: scalePosition.left - 10, 
-            top: scalePosition.top - 65,
-        });
 
-        this.scale.beginPath();
-        this.scale.moveTo(0, 4);
-        this.scale.lineTo(lineWidth, 4);
-        this.scale.stroke();    
-        $("#betaScale1").css({
-            left: scalePosition.left + 30, 
-            top: scalePosition.top - 11,
-        });
-        
-        this.scale.beginPath();
-        this.scale.moveTo(0, this.scaleHeight-2);
-        this.scale.lineTo(lineWidth, this.scaleHeight-2);
-        this.scale.stroke();            
-        $("#betaScale0").css({
-            left: scalePosition.left + 30, 
-            top: scalePosition.top + this.scaleHeight - 16,
-        });
-    },
-    
     drawScale: function () {
-        var x=13;
-        this.drawScaleEntry(0.5, 1, x);
-        this.drawScaleEntry(0.8, 1, x);
-        this.drawScaleEntry(0.9, 1, x);
-        this.drawScaleEntry(0.95, 2, x);
-        this.drawScaleEntry(0.99, 2, x);
+        this.scale.font = "normal 16pt Calibri";
+        this.drawScaleEntry(0.5, 1, 13, 16);
+        this.drawScaleEntry(0.8, 1, 13, 16);
+        this.drawScaleEntry(0.9, 1, 13, 16);
+        this.drawScaleEntry(0.95, 2, 13, 16);
+        this.drawScaleEntry(0.99, 2, 13, 16);
 
-        this.drawScaleBorders(24);
+        this.scale.font = "normal 20pt Calibri";
+        this.drawScaleEntry(0.001, 0, 18, 20);
+        this.drawScaleEntry(0.999, 0, 18, 20);
     },
 };
 

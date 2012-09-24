@@ -1,3 +1,44 @@
+
+.horizontal {
+    display: block;
+    float: left;
+}
+
+.vertical {
+    display: block;
+    float: top;
+}
+
+.verticalSmallSpace {
+    display: block;
+    position: relative;
+    height: 10px;
+}
+
+.verticalBigSpace {
+    display: block;
+    position: relative;
+    height: 50px;
+}
+
+.clearLeft {
+    clear: left;
+}
+
+.clearBoth {
+    clear: both;
+}
+
+.mediumFont {
+    font-family: Arial;
+    font-size: 14pt;
+    font-weight: normal;
+}
+
+.yellow {
+    color: yellow;
+}
+
 body {
     font-family: Monospace;
     background-color: #f0f0f0;
@@ -5,11 +46,7 @@ body {
     overflow: hidden;
 }
 
-#renderContainer {
-    position: relative;
-}
-
-#display {
+#hudIndicators {
     display: block;
     position: absolute;
     z-index: 100;
@@ -17,66 +54,28 @@ body {
     font-weight: bold;
 }
 
-.yellow {
-    color: yellow;
+#options {
+    width: 220px;
+    background: #efefef;
 }
 
-.verticalSpace {
-    display: block;
-    position: relative;
-    height: 50px;
-}
-
-.vertical {
-    display: block;
-}
-
-.horizontal {
-    display: block;
-    float: left;
-}
-
-.leftColumn {
-    display: block;
-    float: left;
-}
-
-.rightColumn {
-    display: block;
-    width: 200;
-}
-
-.clearLeft {
-    clear: left;
+#instrumentContainer {
+    padding-top: 550px;
+    padding-bottom: 50px;
+    padding-right: 50px;
+    padding-left: 50px;
 }
 
 #betaSlider {
-    position: relative;
-    display: block;
-    float: left;
-
     width: 10x;
     height: 200px;
-
     background: #b0b0b0;
     color: #ff0000;
 }
 
 #betaScale {
-    position: relative;
-    display: block;
-    float: left;
-
     width: 100px;
     background: #efefef;
-}
-
-#betaScaleTitle {
-    position: absolute; 
-    z-index: 100;
-    font-family: Monospace;
-    font-size: 24pt;
-    font-weight: bold;
 }
 
 .betaScaleBorders {
@@ -87,18 +86,13 @@ body {
     font-weight: bold;
 }
 
-#options {
-    position: relative;
-    display: block;
-    float: left;
-
-    width: 200px;
-    background: #efefef;
+.scaleTitle {
+    font-family: Monospace;
+    font-size: 24pt;
+    font-weight: bold;
 }
 
-.box {
-    padding-top: 550px;
-    padding-bottom: 50px;
-    padding-right: 50px;
-    padding-left: 50px;
+#dopplerShiftRescale {
+    width: 130px;
+    height: 30px;
 }
