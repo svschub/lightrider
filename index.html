@@ -6,7 +6,7 @@
         <title>WegGL - LightRider</title>  
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="lightrider.css" />
+        <link rel="stylesheet" type="text/css" href="index.css" />
         <link rel="stylesheet" type="text/css" href="../../js/jquery/ui/css/jquery-ui-1.8.21.custom.css">
     </head>
 
@@ -14,22 +14,7 @@
         <div>
             <div id="renderContainer" class="horizontal"></div>
             <div id="instrumentContainer" class="horizontal">
-                <div class="horizontal">
-                    <div class="vertical scaleTitle">v/c</div>
-                    <div class="verticalSmallSpace"></div>
-                    <div class="vertical">
-                        <div class="horizontal">
-                            <div class="horizontal">
-                                <div class="verticalSmallSpace"></div>
-                                <div id="betaSlider" class="vertical"></div>
-                            </div>
-                            <canvas id="betaScale" class="horizontal" width="100" height="220">
-                                Browser does not support canvas!
-                            </canvas>
-                        </div>
-                    </div>
-                </div>
-                <div id="options" class="horizontal">
+                <div id="options" class="vertical">
                     <form action="" method="">
                         <div class="verticalBigSpace"></div>
                         <div class="mediumFont">Doppler Effect</div>
@@ -39,7 +24,20 @@
                         <div><input type="number" id="dopplerShiftRescale" class="mediumFont" min="-1.0" max="1.0" step="0.01" value="0.3"/></div>
                     </form>
                 </div>
-                <div class="clearLeft"></div>
+                <div class="verticalBigSpace"></div>
+                <div class="vertical scaleTitle">v/c</div>
+                <div class="verticalSmallSpace"></div>
+                <div class="vertical">
+                    <div class="horizontal">
+                        <div class="verticalSmallSpace"></div>
+                        <div id="betaSlider" class="vertical"></div>
+                    </div>
+                    <canvas id="betaScale" class="horizontal" width="100" height="220">
+                        Browser does not support canvas!
+                    </canvas>
+                    <div class="clearLeft"></div>
+                </div>                
+                <div class="clearBoth"></div>
             </div>
             <div id="hudIndicators">
                 <div class="vertical yellow" id="speed"></div>

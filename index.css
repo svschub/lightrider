@@ -54,16 +54,13 @@ body {
     font-weight: bold;
 }
 
+#instrumentContainer {
+    padding: 50px;
+}
+
 #options {
     width: 220px;
     background: #efefef;
-}
-
-#instrumentContainer {
-    padding-top: 550px;
-    padding-bottom: 50px;
-    padding-right: 50px;
-    padding-left: 50px;
 }
 
 #betaSlider {

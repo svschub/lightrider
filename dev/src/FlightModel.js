@@ -1,5 +1,7 @@
 
 FlightModel = function (boost) {
+    this.boost = boost;
+
     this.position = new THREE.Vector3(0,0,0);
     this.speed = 0.0;
 
@@ -26,13 +28,60 @@ FlightModel = function (boost) {
     this.sinYawAngle = 0.0;
     this.cosYawAngle = 1.0;  // 0 .. 360
     this.yawSpeed = 0.0;
-        
-    this.createCabin(boost);
+
+    this.accelerationIncr = 0.007;
+    this.pitchAngleIncr = 0.022;
+    this.rollAngleIncr = 0.03;
+    this.yawAngleIncr = 0.02;
+
+    this.createCabin();
+
+    this.initKeyHandler();
+    this.update(this);
 };
 
 FlightModel.prototype = {
     constructor: FlightModel,
 
+    createCabin: function () {
+        this.cabin = new THREE.Object3D();        
+
+        this.cockpit = new Cockpit();
+        this.cabin.add(this.cockpit.mesh);
+
+        this.observer = new Observer(this.boost);
+        this.cabin.add(this.observer.mesh);
+    },
+
+    initKeyHandler: function () {
+        var self = this;
+        
+        self.keyPressed = new Array(256);
+
+        for (var i=0; i < 256; i++) {
+            self.keyPressed[i] = false;
+        }        
+        $(window).bind("keydown", function (key) {
+            if (key.which < 256) {
+                self.keyPressed[key.which] = true;
+            }
+        });
+        $(window).bind("keyup", function (key) {
+            if (key.which < 256) {
+                self.keyPressed[key.which] = false;
+            }
+        });        
+    },
+    
+    startLoop: function (milliseconds) {
+        var self = this;
+        
+        this.loopMilliseconds = milliseconds;
+        this.timerLoopHandle = setInterval(function () {
+            self.update(self);
+        }, this.loopMilliseconds);
+    },
+    
     roll: function (rollAngleIncr) {
         this.rollSpeed = this.rollSpeed + rollAngleIncr - 0.3*this.rollSpeed; 
         if (Math.abs(this.rollSpeed) < 0.0001) {
@@ -143,27 +192,83 @@ FlightModel.prototype = {
             cosYawAngle: this.cosYawAngle
         };
     },
+
+    move: function () {
+        var acceleration, rollAngle, pitchAngle, yawAngle;    
+
+        acceleration = 0.0;
+        if (this.keyPressed[109]) {  // -
+            acceleration -= this.accelerationIncr;
+        }
+        if (this.keyPressed[107]) {  // + 
+            acceleration += this.accelerationIncr;
+        }
+        this.accelerate(acceleration);
+        
+        // Rollen:
+        rollAngle = 0.0;
+        if (this.keyPressed[37]) {  // left cursor
+            rollAngle -= this.rollAngleIncr;
+        }
+        if (this.keyPressed[39]) {  // right cursor
+            rollAngle += this.rollAngleIncr;
+        }
+        this.roll(rollAngle);
+        
+        // Neigen:
+        pitchAngle = 0.0;
+        if (this.keyPressed[38]) {  // up cursor
+            pitchAngle -= this.pitchAngleIncr;
+        }
+        if (this.keyPressed[40]) {  // down cursor
+            pitchAngle += this.pitchAngleIncr;
+        }
+        this.pitch(pitchAngle);
+        
+        // Gieren:
+        yawAngle = 0.0;
+        if (this.keyPressed[33]) {
+            yawAngle += this.yawAngleIncr;
+        }
+        if (this.keyPressed[34]) {
+            yawAngle -= this.yawAngleIncr;
+        }
+        this.yaw(yawAngle);
+
+        if (this.keyPressed[27]) {
+            clearInterval(this.timerLoopHandle);
+        }
+    },
     
-    update: function () {
-        this.cabin.position = this.getPosition();
-        this.cabin.up = this.getUpVector();
-        this.cabin.lookAt(this.getLookAtVector());
+    updateHud: function () {
+        var speedMetersPerSecond=this.getSpeed()*1000/this.loopMilliseconds,
+            speedKmPerSecond=speedMetersPerSecond*3.6,
+            viewConeAngle;
+            
+        if (this.boost.beta < 0.1) {        
+            $("#speed").html("spd " + speedKmPerSecond.toFixed(1) + " km/h");
+        } else {
+            $("#speed").html("spd " + this.boost.beta.toFixed(4) + " c");
+        }
+        
+        $("#altitude").html("alt " + this.getAltitude().toFixed(1) + " m");
 
-        this.calculateAngles();
-
-        this.observer.update(this.getAngles());
-        this.cockpit.update(this.getAngles());        
+        viewConeAngle = 360*this.boost.referenceViewConeAngle/Math.PI;
+        $("#viewConeAngle").html("fov " + viewConeAngle.toFixed(1) + " deg");
     },
 
-    createCabin: function (boost) {
-        this.cabin = new THREE.Object3D();        
-
-        this.cockpit = new Cockpit();
-        this.cabin.add(this.cockpit.mesh);
-
-        this.observer = new Observer(boost);
-        this.cabin.add(this.observer.mesh);
+    update: function (self) {
+        self.move();
         
-        this.update();
+        self.cabin.position = self.getPosition();
+        self.cabin.up = self.getUpVector();
+        self.cabin.lookAt(self.getLookAtVector());
+
+        self.calculateAngles();
+
+        self.observer.update(self.getAngles());
+        self.cockpit.update(self.getAngles());     
+
+        self.updateHud();
     },
 };
