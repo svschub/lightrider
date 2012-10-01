@@ -5,8 +5,8 @@ BoostFactory = function () {
     
     this.material = [];
 
-    this.vertexShaderCode = readFile("shaders/covariantLambert.vs");
-    this.fragmentShaderCode = readFile("shaders/covariantLambert.fs");
+    this.vertexShaderCode = this.loadShaderCode("shaders/covariantLambert.vs");
+    this.fragmentShaderCode = this.loadShaderCode("shaders/covariantLambert.fs");
 
     this.dopplerShiftTable = new DopplerShiftTable();    
 
@@ -33,6 +33,30 @@ BoostFactory = function () {
 
 BoostFactory.prototype = {
     constructor: BoostFactory,
+
+	loadShaderCode: function (fileName) {  
+		var shaderSource;
+			
+		$.ajax({
+			url: "getFileContent.php",
+			type: 'POST',
+			data: {
+				filename: fileName
+			},
+			async: false,
+			cache: false,
+			timeout: 30000,
+			error: function(){
+				deleteShader(shader);
+				shaderSource = "";
+			},
+			success: function(response){
+				shaderSource = response;
+			}
+		});
+
+		return shaderSource;
+	},
 
     setUniforms: function (uniformName, value) {
         for (var i=0; i < this.material.length; i++) {

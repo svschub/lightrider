@@ -32,10 +32,22 @@ BetaSlider = function (properties) {
 BetaSlider.prototype = {
     constructor: BetaSlider,
     
+    getValue: function () {
+        return $("#betaSlider").slider("value");
+    },
+
+    setValue: function (value) {
+        $("#betaSlider").slider("value", value);
+    },
+
+    getBeta: function () {
+        return Math.max(0.0, this.a*Math.exp(this.b*this.getValue()) - this.a);
+    },
+
     getScaleY: function (beta) {
         return Math.log(beta/this.a + 1)/this.b;
     },
-    
+
     drawScaleEntry: function (beta, precision, lineWidth, fontsize) {
         var y = this.scaleOffset + this.sliderHeight*(1.0-this.getScaleY(beta));
         

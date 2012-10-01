@@ -39,8 +39,8 @@ Horizon.prototype = {
     constructor: Horizon,
 
     initShaders: function () {
-        var horizonVertexShaderCode = readFile("shaders/covariantHorizon.vs"),
-            horizonFragmentShaderCode = readFile("shaders/covariantLambert.fs");
+        var horizonVertexShaderCode = this.boost.loadShaderCode("shaders/covariantHorizon.vs"),
+            horizonFragmentShaderCode = this.boost.loadShaderCode("shaders/covariantLambert.fs");
 
         this.horizonArcMaterial = this.boost.setMaterial({
             vertexShader: [

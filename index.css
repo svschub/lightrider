@@ -29,6 +29,12 @@
     clear: both;
 }
 
+.smallFont {
+    font-family: Arial;
+    font-size: 12pt;
+    font-weight: normal;
+}
+
 .mediumFont {
     font-family: Arial;
     font-size: 14pt;
@@ -46,10 +52,13 @@ body {
     overflow: hidden;
 }
 
-#hudIndicators {
+.overlay {
     display: block;
     position: absolute;
     z-index: 100;
+}
+
+#hudIndicators {
     font-size: 2em;
     font-weight: bold;
 }
@@ -92,4 +101,14 @@ body {
 #dopplerShiftRescale {
     width: 130px;
     height: 30px;
+}
+
+table {
+    font-family: Arial;
+    font-size: 14pt;
+    font-weight: normal;   
+}
+
+tr > td:first-child {
+    font-weight: bold;
 }

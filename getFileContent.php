@@ -3,7 +3,7 @@
 
     $file = fopen($fileName, "r");
     $content = fread($file, filesize($fileName));
-     fclose($file);        
+    fclose($file);        
 
     echo $content;
 ?>

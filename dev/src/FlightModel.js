@@ -82,6 +82,14 @@ FlightModel.prototype = {
         }, this.loopMilliseconds);
     },
     
+    stopLoop: function () {
+        clearInterval(this.timerLoopHandle);
+    },
+    
+    setMoveHandler: function (moveHandler) {
+        this.moveHandler = moveHandler;
+    },
+    
     roll: function (rollAngleIncr) {
         this.rollSpeed = this.rollSpeed + rollAngleIncr - 0.3*this.rollSpeed; 
         if (Math.abs(this.rollSpeed) < 0.0001) {
@@ -197,10 +205,10 @@ FlightModel.prototype = {
         var acceleration, rollAngle, pitchAngle, yawAngle;    
 
         acceleration = 0.0;
-        if (this.keyPressed[109]) {  // -
+        if (this.keyPressed[83]) {  // s
             acceleration -= this.accelerationIncr;
         }
-        if (this.keyPressed[107]) {  // + 
+        if (this.keyPressed[87]) {  // w 
             acceleration += this.accelerationIncr;
         }
         this.accelerate(acceleration);
@@ -227,16 +235,16 @@ FlightModel.prototype = {
         
         // Gieren:
         yawAngle = 0.0;
-        if (this.keyPressed[33]) {
+        if (this.keyPressed[65]) {  // a
             yawAngle += this.yawAngleIncr;
         }
-        if (this.keyPressed[34]) {
+        if (this.keyPressed[68]) {  // d
             yawAngle -= this.yawAngleIncr;
         }
         this.yaw(yawAngle);
 
         if (this.keyPressed[27]) {
-            clearInterval(this.timerLoopHandle);
+            this.stopLoop();
         }
     },
     
@@ -259,6 +267,10 @@ FlightModel.prototype = {
 
     update: function (self) {
         self.move();
+
+        if (typeof self.moveHandler !== "undefined") {
+            self.moveHandler(self.getPosition());
+        }
         
         self.cabin.position = self.getPosition();
         self.cabin.up = self.getUpVector();

@@ -14,34 +14,51 @@ MainLoop = function () {
        
     this.lookDownGroup = new LookDownGroup();
     this.world.add(this.lookDownGroup.mesh);
-        
+
     this.renderer = new THREE.WebGLRenderer();
     this.renderer.setSize(canvasWidth, canvasHeight);
     $("#renderContainer").append(this.renderer.domElement);
-	
+    
     this.beta = -1000.0;
     this.beta_next = 0.0;
 
-	this.dopplerShiftRescale = -1;
-	this.dopplerShiftRescale_next = parseFloat( $("#dopplerShiftRescale").val() );
+    this.dopplerShiftRescale = -1;
+    this.dopplerShiftRescale_next = parseFloat( $("#dopplerShiftRescale").val() );
 };
 
 MainLoop.prototype = {
     constructor: MainLoop,
 
-	setNextBeta: function (beta) {
-	    this.beta_next = beta;
-	},
-	
-	setNextDopplerShiftRescale: function (dopplerShiftRescale) {
-	    this.dopplerShiftRescale_next = dopplerShiftRescale;
-	},
+    start: function (milliseconds) {
+        var self = this;
+        this.plane.setMoveHandler(function (position) {
+            if (position.y <= 0.0) {
+                self.plane.stopLoop();
+                document.body.innerHTML = "";
+                $(document).ready(function () {
+                    alert("Crashed!");
+                });
+            }
+        });
+        this.plane.startLoop(30);
+    },
 
-    drawFrame: function () {    
-        var angles = this.plane.getAngles(),
-            position = this.plane.getPosition();
-            
-        if (this.dopplerShiftRescale_next != this.dopplerShiftRescale) {
+    setBeta: function (beta) {
+        this.beta_next = Math.min(beta, 0.9999);
+    },
+    
+    setDopplerShiftRescale: function (dopplerShiftRescale) {
+        this.dopplerShiftRescale_next = dopplerShiftRescale;
+    },
+
+    setVisibility: function (object3d, visible) {
+        THREE.SceneUtils.traverseHierarchy(object3d, function (child) {
+            child.visible = visible;
+        });
+    },
+    
+	updateBoostParameters: function () {
+       if (this.dopplerShiftRescale_next != this.dopplerShiftRescale) {
             this.dopplerShiftRescale = this.dopplerShiftRescale_next;
             this.boost.dopplerShiftTable.update({
                 dopplerShiftRescale: this.dopplerShiftRescale,
@@ -52,23 +69,32 @@ MainLoop.prototype = {
             this.beta = this.beta_next;
             this.boost.setBoostParameters(this.beta);
         }
+	},
 
-        this.lookDownGroup.setPosition(position);
+	renderLookDownImage: function () {
+        var angles = this.plane.getAngles(),
+            position = this.plane.getPosition();
+
+		this.lookDownGroup.setPosition(position);
         this.lookDownGroup.setViewAngle(angles);
 
         this.boost.disableBoost();
-        setVisibility(this.lookDownGroup.mesh, true);
-        setVisibility(this.plane.cabin, false);
+        this.setVisibility(this.lookDownGroup.mesh, true);
+        this.setVisibility(this.plane.cabin, false);
         this.renderer.render(this.world.scene, this.lookDownGroup.camera, this.plane.cockpit.lookDownImage, true);
-        
-        this.boost.enableBoost();
-        setVisibility(this.lookDownGroup.mesh, false);
-        setVisibility(this.plane.cabin, true);
-        this.renderer.render(this.world.scene, this.plane.observer.camera);
-    },
-	
-	start: function (milliseconds) {
-        this.plane.startLoop(30);
 	},
-   
+	
+	renderObserverView: function () {
+        this.boost.enableBoost();
+        this.setVisibility(this.lookDownGroup.mesh, false);
+        this.setVisibility(this.plane.cabin, true);
+        this.renderer.render(this.world.scene, this.plane.observer.camera);
+	},
+	
+    drawFrame: function () {    
+        this.updateBoostParameters();
+
+		this.renderLookDownImage();		
+		this.renderObserverView();
+    },   
 };
