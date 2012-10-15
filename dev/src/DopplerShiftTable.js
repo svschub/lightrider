@@ -1,4 +1,5 @@
-DopplerShiftTable = function () {
+// DopplerShiftTable = function () {
+function DopplerShiftTable () {
     this.tableSize = 512;
 
     this.texture = this.createEmptyTexture();
@@ -9,7 +10,7 @@ DopplerShiftTable = function () {
     this.setInitialBoostParameters();
         
     this.disable();
-};
+}
 
 DopplerShiftTable.prototype = {
     constructor: DopplerShiftTable,

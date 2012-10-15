@@ -1,5 +1,6 @@
 
-CockpitGeometry = function () {
+// CockpitGeometry = function () {
+function CockpitGeometry () {
     var lightGrey = new THREE.Color(0xDDDDDD),
         darkGrey = new THREE.Color(0xAAAAAA),
         black = new THREE.Color(0x333333),
@@ -91,7 +92,7 @@ CockpitGeometry = function () {
     this.faceVertexUvs[0] = [];        
 
     this.computeCentroids();
-};
+}
 
 CockpitGeometry.prototype = new THREE.Geometry();
 

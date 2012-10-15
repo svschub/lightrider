@@ -1,6 +1,7 @@
 // TODO
 
-LookDownGroup = function () {
+// LookDownGroup = function () {
+function LookDownGroup () {
     this.y = 20;
 
     this.mesh = new THREE.Object3D();
@@ -20,7 +21,7 @@ LookDownGroup = function () {
     );
     this.ground.position.y = -this.y-10;
     this.mesh.add(this.ground);
-};
+}
 
 LookDownGroup.prototype = {
     constructor: LookDownGroup,

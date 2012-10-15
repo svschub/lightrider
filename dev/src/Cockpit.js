@@ -1,7 +1,8 @@
 
-Cockpit = function () {
+// Cockpit = function () {
+function Cockpit () {
     this.mesh = this.create();
-};
+}
 
 Cockpit.prototype = {
     constructor: Cockpit,

@@ -1,14 +1,14 @@
-Observer = function (boost) {
+function Observer(boost) {
     this.mesh = new THREE.Object3D();
-    
-    this.camera = new THREE.PerspectiveCamera(45, 4/3, 0.3, 10000);
-    this.camera.position = new THREE.Vector3(0,0,0);
-    this.camera.lookAt(new THREE.Vector3(0,0,1));
-    this.camera.up = new THREE.Vector3(0,1,0);
+
+    this.camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.3, 10000);
+    this.camera.position = new THREE.Vector3(0, 0, 0);
+    this.camera.lookAt(new THREE.Vector3(0, 0, 1));
+    this.camera.up = new THREE.Vector3(0, 1, 0);
     this.mesh.add(this.camera);
 
     this.boost = boost;
-    
+
     this.horizon = new Horizon(this.boost);
     this.horizon.setZ(5000);
     this.horizon.setFrustumParametersFromCamera(this.camera);
@@ -17,7 +17,7 @@ Observer = function (boost) {
     this.mesh.position.y = 1;
 
     this.updateObserverViewCone();
-};
+}
 
 Observer.prototype = {
     constructor: Observer,
@@ -30,30 +30,30 @@ Observer.prototype = {
     },
 
     setViewport: function (width, height) {
-        this.camera.aspect = width/height;
+        this.camera.aspect = width / height;
         this.horizon.setFrustumParametersFromCamera(this.camera);
         this.camera.updateProjectionMatrix();
         this.updateObserverViewCone();
     },
-    
-    updateObserverViewCone: function () {
-        var h = 2*Math.tan(Math.PI*this.camera.fov/360)*this.camera.near,
-            w = h*this.camera.aspect,
-            rNear = 0.5*Math.sqrt(h*h + w*w),
-            rFar = rNear*this.camera.far/this.camera.near;            
 
-        this.viewConeAngle = Math.atan(rNear/this.camera.near);
-        this.viewSphereRadius = Math.sqrt(rFar*rFar + this.camera.far*this.camera.far);        
+    updateObserverViewCone: function () {
+        var h = 2 * Math.tan(Math.PI * this.camera.fov / 360) * this.camera.near,
+            w = h * this.camera.aspect,
+            rNear = 0.5 * Math.sqrt(h * h + w * w),
+            rFar = rNear * this.camera.far / this.camera.near;
+
+        this.viewConeAngle = Math.atan(rNear / this.camera.near);
+        this.viewSphereRadius = Math.sqrt(rFar * rFar + this.camera.far * this.camera.far);
 
         this.boost.setObserverViewConeAngle(this.viewConeAngle);
 
         this.horizon.updateObserverViewCone({
             viewConeAngle: this.viewConeAngle,
-            viewSphereRadius: this.viewSphereRadius,
+            viewSphereRadius: this.viewSphereRadius
         });
     },
 
     update: function (angles) {
         this.horizon.update(angles);
-    },
+    }
 };

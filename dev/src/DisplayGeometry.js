@@ -1,5 +1,6 @@
 
-DisplayGeometry = function () {
+// DisplayGeometry = function () {
+function DisplayGeometry () {
     var displayColor = new THREE.Color(0xDDDDDD),
         frameInnerColor = new THREE.Color(0x888888),
         frameOuterColor = new THREE.Color(0xBBBBBB),
@@ -75,7 +76,7 @@ DisplayGeometry = function () {
     this.faceVertexUvs[0].push([ new THREE.UV(1,0), new THREE.UV(1,1), new THREE.UV(0,1), new THREE.UV(0,0) ]);        
 
     this.computeCentroids();
-};
+}
 
 DisplayGeometry.prototype = new THREE.Geometry();
 

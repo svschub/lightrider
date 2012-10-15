@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# echo "(function ($) {" >> $outfiletemp;
-# echo "    'use strict';" >> $outfiletemp;
-# echo >> $outfiletemp;
+echo "(function ($) {";
+echo "    'use strict';";
+echo;
 
 for file in `cat jsSourceFiles.lst`
 do
@@ -10,5 +10,5 @@ do
 	echo
 done
   
-# echo >> $outfiletemp;
-# echo "}(jQuery));" >> $outfiletemp;
+echo;
+echo "}(jQuery));";

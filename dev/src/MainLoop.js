@@ -1,33 +1,48 @@
 
-MainLoop = function () {
-    var canvasWidth = 0.75*$(window).width(), 
-        canvasHeight = canvasWidth/1.75;
-        
-    this.boost = new BoostFactory();
-        
-    this.world = new World(this.boost);
-
-    this.plane = new FlightModel(this.boost);
-    this.plane.position = new THREE.Vector3(0,10,13);
-    this.plane.observer.setViewport(canvasWidth, canvasHeight);
-    this.world.add(this.plane.cabin);
-       
-    this.lookDownGroup = new LookDownGroup();
-    this.world.add(this.lookDownGroup.mesh);
-
-    this.renderer = new THREE.WebGLRenderer();
-    this.renderer.setSize(canvasWidth, canvasHeight);
-    $("#renderContainer").append(this.renderer.domElement);
-    
-    this.beta = -1000.0;
-    this.beta_next = 0.0;
-
-    this.dopplerShiftRescale = -1;
-    this.dopplerShiftRescale_next = parseFloat( $("#dopplerShiftRescale").val() );
-};
+// MainLoop = function () {
+function MainLoop() {
+    try {
+        this.renderer = new THREE.WebGLRenderer();
+        this.renderContextAvailable = true;
+        this.initLoop();
+    } catch (e) {
+        this.renderContextAvailable = false;
+        return;
+    }
+}
 
 MainLoop.prototype = {
     constructor: MainLoop,
+
+    isRenderContextAvailable: function () {
+        return this.renderContextAvailable;
+    },
+
+    initLoop: function () {
+        var canvasWidth = 0.75 * $(window).width(),
+            canvasHeight = canvasWidth / 1.75;
+
+        this.renderer.setSize(canvasWidth, canvasHeight);
+        $("#renderContainer").append(this.renderer.domElement);
+            
+        this.boost = new BoostFactory();
+
+        this.world = new World(this.boost);
+
+        this.plane = new FlightModel(this.boost);
+        this.plane.position = new THREE.Vector3(0, 10, 13);
+        this.plane.observer.setViewport(canvasWidth, canvasHeight);
+        this.world.add(this.plane.cabin);
+
+        this.lookDownGroup = new LookDownGroup();
+        this.world.add(this.lookDownGroup.mesh);
+
+        this.beta = -1000.0;
+        this.beta_next = 0.0;
+
+        this.dopplerShiftRescale = -1;
+        this.dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
+    },
 
     start: function (milliseconds) {
         var self = this;
@@ -40,13 +55,13 @@ MainLoop.prototype = {
                 });
             }
         });
-        this.plane.startLoop(30);
+        this.plane.startLoop(milliseconds);
     },
 
     setBeta: function (beta) {
         this.beta_next = Math.min(beta, 0.9999);
     },
-    
+
     setDopplerShiftRescale: function (dopplerShiftRescale) {
         this.dopplerShiftRescale_next = dopplerShiftRescale;
     },
@@ -56,45 +71,45 @@ MainLoop.prototype = {
             child.visible = visible;
         });
     },
-    
-	updateBoostParameters: function () {
-       if (this.dopplerShiftRescale_next != this.dopplerShiftRescale) {
+
+    updateBoostParameters: function () {
+        if (this.dopplerShiftRescale_next !== this.dopplerShiftRescale) {
             this.dopplerShiftRescale = this.dopplerShiftRescale_next;
             this.boost.dopplerShiftTable.update({
-                dopplerShiftRescale: this.dopplerShiftRescale,
+                dopplerShiftRescale: this.dopplerShiftRescale
             });
         }
 
-        if (this.beta_next != this.beta) {
+        if (this.beta_next !== this.beta) {
             this.beta = this.beta_next;
             this.boost.setBoostParameters(this.beta);
         }
-	},
+    },
 
-	renderLookDownImage: function () {
+    renderLookDownImage: function () {
         var angles = this.plane.getAngles(),
             position = this.plane.getPosition();
 
-		this.lookDownGroup.setPosition(position);
+        this.lookDownGroup.setPosition(position);
         this.lookDownGroup.setViewAngle(angles);
 
         this.boost.disableBoost();
         this.setVisibility(this.lookDownGroup.mesh, true);
         this.setVisibility(this.plane.cabin, false);
         this.renderer.render(this.world.scene, this.lookDownGroup.camera, this.plane.cockpit.lookDownImage, true);
-	},
-	
-	renderObserverView: function () {
+    },
+
+    renderObserverView: function () {
         this.boost.enableBoost();
         this.setVisibility(this.lookDownGroup.mesh, false);
         this.setVisibility(this.plane.cabin, true);
         this.renderer.render(this.world.scene, this.plane.observer.camera);
-	},
-	
-    drawFrame: function () {    
+    },
+
+    drawFrame: function () {
         this.updateBoostParameters();
 
-		this.renderLookDownImage();		
-		this.renderObserverView();
-    },   
+        this.renderLookDownImage();
+        this.renderObserverView();
+    }
 };

@@ -1,21 +1,24 @@
-BetaSlider = function (properties) {
-    var a = properties.halfScale*properties.halfScale/(1-2*properties.halfScale),
+// BetaSlider = function (properties) {
+function BetaSlider (properties) {
+    var self = this,
+	    a = properties.halfScale*properties.halfScale/(1-2*properties.halfScale),
         b = Math.log((1+a)/a);
             
+	this.handleSlider = properties.handle;
+
     $("#betaSlider").slider({
         orientation: "vertical",
         min: 0.0,
         max: 1.0,
         step: 0.01,
         slide: function(e, ui) { 
-            properties.handle(a*Math.exp(b*ui.value)-a);
+            self.handleSlider(a*Math.exp(b*ui.value)-a);
         }
     });
-        
     $("#betaSlider .ui-slider-handle").unbind("keydown");
+	this.bindMouseWheelEvents();
     
     this.sliderHeight = parseFloat($("#betaSlider").css("height"));
-
     this.scaleHeight = parseFloat($("#betaScale").attr("height"));
     this.scaleOffset = 0.5*(this.scaleHeight - this.sliderHeight);
     
@@ -27,17 +30,46 @@ BetaSlider = function (properties) {
     this.b = b;
     
     this.drawScale();
-};
+}
 
 BetaSlider.prototype = {
     constructor: BetaSlider,
-    
-    getValue: function () {
-        return $("#betaSlider").slider("value");
-    },
+
+	bindMouseWheelEvents: function () {
+	    var self = this;
+
+		if (document.body.addEventListener) {  
+			// Chrome, Safari, Opera, IE9
+			document.body.addEventListener("mousewheel", function (e) {
+				self.handleMouseWheel(self, e);
+			}, false);  
+
+			// Firefox
+			document.body.addEventListener("DOMMouseScroll", function (e) {
+				self.handleMouseWheel(self, e); 
+			}, false);  
+		}	
+	},
+
+	handleMouseWheel: function (self, e) {
+		var event = window.event || e, // equalize event object
+			delta = event.detail? -event.detail : event.wheelDelta, // check for detail first so Opera uses that instead of wheelDelta
+			value = self.getValue();
+
+		value += 0.05*delta/Math.abs(delta);
+		if (value < 0.0) value = 0.0;
+		if (value > 1.0) value = 1.0;
+
+		self.setValue(value);
+		self.handleSlider(self.getBeta());
+	},
 
     setValue: function (value) {
         $("#betaSlider").slider("value", value);
+    },
+
+    getValue: function () {
+        return $("#betaSlider").slider("value");
     },
 
     getBeta: function () {

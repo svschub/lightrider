@@ -1,7 +1,8 @@
 
-AngleIndicator = function (options) {
+// AngleIndicator = function (options) {
+function AngleIndicator (options) {
     this.mesh = this.create(options);
-};
+}
 
 AngleIndicator.prototype = {
     constructor: AngleIndicator,
@@ -33,7 +34,7 @@ AngleIndicator.prototype = {
             new THREE.LineBasicMaterial({
                 color: 0xFFFF00,
                 opacity: 1,
-                linewidth: 3,
+                linewidth: 2,
             })
         );
         this.planeSketch.position = new THREE.Vector3(0, 0.003, 0);

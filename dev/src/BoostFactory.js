@@ -1,4 +1,5 @@
-BoostFactory = function () {
+// BoostFactory = function () {
+function BoostFactory () {
     this.beta = 0.0;
     this.gamma = 1.0;
     this.invgamma = 1.0;
@@ -29,7 +30,7 @@ BoostFactory = function () {
     
     this.observerViewConeAngle = 0;
     this.setBoostParameters(0);
-};
+}
 
 BoostFactory.prototype = {
     constructor: BoostFactory,
