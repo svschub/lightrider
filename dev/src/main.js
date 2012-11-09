@@ -1,5 +1,5 @@
 
-var mainLoop, slider;
+var mainLoop, keyHandler, slider, firstFrame;
 
 function printCopyright() {
     var author, canvas, canvasPosition;
@@ -16,13 +16,27 @@ function printCopyright() {
     });
 }
 
-function initWidgets() {
-    slider = new BetaSlider({
-        halfScale: 0.9,
-        handle: function (value) {
-            mainLoop.setBeta(value);
-        }
-    });
+function toggleLightbox() {
+	var cssDisplayValue;
+
+	if ($("#lightbox").css("display") === "block") {
+	    cssDisplayValue = "none";
+		mainLoop.restart();
+		slider.enabled = true;
+    } else {
+	    cssDisplayValue = "block";
+		mainLoop.pause();
+		slider.enabled = false;
+    }
+
+	$("#lightbox").css("display", cssDisplayValue);
+	$("#lightboxbackground").css("display", cssDisplayValue);
+}
+
+function initLightbox() {
+	$("#lightbox .button > a").bind("click", function () {
+		toggleLightbox();
+	});
 
     $("#dopplerForm").bind('submit', function () {
         return false;
@@ -41,35 +55,76 @@ function initWidgets() {
         mainLoop.setDopplerShiftRescale(parseFloat($(this).val()));
     });
     $("#dopplerShiftRescale").focus(function () {
-        mainLoop.plane.disableKeyHandler();
+        keyHandler.disable();
     });
     $("#dopplerShiftRescale").blur(function () {
-        mainLoop.plane.enableKeyHandler();
+        keyHandler.enable();
     });
+}
+
+function initKeyHandler() {
+    keyHandler = new KeyHandler({
+	    handleFlight: function (keyPressed) {
+			mainLoop.plane.speedUp = keyPressed[87]; // w
+			mainLoop.plane.speedDown = keyPressed[83]; // s
+
+			mainLoop.plane.rollLeft = keyPressed[37];  // left cursor
+			mainLoop.plane.rollRight = keyPressed[39];  // right cursor
+
+			mainLoop.plane.pitchUp = keyPressed[40];  // arrow down
+			mainLoop.plane.pitchDown = keyPressed[38];  // arrow up
+
+			mainLoop.plane.yawLeft = keyPressed[65];  // a
+			mainLoop.plane.yawRight = keyPressed[68];  // d
+		},
+		handleKey: function (keyCode) {
+			if (keyCode === 27) {
+			    toggleLightbox();
+			}
+		}
+	});
+}
+
+function initWidgets() {
+    slider = new BetaSlider({
+        halfScale: 0.9,
+        handle: function (value) {
+            mainLoop.setBeta(value);
+        }
+    });
+
+    initLightbox();
 }
 
 function animate() {
     requestAnimationFrame(animate);
     mainLoop.drawFrame();
+
+	if (firstFrame) {
+	    toggleLightbox();
+	    firstFrame = false;
+	}
 }
 
 function init() {
     mainLoop = new MainLoop();
     if (mainLoop.isRenderContextAvailable()) {
+	    $("#page").css("display", "block");
+
+	    initKeyHandler();
         initWidgets();
         printCopyright();
 
         mainLoop.start(30);
+
+		firstFrame = true;
         animate();
+    } else if (! Detector.webgl) {
+		document.body.innerHTML = "";
+		Detector.addGetWebGLMessage();
     } else {
-		document.body.innerHTML = window.WebGLRenderingContext ? [
-		    'Your graphics card does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a>.<br />',
-		    'Find out how to get it <a href="http://get.webgl.org/">here</a>.'
-		].join( '\n' ) : [
-		    'Your browser does not seem to support <a href="http://khronos.org/webgl/wiki/Getting_a_WebGL_Implementation">WebGL</a>.<br/>',
-		    'Find out how to get it <a href="http://get.webgl.org/">here</a>.'
-		].join( '\n' );        
-    }
+	    document.body.innerHTML = "unknown error";
+	}
 }
 
 $(document).ready(init);

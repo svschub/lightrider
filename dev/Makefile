@@ -1,6 +1,6 @@
 LIB=../../../js
 
-all: ../lightrider.min.js ../Three.js
+all: ../lightrider.min.js ../Three.js ../Detector.js
 
 ../lightrider.min.js: lightrider.debug.js
 	rm -f ../lightrider.min.js
@@ -16,5 +16,8 @@ lightrider.debug.js: src/*.js
 
 ../Three.js: $(LIB)/three/Three.js
 	cp $(LIB)/three/Three.js ..
+
+../Detector.js: $(LIB)/webgl/Detector.js
+	cp $(LIB)/webgl/Detector.js ..
 
 

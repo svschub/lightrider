@@ -45,38 +45,59 @@
     color: yellow;
 }
 
-body {
-    font-family: Monospace;
-    background-color: #f0f0f0;
-    margin: 0px;
-    overflow: hidden;
-}
-
 .overlay {
     display: block;
     position: absolute;
     z-index: 100;
 }
 
+body {
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    overflow: hidden;
+}
+
+#page {
+    display: none;
+}
+
 #hudIndicators {
+    font-family: Monospace;
     font-size: 2em;
     font-weight: bold;
 }
 
 #instrumentContainer {
-    padding: 50px;
+    position: relative;
+    padding-top: 0px;
+    padding-left: 50px;
+    padding-right: 50px;
+	padding-bottom: 0;
 }
 
-#options {
-    width: 220px;
-    background: #efefef;
+#instrumentContainer > div {
+    position: relative;
+    margin: 0;
+    padding: 0;
 }
 
 #betaSlider {
-    width: 10x;
+    margin-top: 10px;
+    margin-bottom: 10px;
+	padding: 0;
+    width: 10px;
     height: 200px;
     background: #b0b0b0;
     color: #ff0000;
+}
+
+#betaSlider  > a {
+    width: 26px;
+    left: -8px;
+    background: #ffffff;
 }
 
 #betaScale {
@@ -84,32 +105,8 @@ body {
     background: #efefef;
 }
 
-.betaScaleBorders {
-    position: absolute; 
-    z-index: 100;
-    font-family: Monospace;
-    font-size: 20pt;
-    font-weight: bold;
-}
-
-.scaleTitle {
+#betaScaleTitle {
     font-family: Monospace;
     font-size: 24pt;
-    font-weight: bold;
-}
-
-#dopplerShiftRescale {
-    width: 130px;
-    height: 30px;
-    height: 5%;
-}
-
-table {
-    font-family: Arial;
-    font-size: 14pt;
-    font-weight: normal;   
-}
-
-tr > td:first-child {
     font-weight: bold;
 }

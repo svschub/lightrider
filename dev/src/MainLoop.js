@@ -19,12 +19,12 @@ MainLoop.prototype = {
     },
 
     initLoop: function () {
-        var canvasWidth = 0.75 * $(window).width(),
-            canvasHeight = canvasWidth / 1.75;
+        var canvasWidth = $(window).width() - 240, // 0.75 * $(window).width(),
+            canvasHeight = $(window).height(); // canvasWidth / 1.75;
 
         this.renderer.setSize(canvasWidth, canvasHeight);
         $("#renderContainer").append(this.renderer.domElement);
-            
+
         this.boost = new BoostFactory();
 
         this.world = new World(this.boost);
@@ -42,6 +42,8 @@ MainLoop.prototype = {
 
         this.dopplerShiftRescale = -1;
         this.dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
+
+		this.paused = false;
     },
 
     start: function (milliseconds) {
@@ -57,6 +59,16 @@ MainLoop.prototype = {
         });
         this.plane.startLoop(milliseconds);
     },
+
+	pause: function () {
+	    this.paused = true;
+		this.plane.paused = true;
+	},
+
+	restart: function () {
+	    this.paused = false;
+		this.plane.paused = false;
+	},
 
     setBeta: function (beta) {
         this.beta_next = Math.min(beta, 0.9999);
@@ -107,6 +119,10 @@ MainLoop.prototype = {
     },
 
     drawFrame: function () {
+	    if (this.paused) {
+            return;
+		}
+
         this.updateBoostParameters();
 
         this.renderLookDownImage();

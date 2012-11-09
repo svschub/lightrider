@@ -3,7 +3,11 @@ function FlightModel(boost) {
     this.boost = boost;
 
     this.position = new THREE.Vector3(0, 0, 0);
+
     this.speed = 0.0;
+    this.speedUp = false;
+    this.speedDown = false;
+    this.accelerationIncr = 0.007;
 
     // Rollen:
     this.rollAction = new THREE.Quaternion();
@@ -12,6 +16,9 @@ function FlightModel(boost) {
     this.sinRollAngle = 0.0;
     this.cosRollAngle = 1.0;  // 0 .. 360
     this.rollSpeed = 0.0;
+    this.rollLeft = false;
+    this.rollRight = false;
+    this.rollAngleIncr = 0.03;
 
     // Neigen:
     this.pitchAction = new THREE.Quaternion();
@@ -20,6 +27,9 @@ function FlightModel(boost) {
     this.sinPitchAngle = 0.0;
     this.cosPitchAngle = 1.0;  // -90 .. +90
     this.pitchSpeed = 0.0;
+    this.pitchUp = false;
+    this.pitchDown = false;
+    this.pitchAngleIncr = 0.022;
 
     // Gieren:
     this.yawAction = new THREE.Quaternion();
@@ -28,15 +38,12 @@ function FlightModel(boost) {
     this.sinYawAngle = 0.0;
     this.cosYawAngle = 1.0;  // 0 .. 360
     this.yawSpeed = 0.0;
-
-    this.accelerationIncr = 0.007;
-    this.pitchAngleIncr = 0.022;
-    this.rollAngleIncr = 0.03;
+    this.yawLeft = false;
+    this.yawRight = false;
     this.yawAngleIncr = 0.02;
 
     this.createCabin();
 
-    this.initKeyHandler();
     this.update(this);
 }
 
@@ -53,48 +60,14 @@ FlightModel.prototype = {
         this.cabin.add(this.observer.mesh);
     },
 
-    initKeyHandler: function () {
-        var self = this, i;
-
-	    self.enableKeyHandler();
-
-        self.keyPressed = new Array(256);
-
-        for (i = 0; i < 256; i++) {
-            self.keyPressed[i] = false;
-        }
-
-		$(document).unbind("keydown");
-        $(document).bind("keydown", function (key) {
-		    self.updateKeyTable(self, key.which, true);
-        });
-
-		$(document).unbind("keyup");
-        $(document).bind("keyup", function (key) {
-		    self.updateKeyTable(self, key.which, false);
-        });
-    },
-
-	enableKeyHandler: function () {
-	    this.keyHandlerEnabled = true;
-	},
-
-	disableKeyHandler: function () {
-	    this.keyHandlerEnabled = false;
-	},
-
-	updateKeyTable: function (self, keyCode, keyPressed) {
-        if ((self.keyHandlerEnabled) && (keyCode < 256)) {
-            self.keyPressed[keyCode] = keyPressed;
-        }
-	},
-
     startLoop: function (milliseconds) {
         var self = this;
 
         self.loopMilliseconds = milliseconds;
 
-		self.update(self);
+        this.paused = false;
+
+        self.update(self);
 
         self.timerLoopHandle = setInterval(function () {
             self.update(self);
@@ -224,47 +197,40 @@ FlightModel.prototype = {
         var acceleration, rollAngle, pitchAngle, yawAngle;
 
         acceleration = 0.0;
-        if (this.keyPressed[83]) {  // s
-            acceleration -= this.accelerationIncr;
-        }
-        if (this.keyPressed[87]) {  // w 
+        if (this.speedUp) {
             acceleration += this.accelerationIncr;
+        }
+        if (this.speedDown) {
+            acceleration -= this.accelerationIncr;
         }
         this.accelerate(acceleration);
 
-        // Rollen:
         rollAngle = 0.0;
-        if (this.keyPressed[37]) {  // left cursor
+        if (this.rollLeft) {
             rollAngle -= this.rollAngleIncr;
         }
-        if (this.keyPressed[39]) {  // right cursor
+        if (this.rollRight) {
             rollAngle += this.rollAngleIncr;
         }
         this.roll(rollAngle);
 
-        // Neigen:
         pitchAngle = 0.0;
-        if (this.keyPressed[38]) {  // up cursor
-            pitchAngle -= this.pitchAngleIncr;
-        }
-        if (this.keyPressed[40]) {  // down cursor
+        if (this.pitchUp) {
             pitchAngle += this.pitchAngleIncr;
+        }
+        if (this.pitchDown) {
+            pitchAngle -= this.pitchAngleIncr;
         }
         this.pitch(pitchAngle);
 
-        // Gieren:
         yawAngle = 0.0;
-        if (this.keyPressed[65]) {  // a
+        if (this.yawLeft) {
             yawAngle += this.yawAngleIncr;
         }
-        if (this.keyPressed[68]) {  // d
+        if (this.yawRight) {
             yawAngle -= this.yawAngleIncr;
         }
         this.yaw(yawAngle);
-
-        if (this.keyPressed[27]) {
-            this.stopLoop();
-        }
     },
 
     updateHud: function () {
@@ -285,6 +251,10 @@ FlightModel.prototype = {
     },
 
     update: function (self) {
+        if (self.paused) {
+            return;
+        }
+
         self.move();
 
         if (typeof self.moveHandler !== "undefined") {

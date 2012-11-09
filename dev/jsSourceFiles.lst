@@ -11,4 +11,5 @@ Observer.js
 World.js
 FlightModel.js
 MainLoop.js
+KeyHandler.js
 main.js
