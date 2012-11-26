@@ -1,12 +1,8 @@
-// TODO
-
-// LookDownGroup = function () {
 function LookDownGroup () {
     this.y = 20;
 
     this.mesh = new THREE.Object3D();
 
-//    this.camera = new THREE.OrthographicCamera(-80,+80, +70,-70, -1000, 1);
     this.camera = new THREE.OrthographicCamera(-80,+80, +70,-70, 1, 1000);
     this.camera.up = new THREE.Vector3(0,0,1);
     this.camera.lookAt(new THREE.Vector3(0,-1,0));
@@ -25,15 +21,15 @@ function LookDownGroup () {
 
 LookDownGroup.prototype = {
     constructor: LookDownGroup,
-    
+
     setPosition: function (position) {
         this.mesh.position = new THREE.Vector3(position.x, this.y, position.z);  // 0
     },
 
     setViewAngle: function (angles) {
         this.mesh.lookAt(new THREE.Vector3(
-            this.mesh.position.x + angles.sinYawAngle, 
-            this.mesh.position.y, 
+            this.mesh.position.x + angles.sinYawAngle,
+            this.mesh.position.y,
             this.mesh.position.z - angles.cosYawAngle
         ));
     }

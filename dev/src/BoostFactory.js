@@ -1,17 +1,16 @@
-// BoostFactory = function () {
 function BoostFactory () {
     this.beta = 0.0;
     this.gamma = 1.0;
     this.invgamma = 1.0;
-    
+
     this.material = [];
 
-    this.vertexShaderCode = this.loadShaderCode("shaders/covariantLambert.vs");
-    this.fragmentShaderCode = this.loadShaderCode("shaders/covariantLambert.fs");
+    this.vertexShaderCode = loadAscii("lambertVertexShader");
+    this.fragmentShaderCode = loadAscii("lambertFragmentShader");
 
-    this.dopplerShiftTable = new DopplerShiftTable();    
+    this.dopplerShiftTable = new DopplerShiftTable();
 
-    this.relativityUniforms = { 
+    this.relativityUniforms = {
         "isBoostEnabled": { type: "i", value: 0 },
         "isDopplerEffectEnabled": { type: "i", value: 0 },
         "beta": { type: "f", value: 0.0 },
@@ -23,41 +22,17 @@ function BoostFactory () {
         "rgbrange" : { type: "v4", value: this.dopplerShiftTable.rgbRangeVector },
     };
 
-    this.dopplerMap = THREE.ImageUtils.loadTexture('shaders/dopplerMap.png');
+    this.dopplerMap = loadTexture("dopplerMap");
 
     this.relativityUniforms.dopplerMap.texture = this.dopplerMap;
     this.relativityUniforms.dopplerShift.texture = this.dopplerShiftTable.texture;
-    
+
     this.observerViewConeAngle = 0;
     this.setBoostParameters(0);
 }
 
 BoostFactory.prototype = {
     constructor: BoostFactory,
-
-	loadShaderCode: function (fileName) {  
-		var shaderSource;
-			
-		$.ajax({
-			url: "getFileContent.php",
-			type: 'POST',
-			data: {
-				filename: fileName
-			},
-			async: false,
-			cache: false,
-			timeout: 30000,
-			error: function(){
-				deleteShader(shader);
-				shaderSource = "";
-			},
-			success: function(response){
-				shaderSource = response;
-			}
-		});
-
-		return shaderSource;
-	},
 
     setUniforms: function (uniformName, value) {
         for (var i=0; i < this.material.length; i++) {
@@ -69,7 +44,7 @@ BoostFactory.prototype = {
         this.setUniforms("isBoostEnabled", 1);
     },
 
-    disableBoost: function () {        
+    disableBoost: function () {
         this.setUniforms("isBoostEnabled", 0);
     },
 
@@ -80,7 +55,7 @@ BoostFactory.prototype = {
         this.dopplerShiftTable.update();
     },
 
-    disableDopplerEffect: function () {        
+    disableDopplerEffect: function () {
         this.setUniforms("isDopplerEffectEnabled", 0);
 
         this.dopplerShiftTable.disable();
@@ -95,8 +70,8 @@ BoostFactory.prototype = {
         this.setUniforms("gamma", this.gamma);
 
         this.dopplerShiftTable.update({
-            beta: this.beta, 
-            gamma: this.gamma, 
+            beta: this.beta,
+            gamma: this.gamma,
             tanObserverViewConeAngle: Math.tan(this.observerViewConeAngle),
         });
 
@@ -107,13 +82,13 @@ BoostFactory.prototype = {
         this.observerViewConeAngle = observerViewConeAngle;
         this.setUniforms("tanObserverViewConeAngle", Math.tan(this.observerViewConeAngle));
 
-        this.calculateReferenceViewConeAngle();        
+        this.calculateReferenceViewConeAngle();
     },
-    
+
     calculateReferenceViewConeAngle: function () {
-        this.referenceViewConeAngle = this.getReferenceAngle(this.observerViewConeAngle);        
+        this.referenceViewConeAngle = this.getReferenceAngle(this.observerViewConeAngle);
     },
-    
+
     getReferenceVertex: function (vertex) {
         return new THREE.Vector3(vertex.x, vertex.y, this.gamma*vertex.z - this.gamma*this.beta*vertex.length());
     },
@@ -137,7 +112,7 @@ BoostFactory.prototype = {
         }
         return observerAngle;
     },
-    
+
     isMaterialEqual: function (material1, material2) {
         if (material1.vertexShader !== material2.vertexShader) return false;
         if (material1.fragmentShader !== material2.fragmentShader) return false;
@@ -160,14 +135,14 @@ BoostFactory.prototype = {
                 return this.material[i].object;
             }
         }
-        
+
         uniforms = THREE.UniformsUtils.merge([
             THREE.ShaderLib['lambert'].uniforms,
             this.relativityUniforms,
             material.uniforms || {},
         ]);
 
-        uniforms.dopplerMap.texture = this.dopplerMap;        
+        uniforms.dopplerMap.texture = this.dopplerMap;
         uniforms.dopplerShift.texture = this.dopplerShiftTable.texture;
 
         if (material.vertexShader) {
@@ -175,7 +150,7 @@ BoostFactory.prototype = {
         } else {
             vertexShaderCode = this.vertexShaderCode;
         }
-        
+
         if (material.fragmentShader) {
             fragmentShaderCode = material.fragmentShader;
         } else {
@@ -188,7 +163,7 @@ BoostFactory.prototype = {
         if (material.color) {
             uniforms.diffuse.value = new THREE.Color(material.color);
         }
-        
+
         if (material.map) {
             uniforms.map.texture = THREE.ImageUtils.loadTexture(material.map);
 
@@ -196,7 +171,7 @@ BoostFactory.prototype = {
                 "#define USE_MAP",
                 vertexShaderCode,
             ].join("\n");
-            
+
             fragmentShaderCode = [
                 "#define USE_MAP",
                 fragmentShaderCode,
@@ -212,7 +187,7 @@ BoostFactory.prototype = {
             shading: material.shading,
 
             map: material.map,
-            
+
             object: new THREE.ShaderMaterial({
                 uniforms:       uniforms,
                 vertexShader:   vertexShaderCode,
@@ -221,7 +196,7 @@ BoostFactory.prototype = {
                 lights:         true,
             }),
         });
-        
+
         return this.material[this.material.length-1].object;
     },
 };

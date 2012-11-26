@@ -75,7 +75,7 @@ body {
     padding-top: 0px;
     padding-left: 50px;
     padding-right: 50px;
-	padding-bottom: 0;
+    padding-bottom: 0;
 }
 
 #instrumentContainer > div {
@@ -87,7 +87,7 @@ body {
 #betaSlider {
     margin-top: 10px;
     margin-bottom: 10px;
-	padding: 0;
+    padding: 0;
     width: 10px;
     height: 200px;
     background: #b0b0b0;

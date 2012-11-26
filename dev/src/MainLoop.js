@@ -1,5 +1,3 @@
-
-// MainLoop = function () {
 function MainLoop() {
     try {
         this.renderer = new THREE.WebGLRenderer();
@@ -43,7 +41,7 @@ MainLoop.prototype = {
         this.dopplerShiftRescale = -1;
         this.dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
 
-		this.paused = false;
+        this.paused = false;
     },
 
     start: function (milliseconds) {
@@ -60,15 +58,15 @@ MainLoop.prototype = {
         this.plane.startLoop(milliseconds);
     },
 
-	pause: function () {
-	    this.paused = true;
-		this.plane.paused = true;
-	},
+    pause: function () {
+        this.paused = true;
+        this.plane.paused = true;
+    },
 
-	restart: function () {
-	    this.paused = false;
-		this.plane.paused = false;
-	},
+    restart: function () {
+        this.paused = false;
+        this.plane.paused = false;
+    },
 
     setBeta: function (beta) {
         this.beta_next = Math.min(beta, 0.9999);
@@ -119,9 +117,9 @@ MainLoop.prototype = {
     },
 
     drawFrame: function () {
-	    if (this.paused) {
+        if (this.paused) {
             return;
-		}
+        }
 
         this.updateBoostParameters();
 

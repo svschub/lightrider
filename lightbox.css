@@ -1,8 +1,8 @@
 #lightboxbackground {
     display: none;
     position: absolute;
-	margin: 0;
-	padding: 0;
+    margin: 0;
+    padding: 0;
     top: 0%;
     left: 0%;
     width: 100%;
@@ -17,7 +17,7 @@
 #lightbox {
     display: none;
     position: absolute;
-	margin: 0;
+    margin: 0;
     padding: 0;
     top: 20%;
     left: 30%;
@@ -32,55 +32,55 @@
 #lightbox > div {
     position: relative;
     margin: 0;
-	padding-left: 0px;
-	padding-right: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
     padding-top: 0px;
     padding-bottom: 70px;
     width: 100%;
     height: 100%;
-	background: #eeeeee;
+    background: #eeeeee;
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box;         /* Opera/IE 8+ */
-    overflow: hidden; 
+    overflow: hidden;
 }
 
 #lightboxContent {
     position: relative;
-    margin: 0; 
-	padding: 0; 
-    width: 100%; 
-    height: 100%; 
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     background: #ffffff;
-    text-align: center;	
+    text-align: center;
     font-family: Arial;
     font-size: 14pt;
-	font-weight: normal;
+    font-weight: normal;
     overflow: auto;
 }
 
 #lightboxContent h3 {
     font-size: 18pt;
-    font-weight: bold;   
+    font-weight: bold;
 }
 
 #lightboxContent hr.separator {
-    width: 90%; 
+    width: 90%;
     height: 1pt;
-    border: 0; 
-    color: #3399bb; 
-    background-color: #3399bb; 
+    border: 0;
+    color: #3399bb;
+    background-color: #3399bb;
 }
 
 #lightbox .button {
     margin-top: 10px;
-    margin-left: auto; 
+    margin-left: auto;
     margin-right: auto;
     padding: 0;
     padding-top: 10px;
     width: 100px;
     height: 50px;
-    border: 2px solid #000000;  
+    border: 2px solid #000000;
     background: #ffffff;
     color: #000000;
     text-align: center;
@@ -120,7 +120,7 @@
 #explanations > table {
     font-family: Arial;
     font-size: 14pt;
-    font-weight: normal;   
+    font-weight: normal;
 }
 
 #explanations > tr > td:first-child {
@@ -129,5 +129,5 @@
 
 form .horizontal {
     padding-left: 10px;
-	margin-left: 10px;
+    margin-left: 10px;
 }

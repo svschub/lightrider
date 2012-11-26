@@ -1,5 +1,4 @@
 
-// AngleIndicator = function (options) {
 function AngleIndicator (options) {
     this.mesh = this.create(options);
 }
@@ -10,15 +9,15 @@ AngleIndicator.prototype = {
     create: function (options) {
         var indicator, indicatorBackplane,
             planeSketchGeometry;
-        
+
         indicator = new THREE.Object3D();
-        
+
         indicatorBackplane = new THREE.Mesh(
             new THREE.PlaneGeometry(0.1, 0.1),
             new THREE.MeshBasicMaterial({
                 ambient: 0xFFFFFF,
                 color: 0xFFFFFF,
-                map: THREE.ImageUtils.loadTexture(options.texture),
+                map: options.texture, // THREE.ImageUtils.loadTexture(options.texture),
             })
         );
         indicator.add(indicatorBackplane);
@@ -30,7 +29,7 @@ AngleIndicator.prototype = {
         }
 
         this.planeSketch = new THREE.Line(
-            planeSketchGeometry, 
+            planeSketchGeometry,
             new THREE.LineBasicMaterial({
                 color: 0xFFFF00,
                 opacity: 1,
@@ -42,10 +41,10 @@ AngleIndicator.prototype = {
 
         indicator.position = options.position;
         indicator.rotation.x = -Math.PI/2;
-        
+
         return indicator;
     },
-    
+
     updateDirection: function (dx, dz) {
         this.planeSketch.lookAt(new THREE.Vector3(
             this.planeSketch.position.x+dx,

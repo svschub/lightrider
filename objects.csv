@@ -1,0 +1,7 @@
+lambertVertexShader,shaders/covariantLambert.vs,ascii
+lambertFragmentShader,shaders/covariantLambert.fs,ascii
+horizonVertexShader,shaders/covariantHorizon.vs,ascii
+dopplerMap,shaders/dopplerMap.png,image
+pitchIndicator,textures/pitch_indicator.jpg,image
+rollIndicator,textures/roll_indicator.jpg,image
+vorIndicator,textures/vor_indicator.jpg,image

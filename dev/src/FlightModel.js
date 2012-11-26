@@ -1,4 +1,3 @@
-
 function FlightModel(boost) {
     this.boost = boost;
 

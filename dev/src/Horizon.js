@@ -39,8 +39,8 @@ Horizon.prototype = {
     constructor: Horizon,
 
     initShaders: function () {
-        var horizonVertexShaderCode = this.boost.loadShaderCode("shaders/covariantHorizon.vs"),
-            horizonFragmentShaderCode = this.boost.loadShaderCode("shaders/covariantLambert.fs");
+        var horizonVertexShaderCode = loadAscii("horizonVertexShader"),
+            horizonFragmentShaderCode = loadAscii("lambertFragmentShader");
 
         this.horizonArcMaterial = this.boost.setMaterial({
             vertexShader: [
@@ -96,9 +96,9 @@ Horizon.prototype = {
         this.updateRectangleGeometry(
             this.horizonBackground,
             this.xmin,
-			this.ymin,
-			this.xmax,
-			this.ymax
+            this.ymin,
+            this.xmax,
+            this.ymax
         );
     },
 
@@ -500,7 +500,7 @@ Horizon.prototype = {
             h, dx,
             pRef, pObs,
             center, n,
-			i;
+            i;
 
         n = this.granularity - 1;
 

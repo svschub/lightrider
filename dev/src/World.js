@@ -1,4 +1,3 @@
-// World = function (boost) {
 function World(boost) {
     var church, palace, runway, ambientLight, pointLight;
 

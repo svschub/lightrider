@@ -1,5 +1,3 @@
-
-// Cockpit = function () {
 function Cockpit () {
     this.mesh = this.create();
 }
@@ -8,14 +6,14 @@ Cockpit.prototype = {
     constructor: Cockpit,
 
     create: function () {
-        var mesh, 
-            cockpit, cockpitMesh, 
-            display, displayGeometry, 
+        var mesh,
+            cockpit, cockpitMesh,
+            display, displayGeometry,
             indicator,
             cross;
 
         mesh = new THREE.Object3D();
-        
+
         displayGeometry = new DisplayGeometry();
         display = new THREE.Mesh(
             displayGeometry,
@@ -27,31 +25,31 @@ Cockpit.prototype = {
         cross = this.displayCross();
         cross.position = new THREE.Vector3(0,0.8,0.73);
         mesh.add(cross);
-        
+
         this.lookDownImage = displayGeometry.lookDownImage;
-        
+
         this.vorIndicator = this.addVorIndicator();
         mesh.add(this.vorIndicator.mesh);
-        
+
         this.rollAngleIndicator = this.addRollAngleIndicator();
         mesh.add(this.rollAngleIndicator.mesh);
-        
+
         this.pitchAngleIndicator = this.addPitchAngleIndicator();
         mesh.add(this.pitchAngleIndicator.mesh);
-        
+
         mesh.add(new THREE.Mesh(
             new CockpitGeometry(),
             new THREE.MeshFaceMaterial()
         ));
-                        
-        return mesh; 
+
+        return mesh;
     },
 
     displayCross: function () {
         var cross, crossLine, lineMaterial;
 
         cross = new THREE.Object3D();
-        
+
         lineMaterial = new THREE.LineBasicMaterial({
             color: 0xFFFF00,
             opacity: 1,
@@ -71,10 +69,10 @@ Cockpit.prototype = {
             new THREE.Vector3(0, 0.03, 0),
         ];
         cross.add(new THREE.Line(crossLine,    lineMaterial));
-        
+
         return cross;
     },
-    
+
     addVorIndicator: function () {
         var indicator = new AngleIndicator({
             sketch: [
@@ -91,13 +89,13 @@ Cockpit.prototype = {
                 [0.007, 0, 0.008],
                 [0, 0, 0.028],
             ],
-            texture: 'textures/vor_indicator.jpg',
+            texture: loadTexture("vorIndicator"),
             position: new THREE.Vector3(-0.18, 0.79, 0.75),
         });
 
-        return indicator;        
+        return indicator;
     },
-    
+
     addRollAngleIndicator: function () {
         var indicator = new AngleIndicator({
             sketch: [
@@ -109,13 +107,13 @@ Cockpit.prototype = {
                 [0.004, 0, 0.005],
                 [0, 0, 0.02],
             ],
-            texture: 'textures/roll_indicator.jpg',
+            texture: loadTexture("rollIndicator"),
             position: new THREE.Vector3(0.18, 0.79, 0.75),
         });
 
         return indicator;
     },
-    
+
     addPitchAngleIndicator: function () {
         var indicator = new AngleIndicator({
             sketch: [
@@ -124,12 +122,12 @@ Cockpit.prototype = {
                 [-0.029, 0, -0.002],
                 [-0.01, 0, -0.004],
                 [0.024, 0, -0.003],
-                [0.024, 0, 0.018],            
+                [0.024, 0, 0.018],
                 [0.01, 0, 0.004],
                 [-0.005, 0, 0.004],
                 [-0.012, 0, 0.008],
             ],
-            texture: 'textures/pitch_indicator.jpg',
+            texture: loadTexture("pitchIndicator"),
             position: new THREE.Vector3(0.29, 0.77, 0.75),
         });
 
