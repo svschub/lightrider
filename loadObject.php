@@ -1,5 +1,5 @@
 <?php
-    if (!isset($_POST["name"]) || ($_POST["name"] == "")) {
+    if (!isset($_GET["name"]) || ($_GET["name"] == "")) {
         echo "Error: no object specified!";
         return;
     }
@@ -14,7 +14,7 @@
     }
     fclose($objectsFile) or die("can not close objects file");
 
-    $objectName = $_POST["name"];
+    $objectName = $_GET["name"];
     if (!array_key_exists($objectName, $objects)) {
         echo "Error: object '$objectName' does not exist!";
         return;

@@ -3,7 +3,7 @@ function loadAscii (objectName) {
 
     $.ajax({
         url: "loadObject.php",
-        type: 'POST',
+        type: 'GET',
         data: {
             name: objectName
         },

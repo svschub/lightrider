@@ -17,7 +17,7 @@ AngleIndicator.prototype = {
             new THREE.MeshBasicMaterial({
                 ambient: 0xFFFFFF,
                 color: 0xFFFFFF,
-                map: options.texture, // THREE.ImageUtils.loadTexture(options.texture),
+                map: options.texture,
             })
         );
         indicator.add(indicatorBackplane);
