@@ -2,7 +2,7 @@ function loadAscii (objectName) {
     var asciiData;
 
     $.ajax({
-        url: "loadObject.php",
+        url: "/Lightrider/loadObject/",
         type: 'GET',
         data: {
             name: objectName

@@ -8,8 +8,8 @@
         <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 
         <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.8.21/themes/base/jquery-ui.css">
-        <link rel="stylesheet" type="text/css" href="index.css" />
-        <link rel="stylesheet" type="text/css" href="lightbox.css" />
+        <link rel="stylesheet" type="text/css" href="{{ asset('bundles/lightrider/css/index.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ asset('bundles/lightrider/css/lightbox.css') }}" />
     </head>
 
     <body>
@@ -76,9 +76,9 @@
         <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
         <script type="text/javascript" src="http://code.jquery.com/ui/1.8.21/jquery-ui.min.js"></script>
 
-        <script type="text/javascript" src="Three.js"></script>
-        <script type="text/javascript" src="Detector.js"></script>
-        <script type="text/javascript" src="dev/lightrider.debug.js"></script>
+        <script type="text/javascript" src="{{ asset('bundles/lightrider/js/Three.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/lightrider/js/Detector.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/lightrider/js/lightrider.min.js') }}"></script>
     </body>
 
 </html>

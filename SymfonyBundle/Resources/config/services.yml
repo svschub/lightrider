@@ -1,0 +1,7 @@
+parameters:
+#    projects_lightrider.example.class: Projects\LightriderBundle\Example
+
+services:
+#    projects_lightrider.example:
+#        class: %projects_lightrider.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

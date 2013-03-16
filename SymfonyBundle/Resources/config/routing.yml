@@ -1,0 +1,8 @@
+projects_lightrider_objectloader:
+    pattern:  /Lightrider/loadObject/
+    defaults: { _controller: ProjectsLightriderBundle:ObjectLoader:index }
+
+projects_lightrider_main:
+    pattern:  /Lightrider/
+    defaults: { _controller: ProjectsLightriderBundle:Main:index }
+
