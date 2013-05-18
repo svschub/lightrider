@@ -1,6 +1,6 @@
 <?php
 
-namespace Projects\LightriderBundle\Controller;
+namespace Homepage\LightriderBundle\Controller;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -11,7 +11,7 @@ class MainController extends Controller
     public function indexAction()
     {
         return $this->render(
-            'ProjectsLightriderBundle:Main:index.html.twig', 
+            'HomepageLightriderBundle:Main:index.html.twig', 
              array()
         );
     }

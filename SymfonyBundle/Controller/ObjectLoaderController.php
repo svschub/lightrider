@@ -1,6 +1,6 @@
 <?php
 
-namespace Projects\LightriderBundle\Controller;
+namespace Homepage\LightriderBundle\Controller;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -24,7 +24,7 @@ class ObjectLoaderController extends Controller
         }
 
         $objects = $this->readObjectsFromCsv(
-            $kernel->locateResource('@ProjectsLightriderBundle/Resources/data/objects.csv')
+            $kernel->locateResource('@HomepageLightriderBundle/Resources/data/objects.csv')
         );
 
         $objectName = $request->query->get('name');
@@ -61,7 +61,7 @@ class ObjectLoaderController extends Controller
 		$object = $objects[$objectName];
 		$filename = $object["filename"];
 		$fileext = pathinfo($filename, PATHINFO_EXTENSION);
-        $filepath = $kernel->locateResource('@ProjectsLightriderBundle/Resources/data/'.$filename);
+        $filepath = $kernel->locateResource('@HomepageLightriderBundle/Resources/data/'.$filename);
         $objectData = "reading file: ".$filepath;
 
 		$file = fopen($filepath, "r");

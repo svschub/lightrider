@@ -1,0 +1,24 @@
+result = -0.082577
+
+vector RGB = (1, 0, 0)
+R = 1
+G = -4.55267e-017
+B = 2.65882e-018
+
+vector RGB = (0, 1, 0)
+R = 1.50174e-016
+G = 1
+B = -1.06983e-016
+
+vector RGB = (0, 0, 1)
+R = -5.7183e-017
+G = -8.15911e-017
+B = 1
+
+rgb (vmin, vmax)
+R(-0.448615, 1.55035)
+G(-0.230001, 1.02742)
+B(-0.269253, 1.13998)
+
+
+Umrechnung von Map auf RGB:   rgbval = mapval*(vmax-vmin) + vmin
