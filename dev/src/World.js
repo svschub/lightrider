@@ -1,199 +1,234 @@
 function World(boost) {
-    var church, palace, runway, ambientLight, pointLight;
+    var self = this,
 
-    this.LOD = 4;  // level of detail
+        LOD = 4,  // level of detail
+        scene,
 
-    this.scene = new THREE.Scene();
+        createColumnRow = function (radius, height, number, dx) {
+            var columnRow, 
+                column, 
+                i;
 
-    this.boost = boost;
+            columnRow = new THREE.Object3D();
 
-    church = this.church();
-    church.position = new THREE.Vector3(10, 0, -15);
-    this.scene.add(church);
+            for (i = 0; i < number; i++) {
+                column = new THREE.Mesh(
+                    new THREE.CylinderGeometry(radius, radius, height, 12, 4 * LOD, false),
+                    boost.setMaterial({
+                        color: 0x999999,
+                        ambient: 0x777777,
+                        shading: THREE.SmoothShading
+                    })
+                );
+                column.position.x = i * dx - (number - 1) * dx / 2;
 
-    palace = this.palace();
-    palace.position = new THREE.Vector3(-5, 0, -25);
-    this.scene.add(palace);
+                columnRow.add(column);
+            }
 
-    runway = this.runway();
-    runway.position = new THREE.Vector3(-25, 0, -20);
-    this.scene.add(runway);
+            return columnRow;
+        },
 
-    ambientLight = new THREE.AmbientLight(0x999999);
-    this.scene.add(ambientLight);
+        createPalace = function () {
+            var palace, 
+                columnRow, 
+                building, 
+                roof, 
+                top;
 
-    pointLight = new THREE.PointLight(0xCCFF22);
-    pointLight.position.x = 0.5;
-    pointLight.position.y = 0.7;
-    pointLight.position.z = 10;
-    this.scene.add(pointLight);
+            palace = new THREE.Object3D();
 
-    THREE.SceneUtils.traverseHierarchy(this.scene, function (child) {
-        child.frustumCulled = false;
-    });
-}
+            columnRow = createColumnRow(0.5, 6, 4, 3);
+            columnRow.position.y = 3;
+            columnRow.position.z = 4.5;
+            palace.add(columnRow);
 
-World.prototype = {
-    constructor: World,
+            columnRow = createColumnRow(0.5, 6, 4, 3);
+            columnRow.position.y = 3;
+            columnRow.position.z = -4.5;
+            palace.add(columnRow);
 
-    add: function (object3d) {
-        this.scene.add(object3d);
-    },
+            columnRow = createColumnRow(0.5, 6, 4, 3);
+            columnRow.rotation.y = Math.PI / 2;
+            columnRow.position.y = 3;
+            columnRow.position.x = +7.5;
+            palace.add(columnRow);
 
-    columnRow: function (radius, height, number, dx) {
-        var columnRow, column, i;
+            columnRow = createColumnRow(0.5, 6, 4, 3);
+            columnRow.rotation.y = Math.PI / 2;
+            columnRow.position.y = 3;
+            columnRow.position.x = -7.5;
+            palace.add(columnRow);
 
-        columnRow = new THREE.Object3D();
-
-        for (i = 0; i < number; i++) {
-            column = new THREE.Mesh(
-                new THREE.CylinderGeometry(radius, radius, height, 12, 4 * this.LOD, false),
-                this.boost.setMaterial({
-                    color: 0x999999,
-                    ambient: 0x777777
+            building = new THREE.Mesh(
+                new THREE.CubeGeometry(13, 6, 7, LOD * 2, LOD, LOD),
+                boost.setMaterial({
+                    ambient: 0xCCEECC,
+                    color: 0xCCEECC,
+                    shading: THREE.SmoothShading
                 })
             );
-            column.position.x = i * dx - (number - 1) * dx / 2;
+            building.position.y = 3;
+            palace.add(building);
 
-            columnRow.add(column);
-        }
+            roof = new THREE.Mesh(
+                new THREE.CubeGeometry(17, 11, 0.5, LOD * 2, LOD * 2, 1),
+                boost.setMaterial({
+                    ambient: 0xCCEECC,
+                    color: 0xCCEECC,
+                    shading: THREE.SmoothShading
+                })
+            );
+            roof.rotation.x = Math.PI / 2;
+            roof.position.y = 6.25;
+            palace.add(roof);
 
-        return columnRow;
-    },
+            top = new THREE.Mesh(
+                new THREE.CubeGeometry(6, 3, 4, LOD * 2, LOD, LOD),
+                boost.setMaterial({
+                    ambient: 0xCACA9C,
+                    color: 0xCACA9C,
+                    shading: THREE.SmoothShading
+                })
+            );
+            top.position.y = 8;
+            palace.add(top);
 
-    palace: function () {
-        var palace, columnRow, building, roof, top;
+            return palace;
+        },
 
-        palace = new THREE.Object3D();
+        createChurch = function () {
+            var church, 
+                tower, 
+                towerRoof, 
+                building, 
+                crossHorizontalBar, 
+                crossVerticalBar, 
+                r;
 
-        columnRow = this.columnRow(0.5, 6, 4, 3);
-        columnRow.position.y = 3;
-        columnRow.position.z = 4.5;
-        palace.add(columnRow);
+            church = new THREE.Object3D();
 
-        columnRow = this.columnRow(0.5, 6, 4, 3);
-        columnRow.position.y = 3;
-        columnRow.position.z = -4.5;
-        palace.add(columnRow);
+            building = new THREE.Mesh(
+                new THREE.CubeGeometry(6, 4, 8, LOD * 2, LOD, LOD * 2),
+                boost.setMaterial({
+                    ambient: 0xCCEECC,
+                    color: 0xCCEECC,
+                    shading: THREE.SmoothShading
+                })
+            );
+            building.position.y = 2;
+            church.add(building);
 
-        columnRow = this.columnRow(0.5, 6, 4, 3);
-        columnRow.rotation.y = Math.PI / 2;
-        columnRow.position.y = 3;
-        columnRow.position.x = +7.5;
-        palace.add(columnRow);
+            tower = new THREE.Mesh(
+                new THREE.CubeGeometry(3, 9, 3, LOD, LOD * 2, LOD),
+                boost.setMaterial({
+                    ambient: 0xCCEECC,
+                    color: 0xCCEECC,
+                    shading: THREE.SmoothShading
+                })
+            );
+            tower.position = new THREE.Vector3(0, 4.5, 5.5);
+            church.add(tower);
 
-        columnRow = this.columnRow(0.5, 6, 4, 3);
-        columnRow.rotation.y = Math.PI / 2;
-        columnRow.position.y = 3;
-        columnRow.position.x = -7.5;
-        palace.add(columnRow);
+            r = 0.2;
+            towerRoof = new THREE.Mesh(
+                new THREE.CylinderGeometry(r, 2.5, 3, 16, 4 * LOD, false),
+                boost.setMaterial({
+                    ambient: 0xFFAA99,
+                    color: 0xFFAA99,
+                    shading: THREE.FlatShading
+                })
+            );
+            towerRoof.rotation.y = Math.PI / 4;
+            towerRoof.position = new THREE.Vector3(0, 10.5, 5.5);
+            church.add(towerRoof);
 
-        building = new THREE.Mesh(
-            new THREE.CubeGeometry(13, 6, 7, this.LOD * 2, this.LOD, this.LOD),
-            this.boost.setMaterial({
-                ambient: 0xCCEECC,
-                color: 0xCCEECC
-            })
-        );
-        building.position.y = 3;
-        palace.add(building);
+            crossVerticalBar = new THREE.Mesh(
+                new THREE.CubeGeometry(r * 1.41, r * 1.41, 4, 1, 1, LOD),
+                boost.setMaterial({
+                    ambient: 0xCACA9C,
+                    color: 0xCACA9C,
+                    shading: THREE.SmoothShading
+                })
+            );
+            crossVerticalBar.rotation.x = Math.PI / 2;
+            crossVerticalBar.position = new THREE.Vector3(0, 14, 5.5);
+            church.add(crossVerticalBar);
 
-        roof = new THREE.Mesh(
-            new THREE.CubeGeometry(17, 11, 0.5, this.LOD * 2, this.LOD * 2, 1),
-            this.boost.setMaterial({
-                ambient: 0xCCEECC,
-                color: 0xCCEECC
-            })
-        );
-        roof.rotation.x = Math.PI / 2;
-        roof.position.y = 6.25;
-        palace.add(roof);
+            crossHorizontalBar = new THREE.Mesh(
+                new THREE.CubeGeometry(r * 1.41, r * 1.41, 2, 1, 1, LOD),
+                boost.setMaterial({
+                    ambient: 0xCACA9C,
+                    color: 0xCACA9C,
+                    shading: THREE.SmoothShading
+                })
+            );
+            crossHorizontalBar.rotation.y = Math.PI / 2;
+            crossHorizontalBar.position = new THREE.Vector3(0, 15, 5.5);
+            church.add(crossHorizontalBar);
 
-        top = new THREE.Mesh(
-            new THREE.CubeGeometry(6, 3, 4, this.LOD * 2, this.LOD, this.LOD),
-            this.boost.setMaterial({
-                ambient: 0xCACA9C,
-                color: 0xCACA9C
-            })
-        );
-        top.position.y = 8;
-        palace.add(top);
+            return church;
+        },
 
-        return palace;
-    },
+        createRunway = function () {
+            var runway = new THREE.Mesh(
+                new THREE.PlaneGeometry(10, 100, 2 * LOD, 8 * LOD),
+                boost.setMaterial({
+                    ambient: 0xAAAAAA,
+                    color: 0x777777,
+                    shading: THREE.SmoothShading
+                })
+            );
 
-    church: function () {
-        var church, tower, towerRoof, building, crossHorizontalBar, crossVerticalBar, r;
+            return runway;
+        },
 
-        church = new THREE.Object3D();
+        init = function () {
+            var church, 
+                palace, 
+                runway, 
+                ambientLight, 
+                pointLight;
 
-        building = new THREE.Mesh(
-            new THREE.CubeGeometry(6, 4, 8, this.LOD * 2, this.LOD, this.LOD * 2),
-            this.boost.setMaterial({
-                ambient: 0xCCEECC,
-                color: 0xCCEECC
-            })
-        );
-        building.position.y = 2;
-        church.add(building);
+            scene = new THREE.Scene();
 
-        tower = new THREE.Mesh(
-            new THREE.CubeGeometry(3, 9, 3, this.LOD, this.LOD * 2, this.LOD),
-            this.boost.setMaterial({
-                ambient: 0xCCEECC,
-                color: 0xCCEECC
-            })
-        );
-        tower.position = new THREE.Vector3(0, 4.5, 5.5);
-        church.add(tower);
+            church = createChurch();
+            church.position = new THREE.Vector3(10, 0, -15);
+            scene.add(church);
 
-        r = 0.2;
-        towerRoof = new THREE.Mesh(
-            new THREE.CylinderGeometry(r, 2.5, 3, 16, 4 * this.LOD, false),
-            this.boost.setMaterial({
-                ambient: 0xFFAA99,
-                color: 0xFFAA99,
-                shading: THREE.FlatShading
-            })
-        );
-        towerRoof.rotation.y = Math.PI / 4;
-        towerRoof.position = new THREE.Vector3(0, 10.5, 5.5);
-        church.add(towerRoof);
+            palace = createPalace();
+            palace.position = new THREE.Vector3(-5, 0, -25);
+            scene.add(palace);
 
-        crossVerticalBar = new THREE.Mesh(
-            new THREE.CubeGeometry(r * 1.41, r * 1.41, 4, 1, 1, this.LOD),
-            this.boost.setMaterial({
-                ambient: 0xCACA9C,
-                color: 0xCACA9C
-            })
-        );
-        crossVerticalBar.rotation.x = Math.PI / 2;
-        crossVerticalBar.position = new THREE.Vector3(0, 14, 5.5);
-        church.add(crossVerticalBar);
+            runway = createRunway();
+            runway.position = new THREE.Vector3(-25, 0, -20);
+            scene.add(runway);
 
-        crossHorizontalBar = new THREE.Mesh(
-            new THREE.CubeGeometry(r * 1.41, r * 1.41, 2, 1, 1, this.LOD),
-            this.boost.setMaterial({
-                ambient: 0xCACA9C,
-                color: 0xCACA9C
-            })
-        );
-        crossHorizontalBar.rotation.y = Math.PI / 2;
-        crossHorizontalBar.position = new THREE.Vector3(0, 15, 5.5);
-        church.add(crossHorizontalBar);
+            ambientLight = new THREE.AmbientLight(0x999999);
+            scene.add(ambientLight);
 
-        return church;
-    },
+            pointLight = new THREE.PointLight(0xCCFF22);
+            pointLight.position.x = 0.5;
+            pointLight.position.y = 0.7;
+            pointLight.position.z = 10;
+            scene.add(pointLight);
 
-    runway: function () {
-        var runway = new THREE.Mesh(
-            new THREE.PlaneGeometry(10, 100, 2 * this.LOD, 8 * this.LOD),
-            this.boost.setMaterial({
-                ambient: 0xAAAAAA,
-                color: 0x777777
-            })
-        );
+            THREE.SceneUtils.traverseHierarchy(scene, function (child) {
+                child.frustumCulled = false;
+            });
+/*
+            scene.traverse(function (child) {
+                child.frustumCulled = false;
+            });
+*/
+        };
+ 
+    self.getScene = function () {
+        return scene;
+    };
+    
+    self.add = function (object3d) {
+        scene.add(object3d);
+    };
 
-        return runway;
-    }
-};
+    init();
+}

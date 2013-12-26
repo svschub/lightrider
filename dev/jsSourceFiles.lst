@@ -9,8 +9,9 @@ AngleIndicator.js
 Cockpit.js
 Horizon.js
 Observer.js
+Cabin.js
 World.js
 FlightModel.js
-MainLoop.js
+Renderer.js
 KeyHandler.js
 main.js

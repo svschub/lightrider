@@ -1,651 +1,679 @@
 function Horizon(boost) {
-    this.horizonNormal = new THREE.Vector3(0, 0, -1);
-    this.groundNormal = new THREE.Vector3(0, 1, 0);
+    var self = this,
+    
+        mesh, // horizon mesh
+        
+        skyColor = new THREE.Color(0x3355AA),
+        groundColor = new THREE.Color(0x446600),
 
-    this.skyColor = new THREE.Color(0x3355AA);
-    this.groundColor = new THREE.Color(0x446600);
+        horizonNormal = new THREE.Vector3(0, 0, -1),
+        groundNormal = new THREE.Vector3(0, 1, 0),
 
-    this.boundingRadius = 1;
-    this.granularity = 16;
-    this.horizonArcZshift = 100;  // TODO
+        boundingRadius = 1,
+        granularity = 16,
 
-    this.boost = boost;
+        horizonBackground, // ?
+        horizonBackgroundMaterial, // ?
 
-    this.initShaders();
+        horizonArc, // ?
+        horizonArcGeometry, // ?
+        horizonArcColor, // ?
+        horizonArcMaterial, // ?
+        horizonArcZshift = 100,  // TODO
 
-    this.mesh = new THREE.Object3D();
+        verticalRect, // ?
+        horizontalRect, // ?
+        edgeRect, // ?
+        
+        viewConeAngle, // ?
+        viewSphereRadius, // ?
+        pitchRadius, // ?
+        vanishingPoint, // ?
+        angularNormal, // ?
 
-    this.horizonBackground = this.createRectangle(this.horizonBackgroundMaterial);
-    this.mesh.add(this.horizonBackground);
+        xmin, ymin, xmax, ymax,
 
-    this.horizonArc = this.createHorizonArc();
-    this.horizonArc.position.z = -this.horizonArcZshift;
-    this.mesh.add(this.horizonArc);
+        createRectangle = function (rectangleMaterial) {
+            var rectangle, rectangleGeometry, rectangleFace;
 
-    this.verticalRect = this.createRectangle(this.horizonArcMaterial);
-    this.verticalRect.position.z = -this.horizonArcZshift;
-    this.mesh.add(this.verticalRect);
+            rectangleGeometry = new THREE.Geometry();
+            rectangleGeometry.dynamic = true;
 
-    this.horizontalRect = this.createRectangle(this.horizonArcMaterial);
-    this.horizontalRect.position.z = -this.horizonArcZshift;
-    this.mesh.add(this.horizontalRect);
-
-    this.edgeRect = this.createRectangle(this.horizonArcMaterial);
-    this.edgeRect.position.z = -this.horizonArcZshift;
-    this.mesh.add(this.edgeRect);
-}
-
-Horizon.prototype = {
-    constructor: Horizon,
-
-    initShaders: function () {
-        var horizonVertexShaderCode = loadAscii("horizonVertexShader"),
-            horizonFragmentShaderCode = loadAscii("lambertFragmentShader");
-
-        this.horizonArcMaterial = this.boost.setMaterial({
-            vertexShader: [
-                "#define HORIZON_ARC",
-                horizonVertexShaderCode
-            ].join("\n"),
-            fragmentShader: [
-                "#define HORIZON",
-                "#define USE_COLOR",
-                horizonFragmentShaderCode
-            ].join("\n"),
-
-            uniforms: { "horizonArcColor": { type: "c", value: this.skyColor}}
-        });
-
-        this.horizonBackgroundMaterial = this.boost.setMaterial({
-            vertexShader: [
-                "#define HORIZON_BACKGROUND",
-                horizonVertexShaderCode
-            ].join("\n"),
-            fragmentShader: [
-                "#define HORIZON",
-                "#define USE_COLOR",
-                horizonFragmentShaderCode
-            ].join("\n"),
-
-            uniforms: { "horizonBackgroundColor": { type: "c", value: this.groundColor}}
-        });
-    },
-
-    setZ: function (z) {
-        this.mesh.position.z = z;
-    },
-
-    getZ: function () {
-        return this.mesh.position.z;
-    },
-
-    setFrustumParametersFromCamera: function (camera) {
-        var near = camera.near,
-            far = (this.getZ() + this.horizonBackground.position.z);
-
-        this.ymax = near * Math.tan(camera.fov * Math.PI / 360);
-        this.ymin = -this.ymax;
-        this.xmax = this.ymax * camera.aspect;
-        this.xmin = -this.xmax;
-
-        this.xmin = far * this.xmin / near;
-        this.xmax = far * this.xmax / near;
-        this.ymin = far * this.ymin / near;
-        this.ymax = far * this.ymax / near;
-
-        this.updateRectangleGeometry(
-            this.horizonBackground,
-            this.xmin,
-            this.ymin,
-            this.xmax,
-            this.ymax
-        );
-    },
-
-    calculateGroundNormal: function (angles) {
-        var v = new THREE.Vector3(0, angles.cosPitchAngle, angles.sinPitchAngle);
-
-        this.groundNormal.x = -v.y * angles.sinRollAngle;
-        this.groundNormal.y = v.y * angles.cosRollAngle;
-        this.groundNormal.z = v.z;
-    },
-
-    calculateBoundingCircle: function () {
-        this.boundingRadius = (this.getZ() - this.horizonArcZshift) * Math.tan(this.viewConeAngle);
-    },
-
-    calculatePitchCircle: function (angles) {
-        var v, vRef, vObs;
-
-        v = new THREE.Vector3(0, -this.viewSphereRadius * angles.sinPitchAngle, this.viewSphereRadius * angles.cosPitchAngle);
-        vRef = new THREE.Vector3(-v.y * angles.sinRollAngle, v.y * angles.cosRollAngle, v.z);
-        vObs = this.boost.getObserverVertex(vRef);
-
-        vObs.multiplyScalar((this.getZ() - this.horizonArcZshift) / vObs.z);
-
-        this.pitchRadius = Math.sqrt(vObs.x * vObs.x + vObs.y * vObs.y);
-        this.vanishingPoint = vObs;
-    },
-
-    calculateAngularNormals: function () {
-        var alpha, i;
-
-        this.angularNormal = [];
-
-        for (i = 0; i < this.granularity; i++) {
-            alpha = Math.PI * i / this.granularity;
-
-            this.angularNormal[i] = new THREE.Vector3(
-                -this.viewSphereRadius * Math.cos(alpha),
-                this.viewSphereRadius * Math.sin(alpha),
-                0
-            );
-        }
-    },
-
-    updateObserverViewCone: function (viewconeparameters) {
-        this.viewConeAngle = viewconeparameters.viewConeAngle;
-        this.viewSphereRadius = viewconeparameters.viewSphereRadius;
-
-        this.calculateBoundingCircle();
-        this.calculateAngularNormals();
-    },
-
-    createRectangle: function (rectangleMaterial) {
-        var rectangle, rectangleGeometry, rectangleFace;
-
-        rectangleGeometry = new THREE.Geometry();
-        rectangleGeometry.dynamic = true;
-
-        rectangleGeometry.vertices = [
-            new THREE.Vector3(-1, -1, 0),
-            new THREE.Vector3(-1, +1, 0),
-            new THREE.Vector3(+1, +1, 0),
-            new THREE.Vector3(+1, -1, 0)
-        ];
-
-        rectangleFace = new THREE.Face4(0, 1, 2, 3);
-
-        rectangleFace.normal.copy(this.horizonNormal);
-        rectangleFace.vertexNormals = [
-            this.horizonNormal.clone(),
-            this.horizonNormal.clone(),
-            this.horizonNormal.clone(),
-            this.horizonNormal.clone()
-        ];
-
-        rectangleGeometry.faces.push(rectangleFace);
-        rectangleGeometry.faceVertexUvs[0] = [];
-        rectangleGeometry.computeCentroids();
-
-        rectangle = new THREE.Mesh(rectangleGeometry, rectangleMaterial);
-
-        rectangle.doubleSided = true;
-        rectangle.visible = true;
-
-        return rectangle;
-    },
-
-    updateRectangleGeometry: function (rectangle, xmin, ymin, xmax, ymax) {
-        rectangle.geometry.vertices[0].set(xmin, ymin, 0);
-        rectangle.geometry.vertices[1].set(xmax, ymin, 0);
-        rectangle.geometry.vertices[2].set(xmax, ymax, 0);
-        rectangle.geometry.vertices[3].set(xmin, ymax, 0);
-
-        rectangle.geometry.verticesNeedUpdate = true;
-
-        if ((xmin !== xmax) && (ymin !== ymax)) {
-            rectangle.visible = true;
-        }
-    },
-
-    createHorizonArc: function () {
-        var i, j, horizonArc, arcSlice;
-
-        this.horizonArcGeometry = new THREE.Geometry();
-        this.horizonArcGeometry.dynamic = true;
-
-        for (i = 0; i < 2 * this.granularity + 1; i++) {
-            this.horizonArcGeometry.vertices.push(new THREE.Vector3());
-        }
-
-        for (i = 0; i < 2 * this.granularity; i++) {
-            j = i + 1;
-            if (j === 2 * this.granularity) {
-                j = 0;
-            }
-
-            arcSlice = new THREE.Face3(2 * this.granularity, i, j);
-            arcSlice.normal.copy(this.horizonNormal);
-            arcSlice.vertexNormals = [
-                this.horizonNormal.clone(),
-                this.horizonNormal.clone(),
-                this.horizonNormal.clone()
+            rectangleGeometry.vertices = [
+                new THREE.Vector3(-1, -1, 0),
+                new THREE.Vector3(-1, +1, 0),
+                new THREE.Vector3(+1, +1, 0),
+                new THREE.Vector3(+1, -1, 0)
             ];
-            this.horizonArcGeometry.faces.push(arcSlice);
-        }
-        this.horizonArcGeometry.faceVertexUvs[0] = [];
-        this.horizonArcGeometry.computeCentroids();
 
-        horizonArc = new THREE.Mesh(this.horizonArcGeometry, this.horizonArcMaterial);
+            rectangleFace = new THREE.Face4(0, 1, 2, 3);
 
-        horizonArc.doubleSided = true;
+            rectangleFace.normal.copy(horizonNormal);
+            rectangleFace.vertexNormals = [
+                horizonNormal.clone(),
+                horizonNormal.clone(),
+                horizonNormal.clone(),
+                horizonNormal.clone()
+            ];
 
-        return horizonArc;
-    },
+            rectangleGeometry.faces.push(rectangleFace);
+            rectangleGeometry.faceVertexUvs[0] = [];
+            rectangleGeometry.computeCentroids();
 
-    updateHorizonArcColor: function (color) {
-        this.horizonArcColor = color;
-        this.horizonArcMaterial.uniforms.horizonArcColor.value = color;
+            rectangle = new THREE.Mesh(rectangleGeometry, rectangleMaterial);
 
-        if (this.horizonArcColor === this.skyColor) {
-            this.horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = this.groundColor;
-        } else {
-            this.horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = this.skyColor;
-        }
-    },
+            rectangle.doubleSided = true;
+            rectangle.visible = true;
 
-    isCurvatureNeglegible: function (v0, vn, center) {
-        var curvature, v0n, vr, vc, length;
+            return rectangle;
+        },
 
-        v0n = new THREE.Vector3();
-        v0n.sub(vn, v0);
-        length = v0n.length();
+        updateRectangleGeometry = function (rectangle, xmin, ymin, xmax, ymax) {
+            rectangle.geometry.vertices[0].set(xmin, ymin, 0);
+            rectangle.geometry.vertices[1].set(xmax, ymin, 0);
+            rectangle.geometry.vertices[2].set(xmax, ymax, 0);
+            rectangle.geometry.vertices[3].set(xmin, ymax, 0);
 
-        vr = new THREE.Vector3(v0n.y, -v0n.x, v0n.z);
-        vr.divideScalar(length);
+            rectangle.geometry.verticesNeedUpdate = true;
 
-        vc = new THREE.Vector3();
-        vc.sub(center, v0);
-
-        curvature = vc.dot(vr) / length;
-
-        return (Math.abs(curvature) < 0.001);
-    },
-
-    isTriangle: function (v0, vn, vR) {
-        if (vR.x === v0.x) {
-            if (Math.abs(vR.y - v0.y) < 0.01) {
-                return false;
+            if ((xmin !== xmax) && (ymin !== ymax)) {
+                rectangle.visible = true;
             }
-        }
+        },
 
-        if (vR.x === vn.x) {
-            if (Math.abs(vR.y - vn.y) < 0.01) {
-                return false;
+        initShaders = function () {
+            var horizonVertexShaderCode = loadAscii("horizonVertexShader"),
+                horizonFragmentShaderCode = loadAscii("lambertFragmentShader");
+
+            horizonArcMaterial = boost.setMaterial({
+                vertexShader: [
+                    "#define HORIZON_ARC",
+                    horizonVertexShaderCode
+                ].join("\n"),
+                fragmentShader: [
+                    "#define HORIZON",
+                    "#define USE_COLOR",
+                    horizonFragmentShaderCode
+                ].join("\n"),
+
+                uniforms: { "horizonArcColor": { type: "c", value: skyColor}}
+            });
+
+            horizonBackgroundMaterial = boost.setMaterial({
+                vertexShader: [
+                    "#define HORIZON_BACKGROUND",
+                    horizonVertexShaderCode
+                ].join("\n"),
+                fragmentShader: [
+                    "#define HORIZON",
+                    "#define USE_COLOR",
+                    horizonFragmentShaderCode
+                ].join("\n"),
+
+                uniforms: { "horizonBackgroundColor": { type: "c", value: groundColor}}
+            });
+        },
+
+        init = function () {
+            initShaders();
+
+            mesh = new THREE.Object3D();
+
+            horizonBackground = createRectangle(horizonBackgroundMaterial);
+            mesh.add(horizonBackground);
+
+            horizonArc = createHorizonArc();
+            horizonArc.position.z = -horizonArcZshift;
+            mesh.add(horizonArc);
+
+            verticalRect = createRectangle(horizonArcMaterial);
+            verticalRect.position.z = -horizonArcZshift;
+            mesh.add(verticalRect);
+
+            horizontalRect = createRectangle(horizonArcMaterial);
+            horizontalRect.position.z = -horizonArcZshift;
+            mesh.add(horizontalRect);
+
+            edgeRect = createRectangle(horizonArcMaterial);
+            edgeRect.position.z = -horizonArcZshift;
+            mesh.add(edgeRect);
+        },
+
+        calculateGroundNormal = function (angles) {
+            var v = new THREE.Vector3(0, angles.cosPitchAngle, angles.sinPitchAngle);
+
+            groundNormal.x = -v.y * angles.sinRollAngle;
+            groundNormal.y = v.y * angles.cosRollAngle;
+            groundNormal.z = v.z;
+        },
+
+        calculateBoundingCircle = function () {
+            boundingRadius = (self.getZ() - horizonArcZshift) * Math.tan(viewConeAngle);
+        },
+
+        calculatePitchCircle = function (angles) {
+            var v, vRef, vObs;
+
+            v = new THREE.Vector3(0, -viewSphereRadius * angles.sinPitchAngle, viewSphereRadius * angles.cosPitchAngle);
+            vRef = new THREE.Vector3(-v.y * angles.sinRollAngle, v.y * angles.cosRollAngle, v.z);
+            vObs = boost.getObserverVertex(vRef);
+
+            vObs.multiplyScalar((self.getZ() - horizonArcZshift) / vObs.z);
+
+            pitchRadius = Math.sqrt(vObs.x * vObs.x + vObs.y * vObs.y);
+            vanishingPoint = vObs;
+        },
+
+        calculateAngularNormals = function () {
+            var alpha, i;
+
+            angularNormal = [];
+
+            for (i = 0; i < granularity; i++) {
+                alpha = Math.PI * i / granularity;
+
+                angularNormal[i] = new THREE.Vector3(
+                    -viewSphereRadius * Math.cos(alpha),
+                    viewSphereRadius * Math.sin(alpha),
+                    0
+                );
             }
-        }
+        },
 
-        return true;
-    },
+        createHorizonArc = function () {
+            var i, j, horizonArc, arcSlice;
 
-    trianglePointsToCenter: function (v0, vn, vR) {
-        var va, vb, det;
+            horizonArcGeometry = new THREE.Geometry();
+            horizonArcGeometry.dynamic = true;
 
-        va = new THREE.Vector3();
-        va.sub(vn, v0);
+            for (i = 0; i < 2 * granularity + 1; i++) {
+                horizonArcGeometry.vertices.push(new THREE.Vector3());
+            }
 
-        vb = new THREE.Vector3();
-        vb.sub(vR, v0);
+            for (i = 0; i < 2 * granularity; i++) {
+                j = i + 1;
+                if (j === 2 * granularity) {
+                    j = 0;
+                }
 
-        det = va.x * vb.y - va.y * vb.x;
+                arcSlice = new THREE.Face3(2 * granularity, i, j);
+                arcSlice.normal.copy(horizonNormal);
+                arcSlice.vertexNormals = [
+                    horizonNormal.clone(),
+                    horizonNormal.clone(),
+                    horizonNormal.clone()
+                ];
+                horizonArcGeometry.faces.push(arcSlice);
+            }
+            horizonArcGeometry.faceVertexUvs[0] = [];
+            horizonArcGeometry.computeCentroids();
 
-        return (det * (-va.x * v0.y + va.y * v0.x) > 0);
-    },
+            horizonArc = new THREE.Mesh(horizonArcGeometry, horizonArcMaterial);
 
-    findRectificationVertex: function (v0, vn, center) {
-        var va, vb, det, vRect;
+            horizonArc.doubleSided = true;
 
-        va = new THREE.Vector3();
-        va.sub(vn, v0);
+            return horizonArc;
+        },
 
-        vb = new THREE.Vector3();
-        vb.sub(center, v0);
+        updateHorizonArcColor = function (color) {
+            horizonArcColor = color;
+            horizonArcMaterial.uniforms.horizonArcColor.value = color;
 
-        det = va.x * vb.y - va.y * vb.x;
+            if (horizonArcColor === skyColor) {
+                horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = groundColor;
+            } else {
+                horizonBackgroundMaterial.uniforms.horizonBackgroundColor.value = skyColor;
+            }
+        },
 
-        vRect = new THREE.Vector3(vn.x, v0.y, v0.z);
-        vb.sub(vRect, v0);
+        isCurvatureNeglegible = function (v0, vn, center) {
+            var curvature, v0n, vr, vc, length;
 
-        if (det * (va.x * vb.y - va.y * vb.x) >= 0) {
-            vRect.x = v0.x;
-            vRect.y = vn.y;
-        }
+            v0n = new THREE.Vector3();
+            v0n.sub(vn, v0);
+            length = v0n.length();
 
-        return vRect;
-    },
+            vr = new THREE.Vector3(v0n.y, -v0n.x, v0n.z);
+            vr.divideScalar(length);
 
-    findGroundRectificationVertex: function (v0, vn) {
-        var va, vRect;
+            vc = new THREE.Vector3();
+            vc.sub(center, v0);
 
-        vRect = new THREE.Vector3(vn.x, v0.y, v0.z);
-        va = new THREE.Vector3();
-        va.sub(vRect, v0);
+            curvature = vc.dot(vr) / length;
 
-        if ((this.groundNormal.x * va.x + this.groundNormal.y * va.y) > 0) {
-            vRect.x = v0.x;
-            vRect.y = vn.y;
-        }
+            return (Math.abs(curvature) < 0.001);
+        },
 
-        return vRect;
-    },
+        isTriangle = function (v0, vn, vR) {
+            if (vR.x === v0.x) {
+                if (Math.abs(vR.y - v0.y) < 0.01) {
+                    return false;
+                }
+            }
 
-    simpleHorizonArcCompletion: function (angles, v0, vn, vR) {
-        var x1, y1, x2, y2;
+            if (vR.x === vn.x) {
+                if (Math.abs(vR.y - vn.y) < 0.01) {
+                    return false;
+                }
+            }
 
-        if (Math.abs(angles.cosRollAngle) > 0.5) {
-            x1 = this.xmin;
-            x2 = this.xmax;
-            y1 = v0.y;
-            if (angles.cosRollAngle > 0) {
-                if (this.horizonArcColor === this.skyColor) {
-                    y2 = this.ymax;
+            return true;
+        },
+
+        trianglePointsToCenter = function (v0, vn, vR) {
+            var va, vb, det;
+
+            va = new THREE.Vector3();
+            va.sub(vn, v0);
+
+            vb = new THREE.Vector3();
+            vb.sub(vR, v0);
+
+            det = va.x * vb.y - va.y * vb.x;
+
+            return (det * (-va.x * v0.y + va.y * v0.x) > 0);
+        },
+
+        findRectificationVertex = function (v0, vn, center) {
+            var va, vb, det, vRect;
+
+            va = new THREE.Vector3();
+            va.sub(vn, v0);
+
+            vb = new THREE.Vector3();
+            vb.sub(center, v0);
+
+            det = va.x * vb.y - va.y * vb.x;
+
+            vRect = new THREE.Vector3(vn.x, v0.y, v0.z);
+            vb.sub(vRect, v0);
+
+            if (det * (va.x * vb.y - va.y * vb.x) >= 0) {
+                vRect.x = v0.x;
+                vRect.y = vn.y;
+            }
+
+            return vRect;
+        },
+
+        findGroundRectificationVertex = function (v0, vn) {
+            var va, vRect;
+
+            vRect = new THREE.Vector3(vn.x, v0.y, v0.z);
+            va = new THREE.Vector3();
+            va.sub(vRect, v0);
+
+            if ((groundNormal.x * va.x + groundNormal.y * va.y) > 0) {
+                vRect.x = v0.x;
+                vRect.y = vn.y;
+            }
+
+            return vRect;
+        },
+
+        simpleHorizonArcCompletion = function (angles, v0, vn, vR) {
+            var x1, y1, x2, y2;
+
+            if (Math.abs(angles.cosRollAngle) > 0.5) {
+                x1 = xmin;
+                x2 = xmax;
+                y1 = v0.y;
+                if (angles.cosRollAngle > 0) {
+                    if (horizonArcColor === skyColor) {
+                        y2 = ymax;
+                    } else {
+                        y2 = ymin;
+                    }
                 } else {
-                    y2 = this.ymin;
+                    if (horizonArcColor === skyColor) {
+                        y2 = ymin;
+                    } else {
+                        y2 = ymax;
+                    }
                 }
             } else {
-                if (this.horizonArcColor === this.skyColor) {
-                    y2 = this.ymin;
+                y1 = ymin;
+                y2 = ymax;
+                x1 = v0.x;
+                if (angles.sinRollAngle > 0) {
+                    if (horizonArcColor === skyColor) {
+                        x2 = xmax;
+                    } else {
+                        x2 = xmin;
+                    }
                 } else {
-                    y2 = this.ymax;
+                    if (horizonArcColor === skyColor) {
+                        x2 = xmin;
+                    } else {
+                        x2 = xmax;
+                    }
                 }
             }
-        } else {
-            y1 = this.ymin;
-            y2 = this.ymax;
-            x1 = v0.x;
-            if (angles.sinRollAngle > 0) {
-                if (this.horizonArcColor === this.skyColor) {
-                    x2 = this.xmax;
+
+            updateRectangleGeometry(horizontalRect, x1, y1, x2, y2);
+        },
+
+        triangularHorizonArcCompletion = function (angles, v0, vn, vR) {
+            var xE, yE, x, y, pointsTriangleToCenter;
+
+            xE = vR.x;
+            yE = vR.y;
+
+            pointsTriangleToCenter = trianglePointsToCenter(v0, vn, vR);
+
+            if (v0.y === vR.y) {
+
+                if (pointsTriangleToCenter) {
+                    if (v0.x < vR.x) {
+                        x = xmin;
+                    } else {
+                        x = xmax;
+                    }
                 } else {
-                    x2 = this.xmin;
+                    x = v0.x;
                 }
-            } else {
-                if (this.horizonArcColor === this.skyColor) {
-                    x2 = this.xmin;
+
+                if (v0.y < vn.y) {
+                    if (v0.y > ymin) {
+                        updateRectangleGeometry(horizontalRect, x, ymin, vR.x, vR.y);
+                        yE = ymin;
+                    }
                 } else {
-                    x2 = this.xmax;
+                    if (v0.y < ymax) {
+                        updateRectangleGeometry(horizontalRect, x, ymax, vR.x, vR.y);
+                        yE = ymax;
+                    }
                 }
             }
-        }
 
-        this.updateRectangleGeometry(this.horizontalRect, x1, y1, x2, y2);
-    },
+            if (v0.x === vR.x) {
 
-    triangularHorizonArcCompletion: function (angles, v0, vn, vR) {
-        var xE, yE, x, y, trianglePointsToCenter;
-
-        xE = vR.x;
-        yE = vR.y;
-
-        trianglePointsToCenter = this.trianglePointsToCenter(v0, vn, vR);
-
-        if (v0.y === vR.y) {
-
-            if (trianglePointsToCenter) {
-                if (v0.x < vR.x) {
-                    x = this.xmin;
+                if (pointsTriangleToCenter) {
+                    if (v0.y < vR.y) {
+                        y = ymin;
+                    } else {
+                        y = ymax;
+                    }
                 } else {
-                    x = this.xmax;
+                    y = v0.y;
                 }
-            } else {
-                x = v0.x;
-            }
 
-            if (v0.y < vn.y) {
-                if (v0.y > this.ymin) {
-                    this.updateRectangleGeometry(this.horizontalRect, x, this.ymin, vR.x, vR.y);
-                    yE = this.ymin;
-                }
-            } else {
-                if (v0.y < this.ymax) {
-                    this.updateRectangleGeometry(this.horizontalRect, x, this.ymax, vR.x, vR.y);
-                    yE = this.ymax;
-                }
-            }
-        }
-
-        if (v0.x === vR.x) {
-
-            if (trianglePointsToCenter) {
-                if (v0.y < vR.y) {
-                    y = this.ymin;
+                if (v0.x < vn.x) {
+                    if (v0.x > xmin) {
+                        updateRectangleGeometry(horizontalRect, xmin, y, vR.x, vR.y);
+                        xE = xmin;
+                    }
                 } else {
-                    y = this.ymax;
-                }
-            } else {
-                y = v0.y;
-            }
-
-            if (v0.x < vn.x) {
-                if (v0.x > this.xmin) {
-                    this.updateRectangleGeometry(this.horizontalRect, this.xmin, y, vR.x, vR.y);
-                    xE = this.xmin;
-                }
-            } else {
-                if (v0.x < this.xmax) {
-                    this.updateRectangleGeometry(this.horizontalRect, this.xmax, y, vR.x, vR.y);
-                    xE = this.xmax;
+                    if (v0.x < xmax) {
+                        updateRectangleGeometry(horizontalRect, xmax, y, vR.x, vR.y);
+                        xE = xmax;
+                    }
                 }
             }
-        }
 
-        if (vn.y === vR.y) {
+            if (vn.y === vR.y) {
 
-            if (trianglePointsToCenter) {
-                if (vn.x < vR.x) {
-                    x = this.xmin;
+                if (pointsTriangleToCenter) {
+                    if (vn.x < vR.x) {
+                        x = xmin;
+                    } else {
+                        x = xmax;
+                    }
                 } else {
-                    x = this.xmax;
+                    x = vn.x;
                 }
-            } else {
-                x = vn.x;
-            }
 
-            if (vn.y < v0.y) {
-                if (vn.y > this.ymin) {
-                    this.updateRectangleGeometry(this.verticalRect, x, this.ymin, vR.x, vR.y);
-                    yE = this.ymin;
-                }
-            } else {
-                if (vn.y < this.ymax) {
-                    this.updateRectangleGeometry(this.verticalRect, x, this.ymax, vR.x, vR.y);
-                    yE = this.ymax;
-                }
-            }
-        }
-
-        if (vn.x === vR.x) {
-
-            if (trianglePointsToCenter) {
-                if (vn.y < vR.y) {
-                    y = this.ymin;
+                if (vn.y < v0.y) {
+                    if (vn.y > ymin) {
+                        updateRectangleGeometry(verticalRect, x, ymin, vR.x, vR.y);
+                        yE = ymin;
+                    }
                 } else {
-                    y = this.ymax;
-                }
-            } else {
-                y = vn.y;
-            }
-
-            if (vn.x < v0.x) {
-                if (vn.x > this.xmin) {
-                    this.updateRectangleGeometry(this.verticalRect, this.xmin, y, vR.x, vR.y);
-                    xE = this.xmin;
-                }
-            } else {
-                if (vn.x < this.xmax) {
-                    this.updateRectangleGeometry(this.verticalRect, this.xmax, y, vR.x, vR.y);
-                    xE = this.xmax;
+                    if (vn.y < ymax) {
+                        updateRectangleGeometry(verticalRect, x, ymax, vR.x, vR.y);
+                        yE = ymax;
+                    }
                 }
             }
-        }
 
-        this.updateRectangleGeometry(this.edgeRect, vR.x, vR.y, xE, yE);
-    },
+            if (vn.x === vR.x) {
 
-    horizonArcCompletion: function (angles, v0, vn, vR) {
-        this.horizontalRect.visible = false;
-        this.verticalRect.visible = false;
-        this.edgeRect.visible = false;
+                if (pointsTriangleToCenter) {
+                    if (vn.y < vR.y) {
+                        y = ymin;
+                    } else {
+                        y = ymax;
+                    }
+                } else {
+                    y = vn.y;
+                }
 
-        if (this.isTriangle(v0, vn, vR)) {
-            this.triangularHorizonArcCompletion(angles, v0, vn, vR);
-        } else {
-            this.simpleHorizonArcCompletion(angles, v0, vn, vR);
-        }
-    },
+                if (vn.x < v0.x) {
+                    if (vn.x > xmin) {
+                        updateRectangleGeometry(verticalRect, xmin, y, vR.x, vR.y);
+                        xE = xmin;
+                    }
+                } else {
+                    if (vn.x < xmax) {
+                        updateRectangleGeometry(verticalRect, xmax, y, vR.x, vR.y);
+                        xE = xmax;
+                    }
+                }
+            }
 
-    updateOpenHorizonArc: function (angles) {
-        var dy, vObs, vRef, vRect,
-            h, dx,
-            pRef, pObs,
-            center, n,
-            i;
+            updateRectangleGeometry(edgeRect, vR.x, vR.y, xE, yE);
+        },
 
-        n = this.granularity - 1;
+        horizonArcCompletion = function (angles, v0, vn, vR) {
+            horizontalRect.visible = false;
+            verticalRect.visible = false;
+            edgeRect.visible = false;
 
-        this.horizonArcGeometry.vertices[n].x = this.vanishingPoint.x;
-        this.horizonArcGeometry.vertices[n].y = this.vanishingPoint.y;
+            if (isTriangle(v0, vn, vR)) {
+                triangularHorizonArcCompletion(angles, v0, vn, vR);
+            } else {
+                simpleHorizonArcCompletion(angles, v0, vn, vR);
+            }
+        },
 
-        dy = (this.boundingRadius - this.pitchRadius) / n;
-        vObs = new THREE.Vector3(0, this.pitchRadius, this.getZ() - this.horizonArcZshift);
+        updateOpenHorizonArc = function (angles) {
+            var dy, vObs, vRef, vRect,
+                h, dx,
+                pRef, pObs,
+                center, n,
+                i;
 
-        pRef = new THREE.Vector3();
+            n = granularity - 1;
 
-        center = new THREE.Vector3();
-        center.addSelf(this.horizonArcGeometry.vertices[n]);
+            horizonArcGeometry.vertices[n].x = vanishingPoint.x;
+            horizonArcGeometry.vertices[n].y = vanishingPoint.y;
 
-        for (i = 1; i <= n; i++) {
-            vObs.y += dy;
-            vRef = this.boost.getReferenceVertex(vObs);
-            vRef.multiplyScalar(this.viewSphereRadius / vRef.length());
+            dy = (boundingRadius - pitchRadius) / n;
+            vObs = new THREE.Vector3(0, pitchRadius, self.getZ() - horizonArcZshift);
 
-            h = -vRef.z * angles.sinPitchAngle / angles.cosPitchAngle;
-            dx = Math.sqrt(vRef.y * vRef.y - h * h);
+            pRef = new THREE.Vector3();
 
-            pRef.x = -dx * angles.cosRollAngle - h * angles.sinRollAngle;
-            pRef.y = -dx * angles.sinRollAngle + h * angles.cosRollAngle;
-            pRef.z = vRef.z;
+            center = new THREE.Vector3();
+            center.addSelf(horizonArcGeometry.vertices[n]);
 
-            pObs = this.boost.getObserverVertex(pRef);
-            pObs.multiplyScalar((this.getZ() - this.horizonArcZshift) / pObs.z);
+            for (i = 1; i <= n; i++) {
+                vObs.y += dy;
+                vRef = boost.getReferenceVertex(vObs);
+                vRef.multiplyScalar(viewSphereRadius / vRef.length());
 
-            this.horizonArcGeometry.vertices[n - i].x = pObs.x;
-            this.horizonArcGeometry.vertices[n - i].y = pObs.y;
-            center.addSelf(this.horizonArcGeometry.vertices[n - i]);
+                h = -vRef.z * angles.sinPitchAngle / angles.cosPitchAngle;
+                dx = Math.sqrt(vRef.y * vRef.y - h * h);
 
-            pRef.x = dx * angles.cosRollAngle - h * angles.sinRollAngle;
-            pRef.y = dx * angles.sinRollAngle + h * angles.cosRollAngle;
-            pRef.z = vRef.z;
+                pRef.x = -dx * angles.cosRollAngle - h * angles.sinRollAngle;
+                pRef.y = -dx * angles.sinRollAngle + h * angles.cosRollAngle;
+                pRef.z = vRef.z;
 
-            pObs = this.boost.getObserverVertex(pRef);
-            pObs.multiplyScalar((this.getZ() - this.horizonArcZshift) / pObs.z);
+                pObs = boost.getObserverVertex(pRef);
+                pObs.multiplyScalar((self.getZ() - horizonArcZshift) / pObs.z);
 
-            this.horizonArcGeometry.vertices[n + i].x = pObs.x;
-            this.horizonArcGeometry.vertices[n + i].y = pObs.y;
-            center.addSelf(this.horizonArcGeometry.vertices[n + i]);
-        }
+                horizonArcGeometry.vertices[n - i].x = pObs.x;
+                horizonArcGeometry.vertices[n - i].y = pObs.y;
+                center.addSelf(horizonArcGeometry.vertices[n - i]);
 
-        center.divideScalar(2 * n + 1);
-        this.horizonArcGeometry.vertices[2 * n + 2].copy(center);
+                pRef.x = dx * angles.cosRollAngle - h * angles.sinRollAngle;
+                pRef.y = dx * angles.sinRollAngle + h * angles.cosRollAngle;
+                pRef.z = vRef.z;
 
-        if (this.isCurvatureNeglegible(this.horizonArcGeometry.vertices[0], this.horizonArcGeometry.vertices[2 * n], center)) {
-            vRect = this.findGroundRectificationVertex(
-                this.horizonArcGeometry.vertices[0],
-                this.horizonArcGeometry.vertices[2 * n]
-            );
-            this.horizonArcGeometry.vertices[2 * n + 1].copy(vRect);
-            this.updateHorizonArcColor(this.groundColor);
-        } else {
-            vRect = this.findRectificationVertex(
-                this.horizonArcGeometry.vertices[0],
-                this.horizonArcGeometry.vertices[2 * n],
-                center
-            );
-            this.horizonArcGeometry.vertices[2 * n + 1].copy(vRect);
+                pObs = boost.getObserverVertex(pRef);
+                pObs.multiplyScalar((self.getZ() - horizonArcZshift) / pObs.z);
+
+                horizonArcGeometry.vertices[n + i].x = pObs.x;
+                horizonArcGeometry.vertices[n + i].y = pObs.y;
+                center.addSelf(horizonArcGeometry.vertices[n + i]);
+            }
+
+            center.divideScalar(2 * n + 1);
+            horizonArcGeometry.vertices[2 * n + 2].copy(center);
+
+            if (isCurvatureNeglegible(horizonArcGeometry.vertices[0], horizonArcGeometry.vertices[2 * n], center)) {
+                vRect = findGroundRectificationVertex(
+                    horizonArcGeometry.vertices[0],
+                    horizonArcGeometry.vertices[2 * n]
+                );
+                horizonArcGeometry.vertices[2 * n + 1].copy(vRect);
+                updateHorizonArcColor(groundColor);
+            } else {
+                vRect = findRectificationVertex(
+                    horizonArcGeometry.vertices[0],
+                    horizonArcGeometry.vertices[2 * n],
+                    center
+                );
+                horizonArcGeometry.vertices[2 * n + 1].copy(vRect);
+                if (angles.sinPitchAngle > 0) {
+                    updateHorizonArcColor(skyColor);
+                } else {
+                    updateHorizonArcColor(groundColor);
+                }
+            }
+
+            horizonArcCompletion(angles, horizonArcGeometry.vertices[0], horizonArcGeometry.vertices[2 * n], vRect);
+
+            horizonArcGeometry.verticesNeedUpdate = true;
+            horizonArc.visible = true;
+        },
+
+        updateClosedHorizonArc = function (angles) {
+            var vRef, vObs, vCut, center, i;
+
+            vRef = new THREE.Vector3();
+            vObs = new THREE.Vector3();
+            vCut = new THREE.Vector3();
+
+            center = new THREE.Vector3();
+
+            for (i = 0; i < granularity; i++) {
+//                vCut.crossVectors(angularNormal[i], groundNormal);
+                vCut.cross(angularNormal[i], groundNormal);
+                vCut.multiplyScalar(viewSphereRadius / vCut.length());
+
+                vRef.copy(vCut);
+                vObs = boost.getObserverVertex(vRef);
+                vObs.multiplyScalar((self.getZ() - horizonArcZshift) / vObs.z);
+
+                horizonArcGeometry.vertices[i].x = vObs.x;
+                horizonArcGeometry.vertices[i].y = vObs.y;
+                center.addSelf(horizonArcGeometry.vertices[i]);
+
+                vRef.copy(vCut);
+                vRef.multiplyScalar(-1);
+                vObs = boost.getObserverVertex(vRef);
+                vObs.multiplyScalar((self.getZ() - horizonArcZshift) / vObs.z);
+
+                horizonArcGeometry.vertices[i + granularity].x = vObs.x;
+                horizonArcGeometry.vertices[i + granularity].y = vObs.y;
+                center.addSelf(horizonArcGeometry.vertices[i + granularity]);
+            }
+
+            center.divideScalar(2 * granularity);
+            horizonArcGeometry.vertices[2 * granularity].copy(center);
+
             if (angles.sinPitchAngle > 0) {
-                this.updateHorizonArcColor(this.skyColor);
+                updateHorizonArcColor(skyColor);
             } else {
-                this.updateHorizonArcColor(this.groundColor);
+                updateHorizonArcColor(groundColor);
             }
-        }
 
-        this.horizonArcCompletion(angles, this.horizonArcGeometry.vertices[0], this.horizonArcGeometry.vertices[2 * n], vRect);
+            horizonArcGeometry.verticesNeedUpdate = true;
+            horizonArc.visible = true;
+        };
 
-        this.horizonArcGeometry.verticesNeedUpdate = true;
-        this.horizonArc.visible = true;
-    },
 
-    updateClosedHorizonArc: function (angles) {
-        var vRef, vObs, vCut, center, i;
+    self.getMesh = function () {
+        return mesh;
+    };
 
-        vRef = new THREE.Vector3();
-        vObs = new THREE.Vector3();
-        vCut = new THREE.Vector3();
+    self.setZ = function (z) {
+        mesh.position.z = z;
+    };
 
-        center = new THREE.Vector3();
+    self.getZ = function () { // @todo not needed as public
+        return mesh.position.z;
+    };
 
-        for (i = 0; i < this.granularity; i++) {
-            vCut.cross(this.angularNormal[i], this.groundNormal);
-            vCut.multiplyScalar(this.viewSphereRadius / vCut.length());
+    self.setFrustumParametersFromCamera = function (camera) {
+        var near = camera.near,
+            far = (self.getZ() + horizonBackground.position.z);
 
-            vRef.copy(vCut);
-            vObs = this.boost.getObserverVertex(vRef);
-            vObs.multiplyScalar((this.getZ() - this.horizonArcZshift) / vObs.z);
+        ymax = near * Math.tan(camera.fov * Math.PI / 360);
+        ymin = -ymax;
+        xmax = ymax * camera.aspect;
+        xmin = -xmax;
 
-            this.horizonArcGeometry.vertices[i].x = vObs.x;
-            this.horizonArcGeometry.vertices[i].y = vObs.y;
-            center.addSelf(this.horizonArcGeometry.vertices[i]);
+        xmin = far * xmin / near;
+        xmax = far * xmax / near;
+        ymin = far * ymin / near;
+        ymax = far * ymax / near;
 
-            vRef.copy(vCut);
-            vRef.multiplyScalar(-1);
-            vObs = this.boost.getObserverVertex(vRef);
-            vObs.multiplyScalar((this.getZ() - this.horizonArcZshift) / vObs.z);
+        updateRectangleGeometry(
+            horizonBackground,
+            xmin,
+            ymin,
+            xmax,
+            ymax
+        );
+    };
 
-            this.horizonArcGeometry.vertices[i + this.granularity].x = vObs.x;
-            this.horizonArcGeometry.vertices[i + this.granularity].y = vObs.y;
-            center.addSelf(this.horizonArcGeometry.vertices[i + this.granularity]);
-        }
+    self.updateObserverViewCone = function (viewconeparameters) {
+        viewConeAngle = viewconeparameters.viewConeAngle;
+        viewSphereRadius = viewconeparameters.viewSphereRadius;
 
-        center.divideScalar(2 * this.granularity);
-        this.horizonArcGeometry.vertices[2 * this.granularity].copy(center);
+        calculateBoundingCircle();
+        calculateAngularNormals();
+    };
 
-        if (angles.sinPitchAngle > 0) {
-            this.updateHorizonArcColor(this.skyColor);
-        } else {
-            this.updateHorizonArcColor(this.groundColor);
-        }
+    self.update = function (angles) {
+        var cosReferenceViewConeAngle = Math.cos(boost.getReferenceViewConeAngle());
 
-        this.horizonArcGeometry.verticesNeedUpdate = true;
-        this.horizonArc.visible = true;
-    },
+        calculateGroundNormal(angles);
 
-    update: function (angles) {
-        var cosReferenceViewConeAngle = Math.cos(this.boost.referenceViewConeAngle);
-
-        this.calculateGroundNormal(angles);
-
-        this.horizonArc.visible = false;
-        this.updateRectangleGeometry(this.horizontalRect, 0, 0, 0, 0);
-        this.updateRectangleGeometry(this.verticalRect, 0, 0, 0, 0);
-        this.updateRectangleGeometry(this.edgeRect, 0, 0, 0, 0);
+        horizonArc.visible = false;
+        updateRectangleGeometry(horizontalRect, 0, 0, 0, 0);
+        updateRectangleGeometry(verticalRect, 0, 0, 0, 0);
+        updateRectangleGeometry(edgeRect, 0, 0, 0, 0);
 
         if (angles.cosPitchAngle > Math.abs(cosReferenceViewConeAngle)) {
             // horizon ground plane cuts the view cone in the reference frame:
-            this.calculatePitchCircle(angles);
-            this.updateOpenHorizonArc(angles);
+            calculatePitchCircle(angles);
+            updateOpenHorizonArc(angles);
         } else {
             if (cosReferenceViewConeAngle < 0) {
                 // horizon ground plane completely within the view cone of the reference frame draw 360 deg horizon ...
-                this.updateClosedHorizonArc(angles);
+                updateClosedHorizonArc(angles);
             } else {
                 // view cone angle in reference frame < 180 deg:
                 if (angles.sinPitchAngle >= 0) {
-                    this.updateHorizonArcColor(this.groundColor);
+                    updateHorizonArcColor(groundColor);
                 } else {
-                    this.updateHorizonArcColor(this.skyColor);
+                    updateHorizonArcColor(skyColor);
                 }
             }
         }
-    }
-};
+    };
+
+    init();
+}

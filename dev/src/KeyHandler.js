@@ -1,90 +1,84 @@
 function KeyHandler(options) {
-    this.keyPressed = new Array(256);
-    this.flightControlKeys = [83, 87, 37, 39, 38, 40, 65, 68],
+    var self = this,
 
-    this.handleFlight = options.handleFlight || this.emptyHandler;
-    this.handleKey = options.handleKey || this.emptyHandler;
-    this.keyInterval = options.keyInterval || 250;
+        enabled = true,
+        keyPressed = new Array(256),
+        flightControlKeys = [83, 87, 37, 39, 38, 40, 65, 68],
+        handleFlight = options.handleFlight || function () { },
+        handleKey = options.handleKey || function () { },
+        keyInterval = options.keyInterval || 250,
+        lastPressedKey = 0,
+        lastPressedTime = 0,
+        
+        isFlightControlKey = function (key) {
+            var i;
 
-    this.lastPressedKey = 0;
-    this.lastPressedTime = 0;
-
-    this.enable();
-
-    this.init();
-}
-
-KeyHandler.prototype = {
-    constructor: KeyHandler,
-
-    isFlightControlKey: function (self, key) {
-        for (var i=0; i < self.flightControlKeys.length; i++) {
-            if (key === self.flightControlKeys[i]) {
-                return true;
+            for (i = 0; i < flightControlKeys.length; i++) {
+                if (key === flightControlKeys[i]) {
+                    return true;
+                }
             }
-        }
-        return false;
-    },
+            return false;
+        },
 
-    init: function () {
-        var self = this, i;
+        registerKey = function (event, isKeyDown) {
+            var keyCode = event.which,
+                isFlightControlKeyPressed,
+                time;
 
-        for (i = 0; i < 256; i++) {
-            self.keyPressed[i] = false;
-        }
+            if (keyCode > 256) return;
 
-        $(document).unbind("keydown").bind("keydown", function (event) {
-            self.registerKey(self, event, true);
-        });
+            isFlightControlKeyPressed = enabled && isFlightControlKey(event.which);
+            if (keyPressed[keyCode] === isKeyDown) {
+                if (isFlightControlKeyPressed) {
+                    event.preventDefault();
+                }
+                return;
+            }
 
-        $(document).unbind("keyup").bind("keyup", function (event) {
-            self.registerKey(self, event, false);
-        });
-    },
-
-    registerKey: function (self, event, keyPressed) {
-        var keyCode = event.which,
-            isFlightControlKeyPressed,
-            time;
-
-        if (keyCode > 256) return;
-
-        isFlightControlKeyPressed = self.enabled && self.isFlightControlKey(self, event.which);
-        if (self.keyPressed[keyCode] === keyPressed) {
+            time = (new Date()).getTime();
+            keyPressed[keyCode] = isKeyDown;
+            
             if (isFlightControlKeyPressed) {
+                handleFlight(keyPressed);
                 event.preventDefault();
             }
-            return;
-        }
 
-        time = (new Date()).getTime();
-        self.keyPressed[keyCode] = keyPressed;
-
-        if (isFlightControlKeyPressed) {
-            self.handleFlight(self.keyPressed);
-            event.preventDefault();
-        }
-
-        if (keyPressed) {
-            self.lastPressedKey = keyCode;
-            self.lastPressedTime = time;
-        } else {
-            if (    (keyCode === self.lastPressedKey)
-                 && (time - self.lastPressedTime < self.keyInterval)) {
-                 self.handleKey(keyCode);
+            if (isKeyDown) {
+                lastPressedKey = keyCode;
+                lastPressedTime = time;
+            } else {
+                if (    (keyCode === lastPressedKey)
+                     && (time - lastPressedTime < keyInterval)) {
+                     handleKey(keyCode);
+                }
+                lastPressedKey = 0;
             }
-            self.lastPressedKey = 0;
-        }
-    },
+        },
 
-    enable: function () {
-        this.enabled = true;
-    },
+        init = function () {
+            var i;
 
-    disable: function () {
-        this.enabled = false;
-    },
+            for (i = 0; i < 256; i++) {
+                keyPressed[i] = false;
+            }
 
-    emptyHandler: function () {
-    }
-};
+            $(document).unbind("keydown").bind("keydown", function (event) {
+                registerKey(event, true);
+            });
+
+            $(document).unbind("keyup").bind("keyup", function (event) {
+                registerKey(event, false);
+            });
+        };
+
+    self.enable = function () {
+        enabled = true;
+    };
+
+    self.disable = function () {
+        enabled = false;
+    };
+
+    init();
+}

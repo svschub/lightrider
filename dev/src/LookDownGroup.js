@@ -1,36 +1,47 @@
 function LookDownGroup () {
-    this.y = 20;
+    var self = this,
 
-    this.mesh = new THREE.Object3D();
+        y = 20,
+        mesh, camera, ground,
+        
+        init = function () {
+            mesh = new THREE.Object3D();
 
-    this.camera = new THREE.OrthographicCamera(-80,+80, +70,-70, 1, 1000);
-    this.camera.up = new THREE.Vector3(0,0,1);
-    this.camera.lookAt(new THREE.Vector3(0,-1,0));
-    this.mesh.add(this.camera);
+            camera = new THREE.OrthographicCamera(-80,+80, +70,-70, 1, 1000);
+            camera.up = new THREE.Vector3(0,0,1);
+            camera.lookAt(new THREE.Vector3(0,-1,0));
+            mesh.add(camera);
 
-    this.ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(160, 140),
-        new THREE.MeshBasicMaterial({
-            ambient: 0x446600,
-            color: 0x446600,
-        })
-    );
-    this.ground.position.y = -this.y-10;
-    this.mesh.add(this.ground);
-}
+            ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(160, 140),
+                new THREE.MeshBasicMaterial({
+                    ambient: 0x446600,
+                    color: 0x446600
+                })
+            );
+            ground.position.y = -y-10;
+            mesh.add(ground);
+        };
 
-LookDownGroup.prototype = {
-    constructor: LookDownGroup,
-
-    setPosition: function (position) {
-        this.mesh.position = new THREE.Vector3(position.x, this.y, position.z);  // 0
-    },
-
-    setViewAngle: function (angles) {
-        this.mesh.lookAt(new THREE.Vector3(
-            this.mesh.position.x + angles.sinYawAngle,
-            this.mesh.position.y,
-            this.mesh.position.z - angles.cosYawAngle
-        ));
+    self.getMesh = function () {
+        return mesh;
     }
-};
+    
+    self.getCamera = function () {
+        return camera;
+    }
+
+    self.setPosition = function (position) {
+        mesh.position = new THREE.Vector3(position.x, y, position.z);
+    };
+
+    self.setViewAngle = function (angles) {
+        mesh.lookAt(new THREE.Vector3(
+            mesh.position.x + angles.sinYawAngle,
+            mesh.position.y,
+            mesh.position.z - angles.cosYawAngle
+        ));
+    };
+
+    init();    
+}

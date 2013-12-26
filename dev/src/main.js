@@ -1,5 +1,5 @@
 
-var mainLoop, keyHandler, slider, firstFrame;
+var plane, renderer, keyHandler, slider, firstFrame;
 
 function printCopyright() {
     var author, canvas, canvasPosition;
@@ -21,12 +21,14 @@ function toggleLightbox() {
 
     if ($("#lightbox").css("display") === "block") {
         cssDisplayValue = "none";
-        mainLoop.restart();
-        slider.enabled = true;
+        plane.setPaused(false);
+        renderer.restart();
+        slider.enable();
     } else {
         cssDisplayValue = "block";
-        mainLoop.pause();
-        slider.enabled = false;
+        plane.setPaused(true);
+        renderer.pause();
+        slider.disable();
     }
 
     $("#lightbox").css("display", cssDisplayValue);
@@ -45,14 +47,14 @@ function initLightbox() {
     $("#setDopplerEffect").attr('checked', false);
     $("#setDopplerEffect").bind('click', function () {
         if ($(this).is(':checked')) {
-            mainLoop.boost.enableDopplerEffect();
+            renderer.getBoost().enableDopplerEffect();
         } else {
-            mainLoop.boost.disableDopplerEffect();
+            renderer.getBoost().disableDopplerEffect();
         }
     });
 
     $("#dopplerShiftRescale").bind('change', function () {
-        mainLoop.setDopplerShiftRescale(parseFloat($(this).val()));
+        renderer.setDopplerShiftRescale(parseFloat($(this).val()));
     });
     $("#dopplerShiftRescale").focus(function () {
         keyHandler.disable();
@@ -65,18 +67,59 @@ function initLightbox() {
 function initKeyHandler() {
     keyHandler = new KeyHandler({
         handleFlight: function (keyPressed) {
-            mainLoop.plane.speedUp = keyPressed[87]; // w
-            mainLoop.plane.speedDown = keyPressed[83]; // s
+            var acceleration = 0.0, 
+                accelerationIncr = 0.007,
+                speedUp = keyPressed[87],    // w
+                speedDown = keyPressed[83],  // s
 
-            mainLoop.plane.rollLeft = keyPressed[37];  // left cursor
-            mainLoop.plane.rollRight = keyPressed[39];  // right cursor
+                rollAngle = 0.0, 
+                rollAngleIncr = 0.03,
+                rollLeft = keyPressed[37],   // left cursor
+                rollRight = keyPressed[39],  // right cursor
 
-            mainLoop.plane.pitchUp = keyPressed[40];  // arrow down
-            mainLoop.plane.pitchDown = keyPressed[38];  // arrow up
+                pitchAngle = 0.0, 
+                pitchAngleIncr = 0.022,
+                pitchUp = keyPressed[40],    // arrow down
+                pitchDown = keyPressed[38],  // arrow up
 
-            mainLoop.plane.yawLeft = keyPressed[65];  // a
-            mainLoop.plane.yawRight = keyPressed[68];  // d
+                yawAngle = 0.0, 
+                yawAngleIncr = 0.02,
+                yawLeft = keyPressed[65],    // a
+                yawRight = keyPressed[68];   // d
+
+            if (speedUp) {
+                acceleration += accelerationIncr;
+            }
+            if (speedDown) {
+                acceleration -= accelerationIncr;
+            }
+            plane.setAcceleration(acceleration);
+
+            if (rollLeft) {
+                rollAngle -= rollAngleIncr;
+            }
+            if (rollRight) {
+                rollAngle += rollAngleIncr;
+            }
+            plane.setRollAngle(rollAngle);
+
+            if (pitchUp) {
+                pitchAngle += pitchAngleIncr;
+            }
+            if (pitchDown) {
+                pitchAngle -= pitchAngleIncr;
+            }
+            plane.setPitchAngle(pitchAngle);
+
+            if (yawLeft) {
+                yawAngle += yawAngleIncr;
+            }
+            if (yawRight) {
+                yawAngle -= yawAngleIncr;
+            }
+            plane.setYawAngle(yawAngle);
         },
+
         handleKey: function (keyCode) {
             if (keyCode === 27) {
                 toggleLightbox();
@@ -89,7 +132,7 @@ function initWidgets() {
     slider = new BetaSlider({
         halfScale: 0.9,
         handle: function (value) {
-            mainLoop.setBeta(value);
+            renderer.setBeta(value);
         }
     });
 
@@ -98,7 +141,7 @@ function initWidgets() {
 
 function animate() {
     requestAnimationFrame(animate);
-    mainLoop.drawFrame();
+    renderer.drawFrame();
 
     if (firstFrame) {
         toggleLightbox();
@@ -107,15 +150,29 @@ function animate() {
 }
 
 function init() {
-    mainLoop = new MainLoop();
-    if (mainLoop.isRenderContextAvailable()) {
+    renderer = new Renderer();
+    if (renderer.isRenderContextAvailable()) {
         $("#page").css("display", "block");
 
         initKeyHandler();
         initWidgets();
         printCopyright();
 
-        mainLoop.start(30);
+        plane = new FlightModel();
+        plane.setPosition(new THREE.Vector3(0, 10, 13));
+        plane.setMoveHandler(function (position) {
+            if (position.y <= 0.0) {
+                plane.stopLoop();
+                document.body.innerHTML = "";
+                $(document).ready(function () {
+                    alert("Crashed!");
+                });
+            }
+        });
+
+        renderer.setFlightModel(plane);
+
+        plane.startLoop(30);
 
         firstFrame = true;
         animate();

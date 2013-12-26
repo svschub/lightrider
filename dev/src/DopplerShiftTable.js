@@ -1,133 +1,161 @@
 function DopplerShiftTable () {
-    this.tableSize = 512;
+    var self = this,
 
-    this.texture = this.createEmptyTexture();
+        tableSize = 512,
+        isDopplerEffectEnabled = false,
+        texture,
+        rgbMinVector,
+        rgbRangeVector,
+        shiftMin,
+        shiftMax,
+        shiftRange,
+        invShiftRange,
 
-    this.setRgbBoundaryVectors();
-    this.setShiftBoundaries();
+        params = {
+            beta: 0,
+            betaCalculated: 0,
+            gamma: 1,
+            dopplerShiftRescale: 1,
+            dopplerShiftRescaleCalculated: 1,
+            tanObserverViewConeAngle: 0
+        },
 
-    this.setInitialBoostParameters();
+        createEmptyTexture = function () {
+            var i, n = 3*tableSize,
+                data = new Uint8Array(n);
 
-    this.disable();
-}
+            texture = new THREE.DataTexture(data, tableSize, 1, THREE.RGBFormat);
 
-DopplerShiftTable.prototype = {
-    constructor: DopplerShiftTable,
+            for (i = 0; i < n; i++) {
+                texture.image.data[i] = 0;
+            }
+        },
 
-    createEmptyTexture: function () {
-        var n = 3*this.tableSize,
-            data = new Uint8Array(n),
-            texture = new THREE.DataTexture(data, this.tableSize, 1, THREE.RGBFormat);
+        setRgbBoundaryVectors = function () {
+            var rMin = -0.448615,
+                rMax = 1.55035,
+                gMin = -0.230001,
+                gMax = 1.02742,
+                bMin = -0.269253,
+                bMax = 1.13998;
 
-        for (var i=0; i < n; i++) {
-            texture.image.data[i] = 0;
-        }
+            rgbMinVector = new THREE.Vector4(rMin, gMin, bMin, 0.0);
+            rgbRangeVector = new THREE.Vector4(rMax-rMin, gMax-gMin, bMax-bMin, 1.0);
+        },
 
+        setShiftBoundaries  = function () {
+            var lambdaMin = 380,  // [nm]
+                lambdaMax = 780;  // [nm]
+
+            shiftMin = lambdaMin/lambdaMax;
+            shiftMax = lambdaMax/lambdaMin;
+
+            shiftRange = shiftMax - shiftMin;
+            invShiftRange = 1/shiftRange;
+        },
+
+        setInitialBoostParameters = function () {
+            params.beta = 0;
+            params.betaCalculated = -1000;
+
+            params.gamma = 1.0;
+
+            params.dopplerShiftRescale = 1.0;
+            params.dopplerShiftRescaleCalculated = -1.0;
+        },
+
+        init = function () {
+            createEmptyTexture();
+
+            setRgbBoundaryVectors();
+            setShiftBoundaries();
+
+            setInitialBoostParameters();
+        },
+
+        calculateNonrelativisticValues = function () {
+            var i, n = 3*tableSize,
+                shift = 255*(1.0-shiftMin)*invShiftRange;
+
+            if (shift > 255) shift = 255;
+
+            for (i = 0; i < n; i += 3) {
+                texture.image.data[i] = shift;
+            }
+        },
+
+        calculateRelativisticValues = function () {
+            var i, n = 3*tableSize,
+                cosAngle, tanAngle, dTanAngle,
+                cosAngleRef, tanAngleRef,
+                shift;
+
+            tanAngle = 0;
+            dTanAngle = params.tanObserverViewConeAngle/(tableSize-1);
+
+            for (i = 0; i < n; i += 3) {
+                cosAngle = 1/Math.sqrt(1+tanAngle*tanAngle);
+                tanAngleRef = tanAngle*cosAngle/(params.gamma*(cosAngle-params.beta));
+                cosAngleRef = 1/Math.sqrt(1+tanAngleRef*tanAngleRef);
+                if (tanAngleRef < 0) cosAngleRef = -cosAngleRef;
+
+                shift = params.gamma*(1 - params.beta*cosAngleRef);
+                shift = 1 + (shift - 1)*params.dopplerShiftRescale;
+
+                if (shift < shiftMin) shift = shiftMin;
+                if (shift > shiftMax) shift = shiftMax;
+
+                texture.image.data[i] = 255*(shift-shiftMin)*invShiftRange;
+
+                tanAngle += dTanAngle;
+            }
+        },
+
+        calculateValues = function () {
+            if (params.beta !== 0) {
+                calculateRelativisticValues();
+            } else {
+                calculateNonrelativisticValues();
+            }
+            texture.needsUpdate = true;
+        };
+
+    self.getTexture = function () {
         return texture;
-    },
+    };
 
-    setRgbBoundaryVectors: function () {
-        var rMin = -0.448615,
-            rMax = 1.55035,
-            gMin = -0.230001,
-            gMax = 1.02742,
-            bMin = -0.269253,
-            bMax = 1.13998;
+    self.getRgbMinVector = function () {
+        return rgbMinVector;
+    };
 
-        this.rgbMinVector = new THREE.Vector4(rMin, gMin, bMin, 0.0);
-        this.rgbRangeVector = new THREE.Vector4(rMax-rMin, gMax-gMin, bMax-bMin, 1.0);
-    },
+    self.getRgbRangeVector = function () {
+        return rgbRangeVector;
+    };
 
-    setShiftBoundaries: function () {
-        var lambdaMin = 380,  // [nm]
-            lambdaMax = 780;  // [nm]
+    self.enable = function () {
+        isDopplerEffectEnabled = true;
+    };
 
-        this.shiftMin = lambdaMin/lambdaMax;
-        this.shiftMax = lambdaMax/lambdaMin;
+    self.disable = function () {
+        isDopplerEffectEnabled = false;
+    };
 
-        this.shiftRange = this.shiftMax - this.shiftMin;
-        this.invShiftRange = 1/this.shiftRange;
-    },
-
-    setInitialBoostParameters: function () {
-        this.beta = 0;
-        this.betaCalculated = -1000;
-
-        this.gamma = 1.0;
-
-        this.dopplerShiftRescale = 1.0;
-        this.dopplerShiftRescaleCalculated = -1.0;
-    },
-
-    enable: function () {
-        this.isDopplerEffectEnabled = true;
-    },
-
-    disable: function () {
-        this.isDopplerEffectEnabled = false;
-    },
-
-    calculateNonrelativisticValues: function () {
-        var n = 3*this.tableSize,
-            shift = 255*(1.0-this.shiftMin)*this.invShiftRange;
-
-        if (shift > 255) shift = 255;
-
-        for (var i=0; i < n; i += 3) {
-            this.texture.image.data[i] = shift;
-        }
-    },
-
-    calculateRelativisticValues: function () {
-        var n = 3*this.tableSize,
-            cosAngle, tanAngle, dTanAngle,
-            cosAngleRef, tanAngleRef,
-            shift;
-
-        tanAngle = 0;
-        dTanAngle = this.tanObserverViewConeAngle/(this.tableSize-1);
-
-        for (var i=0; i < n; i += 3) {
-            cosAngle = 1/Math.sqrt(1+tanAngle*tanAngle);
-            tanAngleRef = tanAngle*cosAngle/(this.gamma*(cosAngle-this.beta));
-            cosAngleRef = 1/Math.sqrt(1+tanAngleRef*tanAngleRef);
-            if (tanAngleRef < 0) cosAngleRef = -cosAngleRef;
-
-            shift = this.gamma*(1 - this.beta*cosAngleRef);
-            shift = 1 + (shift - 1)*this.dopplerShiftRescale;
-
-            if (shift < this.shiftMin) shift = this.shiftMin;
-            if (shift > this.shiftMax) shift = this.shiftMax;
-
-            this.texture.image.data[i] = 255*(shift-this.shiftMin)*this.invShiftRange;
-
-            tanAngle += dTanAngle;
-        }
-    },
-
-    calculateValues: function () {
-        if (this.beta !== 0) {
-            this.calculateRelativisticValues();
-        } else {
-            this.calculateNonrelativisticValues();
-        }
-        this.texture.needsUpdate = true;
-    },
-
-    update: function (boostParameters) {
+    self.update = function (boostParameters) {
         if (typeof boostParameters !== "undefined") {
             for (var property in boostParameters) {
-                this[property] = boostParameters[property];
+                params[property] = boostParameters[property];
             }
         }
 
-        if (this.isDopplerEffectEnabled) {
-            if ( (this.beta !== this.betaCalculated) || (this.dopplerShiftRescale !== this.dopplerShiftRescaleCalculated) ) {
-                this.calculateValues();
+        if (isDopplerEffectEnabled) {
+            if ( (params.beta !== params.betaCalculated) || (params.dopplerShiftRescale !== params.dopplerShiftRescaleCalculated) ) {
+                calculateValues();
 
-                this.betaCalculated = this.beta;
-                this.dopplerShiftRescaleCalculated = this.dopplerShiftRescale;
+                params.betaCalculated = params.beta;
+                params.dopplerShiftRescaleCalculated = params.dopplerShiftRescale;
             }
         }
-    },
-};
+    };
+
+    init();
+}
