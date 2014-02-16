@@ -1,8 +1,13 @@
 function Horizon(boost) {
     var self = this,
     
-        mesh, // horizon mesh
-        
+        mesh,
+
+        position,
+        upVector,
+        lookAtVector,
+        angles,
+
         skyColor = new THREE.Color(0x3355AA),
         groundColor = new THREE.Color(0x446600),
 
@@ -15,6 +20,7 @@ function Horizon(boost) {
         horizonBackground, // ?
         horizonBackgroundMaterial, // ?
 
+        horizon,
         horizonArc, // ?
         horizonArcGeometry, // ?
         horizonArcColor, // ?
@@ -34,7 +40,10 @@ function Horizon(boost) {
         xmin, ymin, xmax, ymax,
 
         createRectangle = function (rectangleMaterial) {
-            var rectangle, rectangleGeometry, rectangleFace;
+            var rectangle, 
+                rectangleGeometry, 
+                rectangleFace1, 
+                rectangleFace2;
 
             rectangleGeometry = new THREE.Geometry();
             rectangleGeometry.dynamic = true;
@@ -46,23 +55,34 @@ function Horizon(boost) {
                 new THREE.Vector3(+1, -1, 0)
             ];
 
-            rectangleFace = new THREE.Face4(0, 1, 2, 3);
-
-            rectangleFace.normal.copy(horizonNormal);
-            rectangleFace.vertexNormals = [
+            rectangleFace1 = new THREE.Face3(0, 1, 2);
+            rectangleFace1.normal.copy(horizonNormal);
+            rectangleFace1.vertexNormals = [
                 horizonNormal.clone(),
                 horizonNormal.clone(),
                 horizonNormal.clone(),
                 horizonNormal.clone()
             ];
+            rectangleFace1.materialIndex = 0;
+            rectangleGeometry.faces.push(rectangleFace1);
 
-            rectangleGeometry.faces.push(rectangleFace);
+            rectangleFace2 = new THREE.Face3(0, 2, 3);
+            rectangleFace2.normal.copy(horizonNormal);
+            rectangleFace2.vertexNormals = [
+                horizonNormal.clone(),
+                horizonNormal.clone(),
+                horizonNormal.clone(),
+                horizonNormal.clone()
+            ];
+            rectangleFace2.materialIndex = 0;
+            rectangleGeometry.faces.push(rectangleFace2);
+
             rectangleGeometry.faceVertexUvs[0] = [];
             rectangleGeometry.computeCentroids();
 
             rectangle = new THREE.Mesh(rectangleGeometry, rectangleMaterial);
 
-            rectangle.doubleSided = true;
+            rectangle.material.side = THREE.DoubleSide;
             rectangle.visible = true;
 
             return rectangle;
@@ -119,24 +139,28 @@ function Horizon(boost) {
 
             mesh = new THREE.Object3D();
 
+            horizon = new THREE.Object3D();
+
             horizonBackground = createRectangle(horizonBackgroundMaterial);
-            mesh.add(horizonBackground);
+            horizon.add(horizonBackground);
 
             horizonArc = createHorizonArc();
             horizonArc.position.z = -horizonArcZshift;
-            mesh.add(horizonArc);
+            horizon.add(horizonArc);
 
             verticalRect = createRectangle(horizonArcMaterial);
             verticalRect.position.z = -horizonArcZshift;
-            mesh.add(verticalRect);
+            horizon.add(verticalRect);
 
             horizontalRect = createRectangle(horizonArcMaterial);
             horizontalRect.position.z = -horizonArcZshift;
-            mesh.add(horizontalRect);
+            horizon.add(horizontalRect);
 
             edgeRect = createRectangle(horizonArcMaterial);
             edgeRect.position.z = -horizonArcZshift;
-            mesh.add(edgeRect);
+            horizon.add(edgeRect);
+            
+            mesh.add(horizon);
         },
 
         calculateGroundNormal = function (angles) {
@@ -148,7 +172,7 @@ function Horizon(boost) {
         },
 
         calculateBoundingCircle = function () {
-            boundingRadius = (self.getZ() - horizonArcZshift) * Math.tan(viewConeAngle);
+            boundingRadius = (horizon.position.z - horizonArcZshift) * Math.tan(viewConeAngle);
         },
 
         calculatePitchCircle = function (angles) {
@@ -158,7 +182,7 @@ function Horizon(boost) {
             vRef = new THREE.Vector3(-v.y * angles.sinRollAngle, v.y * angles.cosRollAngle, v.z);
             vObs = boost.getObserverVertex(vRef);
 
-            vObs.multiplyScalar((self.getZ() - horizonArcZshift) / vObs.z);
+            vObs.multiplyScalar((horizon.position.z - horizonArcZshift) / vObs.z);
 
             pitchRadius = Math.sqrt(vObs.x * vObs.x + vObs.y * vObs.y);
             vanishingPoint = vObs;
@@ -210,7 +234,7 @@ function Horizon(boost) {
 
             horizonArc = new THREE.Mesh(horizonArcGeometry, horizonArcMaterial);
 
-            horizonArc.doubleSided = true;
+            horizonArc.material.side = THREE.DoubleSide;
 
             return horizonArc;
         },
@@ -230,14 +254,14 @@ function Horizon(boost) {
             var curvature, v0n, vr, vc, length;
 
             v0n = new THREE.Vector3();
-            v0n.sub(vn, v0);
+            v0n.subVectors(vn, v0);
             length = v0n.length();
 
             vr = new THREE.Vector3(v0n.y, -v0n.x, v0n.z);
             vr.divideScalar(length);
 
             vc = new THREE.Vector3();
-            vc.sub(center, v0);
+            vc.subVectors(center, v0);
 
             curvature = vc.dot(vr) / length;
 
@@ -264,10 +288,10 @@ function Horizon(boost) {
             var va, vb, det;
 
             va = new THREE.Vector3();
-            va.sub(vn, v0);
+            va.subVectors(vn, v0);
 
             vb = new THREE.Vector3();
-            vb.sub(vR, v0);
+            vb.subVectors(vR, v0);
 
             det = va.x * vb.y - va.y * vb.x;
 
@@ -278,15 +302,15 @@ function Horizon(boost) {
             var va, vb, det, vRect;
 
             va = new THREE.Vector3();
-            va.sub(vn, v0);
+            va.subVectors(vn, v0);
 
             vb = new THREE.Vector3();
-            vb.sub(center, v0);
+            vb.subVectors(center, v0);
 
             det = va.x * vb.y - va.y * vb.x;
 
             vRect = new THREE.Vector3(vn.x, v0.y, v0.z);
-            vb.sub(vRect, v0);
+            vb.subVectors(vRect, v0);
 
             if (det * (va.x * vb.y - va.y * vb.x) >= 0) {
                 vRect.x = v0.x;
@@ -301,7 +325,7 @@ function Horizon(boost) {
 
             vRect = new THREE.Vector3(vn.x, v0.y, v0.z);
             va = new THREE.Vector3();
-            va.sub(vRect, v0);
+            va.subVectors(vRect, v0);
 
             if ((groundNormal.x * va.x + groundNormal.y * va.y) > 0) {
                 vRect.x = v0.x;
@@ -489,12 +513,12 @@ function Horizon(boost) {
             horizonArcGeometry.vertices[n].y = vanishingPoint.y;
 
             dy = (boundingRadius - pitchRadius) / n;
-            vObs = new THREE.Vector3(0, pitchRadius, self.getZ() - horizonArcZshift);
+            vObs = new THREE.Vector3(0, pitchRadius, horizon.position.z - horizonArcZshift);
 
             pRef = new THREE.Vector3();
 
             center = new THREE.Vector3();
-            center.addSelf(horizonArcGeometry.vertices[n]);
+            center.add(horizonArcGeometry.vertices[n]);
 
             for (i = 1; i <= n; i++) {
                 vObs.y += dy;
@@ -509,22 +533,22 @@ function Horizon(boost) {
                 pRef.z = vRef.z;
 
                 pObs = boost.getObserverVertex(pRef);
-                pObs.multiplyScalar((self.getZ() - horizonArcZshift) / pObs.z);
+                pObs.multiplyScalar((horizon.position.z - horizonArcZshift) / pObs.z);
 
                 horizonArcGeometry.vertices[n - i].x = pObs.x;
                 horizonArcGeometry.vertices[n - i].y = pObs.y;
-                center.addSelf(horizonArcGeometry.vertices[n - i]);
+                center.add(horizonArcGeometry.vertices[n - i]);
 
                 pRef.x = dx * angles.cosRollAngle - h * angles.sinRollAngle;
                 pRef.y = dx * angles.sinRollAngle + h * angles.cosRollAngle;
                 pRef.z = vRef.z;
 
                 pObs = boost.getObserverVertex(pRef);
-                pObs.multiplyScalar((self.getZ() - horizonArcZshift) / pObs.z);
+                pObs.multiplyScalar((horizon.position.z - horizonArcZshift) / pObs.z);
 
                 horizonArcGeometry.vertices[n + i].x = pObs.x;
                 horizonArcGeometry.vertices[n + i].y = pObs.y;
-                center.addSelf(horizonArcGeometry.vertices[n + i]);
+                center.add(horizonArcGeometry.vertices[n + i]);
             }
 
             center.divideScalar(2 * n + 1);
@@ -567,26 +591,25 @@ function Horizon(boost) {
             center = new THREE.Vector3();
 
             for (i = 0; i < granularity; i++) {
-//                vCut.crossVectors(angularNormal[i], groundNormal);
-                vCut.cross(angularNormal[i], groundNormal);
+                vCut.crossVectors(angularNormal[i], groundNormal);
                 vCut.multiplyScalar(viewSphereRadius / vCut.length());
 
                 vRef.copy(vCut);
                 vObs = boost.getObserverVertex(vRef);
-                vObs.multiplyScalar((self.getZ() - horizonArcZshift) / vObs.z);
+                vObs.multiplyScalar((horizon.position.z - horizonArcZshift) / vObs.z);
 
                 horizonArcGeometry.vertices[i].x = vObs.x;
                 horizonArcGeometry.vertices[i].y = vObs.y;
-                center.addSelf(horizonArcGeometry.vertices[i]);
+                center.add(horizonArcGeometry.vertices[i]);
 
                 vRef.copy(vCut);
                 vRef.multiplyScalar(-1);
                 vObs = boost.getObserverVertex(vRef);
-                vObs.multiplyScalar((self.getZ() - horizonArcZshift) / vObs.z);
+                vObs.multiplyScalar((horizon.position.z - horizonArcZshift) / vObs.z);
 
                 horizonArcGeometry.vertices[i + granularity].x = vObs.x;
                 horizonArcGeometry.vertices[i + granularity].y = vObs.y;
-                center.addSelf(horizonArcGeometry.vertices[i + granularity]);
+                center.add(horizonArcGeometry.vertices[i + granularity]);
             }
 
             center.divideScalar(2 * granularity);
@@ -608,16 +631,12 @@ function Horizon(boost) {
     };
 
     self.setZ = function (z) {
-        mesh.position.z = z;
-    };
-
-    self.getZ = function () { // @todo not needed as public
-        return mesh.position.z;
+        horizon.position.z = z;
     };
 
     self.setFrustumParametersFromCamera = function (camera) {
         var near = camera.near,
-            far = (self.getZ() + horizonBackground.position.z);
+            far = (horizon.position.z + horizonBackground.position.z);
 
         ymax = near * Math.tan(camera.fov * Math.PI / 360);
         ymin = -ymax;
@@ -646,8 +665,29 @@ function Horizon(boost) {
         calculateAngularNormals();
     };
 
-    self.update = function (angles) {
+
+    self.setPosition = function (posVec) {
+        position = posVec;
+    };
+
+    self.setUpVector = function (upVec) {
+        upVector = upVec;
+    };
+
+    self.setLookAtVector = function (lookAtVec) {
+        lookAtVector = lookAtVec;
+    };
+
+    self.setAngles = function (a) {
+        angles = a;
+    };
+
+    self.update = function () {
         var cosReferenceViewConeAngle = Math.cos(boost.getReferenceViewConeAngle());
+
+        mesh.position = position;
+        mesh.up = upVector;
+        mesh.lookAt(lookAtVector);
 
         calculateGroundNormal(angles);
 

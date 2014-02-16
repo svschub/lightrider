@@ -25,16 +25,16 @@ function BoostFactory () {
                 "beta": { type: "f", value: 0.0 },
                 "gamma": { type: "f", value: 1.0 },
                 "tanObserverViewConeAngle": { type: "f", value: 0.0 },
-                "dopplerShift": { type: "t", value: 0 },
-                "dopplerMap": { type: "t", value: 1 },
+                "dopplerShift": { type: "t" },
+                "dopplerMap": { type: "t" },
                 "rgbmin" : { type: "v4", value: dopplerShiftTable.getRgbMinVector() },
                 "rgbrange" : { type: "v4", value: dopplerShiftTable.getRgbRangeVector() }
             };
 
             dopplerMap = loadTexture("dopplerMap");
+            relativityUniforms.dopplerMap.value = dopplerMap;
 
-            relativityUniforms.dopplerMap.texture = dopplerMap;
-            relativityUniforms.dopplerShift.texture = dopplerShiftTable.getTexture();
+            relativityUniforms.dopplerShift.value = dopplerShiftTable.getTexture();
 
             observerViewConeAngle = 0;
             self.setBoostParameters(0);
@@ -153,14 +153,15 @@ function BoostFactory () {
             }
         }
 
+
         uniforms = THREE.UniformsUtils.merge([
             THREE.ShaderLib['lambert'].uniforms,
             relativityUniforms,
             newMaterial.uniforms || {},
         ]);
 
-        uniforms.dopplerMap.texture = dopplerMap;
-        uniforms.dopplerShift.texture = dopplerShiftTable.getTexture();
+        uniforms.dopplerMap.value = dopplerMap;
+        uniforms.dopplerShift.value = dopplerShiftTable.getTexture();
 
         if (newMaterial.vertexShader) {
             vsCode = newMaterial.vertexShader;

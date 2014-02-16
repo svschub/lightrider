@@ -179,6 +179,8 @@ function World(boost) {
                 })
             );
 
+            runway.rotation.x = -Math.PI / 2;
+
             return runway;
         },
 
@@ -212,14 +214,9 @@ function World(boost) {
             pointLight.position.z = 10;
             scene.add(pointLight);
 
-            THREE.SceneUtils.traverseHierarchy(scene, function (child) {
-                child.frustumCulled = false;
-            });
-/*
             scene.traverse(function (child) {
                 child.frustumCulled = false;
             });
-*/
         };
  
     self.getScene = function () {

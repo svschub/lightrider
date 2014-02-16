@@ -1,7 +1,7 @@
 function Cabin() {
     var self = this,
 
-        cabin, cockpit, observer,
+        cabin, cockpit,
         altitude, 
         angles,
         speed,
@@ -14,12 +14,6 @@ function Cabin() {
         };
 
 
-    self.addObserver = function(o) {
-        observer = o;
-
-        cabin.add(observer.getMesh());
-    };
-
     self.getMesh = function () {
         return cabin;
     };
@@ -27,25 +21,21 @@ function Cabin() {
     self.getCockpit = function () {
         return cockpit;
     };
+    
+    self.setPosition = function (posVec) {
+        cabin.position = posVec;
+    };
 
-    self.getObserver = function () {
-        return observer;
-    };
-    
-    self.setPosition = function (position) {
-        cabin.position = position;
-    };
-    
     self.setAltitude = function (alt) {
         altitude = alt;
     };
     
-    self.setLookAtVector = function(lookAtVector) {
-        cabin.lookAt(lookAtVector);
+    self.setLookAtVector = function(lookAtVec) {
+        cabin.lookAt(lookAtVec);
     };
     
-    self.setUpVector = function(upVector) {
-        cabin.up = upVector;
+    self.setUpVector = function(upVec) {
+        cabin.up = upVec;
     };
 
     self.setAngles = function (a) {
@@ -59,11 +49,6 @@ function Cabin() {
     self.update = function () {
         cockpit.setAngles(angles);
         cockpit.update();
-
-        observer.setAltitude(altitude);
-        observer.setAngles(angles);
-        observer.setSpeed(speed);
-        observer.update();
     };
 
 

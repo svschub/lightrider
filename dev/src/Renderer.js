@@ -13,24 +13,20 @@ function Renderer() {
         plane,
         world,
         cabin,
-        lookDownGroup,
+        observer,
 
         init = function () {
-            var observer;
+            glRenderer.setClearColor(0x446600, 1);
 
             boost = new BoostFactory();
 
             world = new World(boost);
 
             observer = new Observer(boost);
+            world.add(observer.getHorizonMesh());
 
             cabin = new Cabin();
-            cabin.addObserver(observer);
-
             world.add(cabin.getMesh());
-
-            lookDownGroup = new LookDownGroup();
-            world.add(lookDownGroup.getMesh());
 
             beta = -1000.0;
             beta_next = 0.0;
@@ -44,14 +40,9 @@ function Renderer() {
         },
         
         setVisibility = function (object3d, visible) {
-            THREE.SceneUtils.traverseHierarchy(object3d, function (child) {
-                child.visible = visible;
-            });
-/*
             object3d.traverse(function (child) {
                 child.visible = visible;
             });
-*/
         },
 
         updateBoostParameters = function () {
@@ -69,18 +60,26 @@ function Renderer() {
         },
 
         renderLookDownImage = function () {
-            lookDownGroup.setPosition(plane.getPosition());
-            lookDownGroup.setViewAngle(plane.getAngles());
+            // @todo to be implemented ...
+        },
+  
+        renderObserverView = function () {
+            observer.setPosition(plane.getPosition());
+            observer.setLookAtVector(plane.getLookAtVector());
+            observer.setUpVector(plane.getYawAxis());
+            observer.setAltitude(plane.getAltitude());
+            observer.setAngles(plane.getAngles());
+            observer.setSpeed(plane.getSpeed());
+
+            observer.updateLookDownCamera();
 
             boost.disableBoost();
 
-            setVisibility(lookDownGroup.getMesh(), true);
             setVisibility(cabin.getMesh(), false);
+            glRenderer.render(world.getScene(), observer.getLookDownCamera(), cabin.getCockpit().getLookDownImage(), true);
 
-            glRenderer.render(world.getScene(), lookDownGroup.getCamera(), cabin.getCockpit().getLookDownImage(), true);
-        },
-        
-        renderObserverView = function () {
+            boost.enableBoost();
+
             cabin.setPosition(plane.getPosition());
             cabin.setAltitude(plane.getAltitude());
             cabin.setLookAtVector(plane.getLookAtVector());
@@ -89,12 +88,11 @@ function Renderer() {
             cabin.setSpeed(plane.getSpeed());
             cabin.update();
 
-            boost.enableBoost();
+            observer.update();
 
-            setVisibility(lookDownGroup.getMesh(), false);
             setVisibility(cabin.getMesh(), true);  
-  
-            glRenderer.render(world.getScene(), cabin.getObserver().getCamera());
+
+            glRenderer.render(world.getScene(), observer.getCamera());
         };
         
 
@@ -132,14 +130,14 @@ function Renderer() {
 
         glRenderer.setSize(canvasWidth, canvasHeight);
 
-        cabin.getObserver().setViewport(canvasWidth, canvasHeight); 
+        observer.setViewport(canvasWidth, canvasHeight); 
     };
 
     self.drawFrame = function () {
         if (!paused) {
             updateBoostParameters();
 
-            renderLookDownImage();
+//@todo            renderLookDownImage();
             renderObserverView();
         }
     };
@@ -151,6 +149,7 @@ function Renderer() {
 
         init();
     } catch (e) {
+        console.log("error message: " + e.message);
         renderContextAvailable = false;
         return;
     }

@@ -1,14 +1,19 @@
 function Observer(boost) {
     var self = this,
 
-        mesh, 
-        camera, 
+        camera,
+        lookDownCamera,
         horizon, 
+
         viewConeAngle, 
         viewSphereRadius,
+        speedMetersPerSecond,
+
+        position,
+        upVector,
+        lookAtVector,
         altitude,
         angles,
-        speedMetersPerSecond,
 
         updateObserverViewCone = function () {
             var h = 2 * Math.tan(Math.PI * camera.fov / 360) * camera.near,
@@ -25,6 +30,21 @@ function Observer(boost) {
                 viewConeAngle: viewConeAngle,
                 viewSphereRadius: viewSphereRadius
             });
+        },
+
+        updateCamera = function () {
+            camera.position = position;
+            camera.lookAt(lookAtVector);
+            camera.up = upVector;
+        },
+
+        updateHorizon = function () {
+            horizon.setPosition(position);
+            horizon.setLookAtVector(lookAtVector);
+            horizon.setUpVector(upVector);
+            horizon.setAngles(angles);
+
+            horizon.update();
         },
 
         updateHud = function () {
@@ -44,32 +64,39 @@ function Observer(boost) {
         },
 
         init = function () {
-            mesh = new THREE.Object3D();
-
             camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.3, 10000);
-            camera.position = new THREE.Vector3(0, 0, 0);
-            camera.lookAt(new THREE.Vector3(0, 0, 1));
-            camera.up = new THREE.Vector3(0, 1, 0);
-            mesh.add(camera);
+ 
+            lookDownCamera = new THREE.OrthographicCamera(-80,+80, +70,-70, 1, 1000);
+            lookDownCamera.up = new THREE.Vector3(0,0,1);
+            lookDownCamera.lookAt(new THREE.Vector3(0,-1,0));
 
             horizon = new Horizon(boost);
             horizon.setZ(5000);
             horizon.setFrustumParametersFromCamera(camera);
-            mesh.add(horizon.getMesh());
-
-            mesh.position.y = 1;
 
             updateObserverViewCone();
         };
 
-    self.getMesh = function () {
-        return mesh;
-    };
-
     self.getCamera = function () {
         return camera;
     };
-    
+
+    self.getLookDownCamera = function () {
+        return lookDownCamera;
+    };
+
+    self.setPosition = function (posVec) {
+        position = posVec;
+    };
+
+    self.setUpVector = function (upVec) {
+        upVector = upVec;
+    };
+
+    self.setLookAtVector = function (lookAtVec) {
+        lookAtVector = lookAtVec;
+    };
+
     self.setAltitude = function (alt) {
         altitude = alt;
     };
@@ -96,8 +123,29 @@ function Observer(boost) {
         updateObserverViewCone();
     };
 
+    self.getHorizonMesh = function () {
+        return horizon.getMesh();
+    };
+
+    self.updateLookDownCamera = function () {
+        var moveVector, downVector;
+
+        lookDownCamera.position = new THREE.Vector3(position.x, 50, position.z);
+
+        moveVector = new THREE.Vector3();
+        moveVector.subVectors(lookAtVector, position);
+        moveVector.y = 0;
+        if (moveVector.lengthSq() > 0.0001) {
+            lookDownCamera.up = moveVector;
+        }
+
+        downVector = new THREE.Vector3(position.x, 0, position.z);
+        lookDownCamera.lookAt(downVector);
+    };
+
     self.update = function () {
-        horizon.update(angles);
+        updateCamera();
+        updateHorizon();
         updateHud();
     };
 

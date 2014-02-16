@@ -43,8 +43,8 @@ function FlightModel() {
             if (rollSpeed !== 0.0) {
                 rollAxis.normalize();
                 rollAction.setFromAxisAngle(rollAxis, rollSpeed);
-                rollAction.multiplyVector3(yawAxis);
-                rollAction.multiplyVector3(pitchAxis);
+                yawAxis.applyQuaternion(rollAction);
+                pitchAxis.applyQuaternion(rollAction);
             }
         },
 
@@ -56,8 +56,8 @@ function FlightModel() {
             if (pitchSpeed !== 0.0) {
                 pitchAxis.normalize();
                 pitchAction.setFromAxisAngle(pitchAxis, pitchSpeed);
-                pitchAction.multiplyVector3(yawAxis);
-                pitchAction.multiplyVector3(rollAxis);
+                yawAxis.applyQuaternion(pitchAction);
+                rollAxis.applyQuaternion(pitchAction);
             }
         },
 
@@ -69,8 +69,8 @@ function FlightModel() {
             if (yawSpeed !== 0.0) {
                 yawAxis.normalize();
                 yawAction.setFromAxisAngle(yawAxis, yawSpeed);
-                yawAction.multiplyVector3(rollAxis);
-                yawAction.multiplyVector3(pitchAxis);
+                rollAxis.applyQuaternion(yawAction);
+                pitchAxis.applyQuaternion(yawAction);
             }
         },
 
@@ -81,8 +81,7 @@ function FlightModel() {
             var direction = new THREE.Vector3();
             direction.copy(rollAxis);
             direction.multiplyScalar(speed);
-            position.addSelf(direction);
-//            position.add(direction);
+            position.add(direction);
         },
 
         move = function () {
@@ -102,14 +101,13 @@ function FlightModel() {
             pitchAxis.normalize();
             yAxis = new THREE.Vector3(0, 1, 0);
             axis = new THREE.Vector3();
-//            axis.crossVectors(rollAxis, yAxis);
-            axis.cross(rollAxis, yAxis);
+            axis.crossVectors(rollAxis, yAxis);
+
             lengthSq = axis.lengthSq();
             if (lengthSq > 0.000001) {
                 axis.divideScalar(Math.sqrt(lengthSq));
                 cosRollAngle = axis.dot(pitchAxis);
-//                yAxis.crossVectors(axis, rollAxis);
-                yAxis.cross(axis, rollAxis);
+                yAxis.crossVectors(axis, rollAxis);
                 yAxis.normalize();
                 sinRollAngle = yAxis.dot(pitchAxis);
             }
@@ -180,7 +178,7 @@ function FlightModel() {
 
     self.getLookAtVector = function () {
         var lookAt = new THREE.Vector3();
-        return lookAt.add(position, rollAxis);
+        return lookAt.addVectors(position, rollAxis);
     };
 
     self.getAngles = function () {
