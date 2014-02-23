@@ -125,8 +125,10 @@ function Renderer() {
     };
 
     self.updateObserverViewport = function () {
-        var canvasWidth = $(window).width() - 240, // 0.75 * $(window).width(),
-            canvasHeight = $(window).height();
+        var canvasWidth, canvasHeight;
+ 
+        canvasWidth = $(window).width();
+        canvasHeight = Math.min(canvasWidth*0.75, $(window).height());
 
         glRenderer.setSize(canvasWidth, canvasHeight);
 

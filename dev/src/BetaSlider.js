@@ -1,6 +1,9 @@
 function BetaSlider (properties) {
     var self = this,
 
+        renderCanvasWidth,
+        renderCanvasHeight,
+
         enabled = true,
         scale,
         scaleHeight,
@@ -58,38 +61,42 @@ function BetaSlider (properties) {
         },
 
         addScale = function (width, height) {
+            var instrumentContainer = $("#instrumentContainer > div"),
+                betaScale = $("#betaScale"),
+                betaSlider = $("#betaSlider"),
+                betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),
+                betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom"));
+
             sliderHeight = height;
-            $("#betaSlider").css("height", sliderHeight.toFixed(0));
+            betaSlider.css("height", sliderHeight.toFixed(0));
 
-            scaleHeight = height + 20;
-            scaleOffset = 10;
+            scaleHeight = height + betaSliderMarginTop + betaSliderMarginBottom;
+            scaleOffset = betaSliderMarginBottom + 1;
 
-            $(['<canvas id="betaScale" class="horizontal"',
-               ' width="', width.toFixed(0), '"',
-               ' height="', scaleHeight.toFixed(0), '">',
-               'Browser does not support canvas!',
-               '</canvas>'].join("")).insertAfter("#betaSlider");
+            betaScale.attr("width", width);
+            betaScale.attr("height", scaleHeight.toFixed(0));
 
-            $("#betaScale").width(width);
-            $("#betaScale").height(height + 20);
-            $("#betaScale").attr("height", scaleHeight.toFixed(0));
+            instrumentContainer.css("top", 0.5 * (renderCanvasHeight - instrumentContainer.height()));
+            instrumentContainer.css("left", renderCanvasWidth - instrumentContainer.width() - 20);
 
-            $("#instrumentContainer > div").css("top", 0.9 * ($(window).height() - $("#instrumentContainer > div").height()));
-
-            scale = $("#betaScale")[0].getContext('2d');
+            scale = betaScale[0].getContext('2d');
             scale.lineWidth = 3;
-            scale.strokeStyle = "#000000";
+            scale.strokeStyle = "#FFFF00";
+            scale.fillStyle = "#FFFF00";
         },
 
         drawScaleEntry = function (beta, precision, lineWidth, fontsize) {
-            var y = scaleOffset + sliderHeight*(1.0-getScaleY(beta));
+            var y = scaleOffset + sliderHeight*(1.0-getScaleY(beta)),
+                betaText = beta.toFixed(precision),
+                betaTextWidth;
 
             scale.beginPath();
-            scale.moveTo(0, y);
-            scale.lineTo(lineWidth, y);
+            scale.moveTo(100, y);
+            scale.lineTo(100-lineWidth, y);
             scale.stroke();
 
-            scale.fillText(beta.toFixed(precision), lineWidth + 13, y + fontsize/2 - 2);
+            betaTextWidth = scale.measureText(betaText).width;
+            scale.fillText(betaText, 100 - lineWidth - 13 - betaTextWidth, y + fontsize/2 - 2);
         },
 
         drawScale = function () {
@@ -106,6 +113,9 @@ function BetaSlider (properties) {
         },
  
         init = function () {
+            renderCanvasWidth = $("#renderContainer > canvas").attr("width");
+            renderCanvasHeight = $("#renderContainer > canvas").attr("height");
+    
             $("#instrumentContainer").css("height", $(window).height().toFixed(0));
 
             $("#betaSlider").slider({
@@ -120,7 +130,7 @@ function BetaSlider (properties) {
             $("#betaSlider .ui-slider-handle").unbind("keydown");
             bindMouseWheelEvents();
 
-            addScale(100, Math.min(0.8*$(window).height(), 500));
+            addScale(100, 0.7*renderCanvasHeight);
 
             drawScale();
         };

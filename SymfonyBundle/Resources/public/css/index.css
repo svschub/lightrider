@@ -45,12 +45,6 @@
     color: yellow;
 }
 
-.overlay {
-    display: block;
-    position: absolute;
-    z-index: 100;
-}
-
 body {
     margin: 0px;
     padding: 0px;
@@ -65,17 +59,19 @@ body {
 }
 
 #hudIndicators {
+    display: block;
+    position: absolute;
+    z-index: 100;
     font-family: Monospace;
     font-size: 2em;
     font-weight: bold;
 }
 
 #instrumentContainer {
-    position: relative;
-    padding-top: 0px;
-    padding-left: 50px;
-    padding-right: 50px;
-    padding-bottom: 0;
+    padding: 0px;
+    display: block;
+    position: absolute;
+    z-index: 200;
 }
 
 #instrumentContainer > div {
@@ -90,23 +86,30 @@ body {
     padding: 0;
     width: 10px;
     height: 200px;
-    background: #b0b0b0;
-    color: #ff0000;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffff00;
+    border-radius: 0;
+    background: rgba(255,255,0,0.3);
 }
 
 #betaSlider  > a {
     width: 26px;
     left: -8px;
-    background: #ffffff;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffff00;
+    background: rgba(0,0,0,0.5);
 }
 
 #betaScale {
     width: 100px;
-    background: #efefef;
 }
 
 #betaScaleTitle {
+    padding-right: 5px;
     font-family: Monospace;
     font-size: 24pt;
     font-weight: bold;
+    text-align: right;
 }

@@ -15,18 +15,19 @@
     <body>
         <div id="page">
             <div id="renderContainer" class="horizontal"></div>
-            <div id="instrumentContainer" class="horizontal">
+            <div id="instrumentContainer">
                 <div>
-                    <div id="betaScaleTitle" class="vertical">v/c</div>
+                    <div id="betaScaleTitle" class="vertical yellow">v/c</div>
                     <div class="verticalSmallSpace"></div>
                     <div class="vertical">
+                        <canvas id="betaScale" class="horizontal" width="1" height="1">Browser does not support canvas!</canvas>
                         <div id="betaSlider" class="horizontal"></div>
                     </div>
                     <div class="clearBoth"></div>
                 </div>
             </div>
 
-            <div id="hudIndicators" class="overlay">
+            <div id="hudIndicators">
                 <div class="vertical yellow" id="speed"></div>
                 <div class="vertical yellow" id="altitude"></div>
                 <div class="vertical yellow" id="viewConeAngle"></div>
@@ -78,7 +79,7 @@
 
         <script type="text/javascript" src="{{ asset('public/lightrider/js/Three.js') }}"></script>
         <script type="text/javascript" src="{{ asset('public/lightrider/js/Detector.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('public/lightrider/js/lightrider.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('public/lightrider/js/lightrider.debug.js') }}"></script>
     </body>
 
 </html>
