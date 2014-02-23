@@ -15,8 +15,8 @@ $(SYMFONY_JS)/lightrider.debug.js: Makefile src/*.js
 #	./mergeWithLibs.sh lightrider.debug.js > lightrider.debug.js.temp
 #	mv lightrider.debug.js.temp lightrider.debug.js
 
-$(SYMFONY_JS)/Three.js: $(LIB)/three/Three.js
-	cp $(LIB)/three/Three.js $(SYMFONY_JS)
+$(SYMFONY_JS)/Three.js: $(LIB)/three/build/three.min.js
+	cp $(LIB)/three/build/three.min.js $(SYMFONY_JS)/Three.js
 
 $(SYMFONY_JS)/Detector.js: $(LIB)/Detector.js
 	cp $(LIB)/Detector.js $(SYMFONY_JS)
