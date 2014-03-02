@@ -1,18 +1,20 @@
 
 var plane, renderer, keyHandler, slider, firstFrame;
 
-function printCopyright() {
-    var author, canvas, canvasPosition;
-
+function printCopyrightMessage() {
     $("#hudIndicators").after('<div id="grr" class="overlay mediumFont yellow">by Sven Schubert, 2012</div>');
 
-    author = $("#grr");
-    canvas = $("canvas");
-    canvasPosition = canvas.position();
+    updateCopyrightMessage();
+}
 
-    author.offset({
-        top: canvasPosition.top + canvas.height() - author.height() - 10,
-        left: canvasPosition.left + canvas.width() - author.width() - 10
+function updateCopyrightMessage() {
+    var copyrightMessage = $("#grr"),
+        renderCanvas = $("#renderContainer > canvas"),
+        renderCanvasPosition = renderCanvas.position();
+
+    copyrightMessage.offset({
+        top: renderCanvasPosition.top + renderCanvas.height() - copyrightMessage.height() - 10,
+        left: renderCanvasPosition.left + 10
     });
 }
 
@@ -128,6 +130,17 @@ function initKeyHandler() {
     });
 }
 
+function bindEvents() {
+    initKeyHandler();
+
+    $(window).bind('resize', function () {
+        renderer.updateViewport();
+        slider.update();
+
+        updateCopyrightMessage();
+    });
+}
+
 function initWidgets() {
     slider = new BetaSlider({
         halfScale: 0.9,
@@ -154,9 +167,10 @@ function init() {
     if (renderer.isRenderContextAvailable()) {
         $("#page").css("display", "block");
 
-        initKeyHandler();
         initWidgets();
-        printCopyright();
+        printCopyrightMessage();
+        
+        bindEvents();
 
         plane = new FlightModel();
         plane.setPosition(new THREE.Vector3(0, 10, 13));

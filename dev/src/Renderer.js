@@ -131,10 +131,9 @@ function Renderer() {
     };
 
     self.updateViewport = function () {
-        var canvasWidth, canvasHeight;
-
-        canvasWidth = $(window).width();
-        canvasHeight = Math.min(canvasWidth*0.75, $(window).height());
+        var canvas = $("#renderContainer > canvas"),
+            canvasWidth = $(window).width(), 
+            canvasHeight = Math.min(canvasWidth*0.75, $(window).height());
 
         glRenderer.setSize(canvasWidth, canvasHeight);
 
