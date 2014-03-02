@@ -45,6 +45,12 @@
     color: yellow;
 }
 
+.overlay {
+    display: block;
+    position: absolute;
+    z-index: 4;
+}
+
 body {
     margin: 0px;
     padding: 0px;
