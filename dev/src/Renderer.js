@@ -14,30 +14,6 @@ function Renderer() {
         world,
         cabin,
         observer,
-
-        init = function () {
-            glRenderer.setClearColor(0x446600, 1);
-
-            boost = new BoostFactory();
-
-            world = new World(boost);
-
-            observer = new Observer(boost);
-            world.add(observer.getHorizonMesh());
-
-            cabin = new Cabin();
-            world.add(cabin.getMesh());
-
-            beta = -1000.0;
-            beta_next = 0.0;
-
-            dopplerShiftRescale = -1;
-            dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
-
-            self.updateObserverViewport();
-
-            paused = false;
-        },
         
         setVisibility = function (object3d, visible) {
             object3d.traverse(function (child) {
@@ -99,6 +75,30 @@ function Renderer() {
             setVisibility(cabin.getMesh(), true);  
 
             glRenderer.render(world.getScene(), observer.getCamera());
+        },
+
+        init = function () {
+            glRenderer.setClearColor(0x446600, 1);
+
+            boost = new BoostFactory();
+
+            world = new World(boost);
+
+            observer = new Observer(boost);
+            world.add(observer.getHorizonMesh());
+
+            cabin = new Cabin();
+            world.add(cabin.getMesh());
+
+            beta = -1000.0;
+            beta_next = 0.0;
+
+            dopplerShiftRescale = -1;
+            dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
+
+            self.updateViewport();
+
+            paused = false;
         };
         
 
@@ -130,9 +130,9 @@ function Renderer() {
         dopplerShiftRescale_next = dopplerShiftRescale;
     };
 
-    self.updateObserverViewport = function () {
+    self.updateViewport = function () {
         var canvasWidth, canvasHeight;
- 
+
         canvasWidth = $(window).width();
         canvasHeight = Math.min(canvasWidth*0.75, $(window).height());
 
