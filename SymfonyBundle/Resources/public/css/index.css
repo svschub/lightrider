@@ -58,26 +58,33 @@ body {
     display: none;
 }
 
+#renderContainer {
+    display: block;
+    position: absolute;
+    z-index: 0;
+}
+
 #hudIndicators {
     display: block;
     position: absolute;
-    z-index: 100;
+    z-index: 1;
     font-family: Monospace;
     font-size: 2em;
     font-weight: bold;
 }
 
 #instrumentContainer {
-    padding: 0px;
     display: block;
     position: absolute;
-    z-index: 200;
+    padding: 0px;
+    z-index: 2;
 }
 
 #instrumentContainer > div {
     position: relative;
     margin: 0;
     padding: 0;
+    z-index: 2;
 }
 
 #betaSlider {
@@ -93,7 +100,7 @@ body {
     background: rgba(255,255,0,0.3);
 }
 
-#betaSlider  > a {
+#betaSlider > a.ui-slider-handle {
     width: 26px;
     left: -8px;
     border-style: solid;

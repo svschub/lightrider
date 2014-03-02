@@ -58,12 +58,14 @@ function Renderer() {
                 boost.setBoostParameters(beta);
             }
         },
-
-        renderLookDownImage = function () {
-            // @todo to be implemented ...
-        },
   
         renderObserverView = function () {
+            /**
+             * update observer variables:
+             * @todo check if observer.update() can be called directly
+             * after setting these variables and before rendering the
+             * lookdown image!
+             */
             observer.setPosition(plane.getPosition());
             observer.setLookAtVector(plane.getLookAtVector());
             observer.setUpVector(plane.getYawAxis());
@@ -73,10 +75,14 @@ function Renderer() {
 
             observer.updateLookDownCamera();
 
+            // render lookdown image:
+
             boost.disableBoost();
 
             setVisibility(cabin.getMesh(), false);
             glRenderer.render(world.getScene(), observer.getLookDownCamera(), cabin.getCockpit().getLookDownImage(), true);
+
+            // render observer view:
 
             boost.enableBoost();
 
@@ -139,7 +145,6 @@ function Renderer() {
         if (!paused) {
             updateBoostParameters();
 
-//@todo            renderLookDownImage();
             renderObserverView();
         }
     };
@@ -153,6 +158,5 @@ function Renderer() {
     } catch (e) {
         console.log("error message: " + e.message);
         renderContextAvailable = false;
-        return;
     }
 }

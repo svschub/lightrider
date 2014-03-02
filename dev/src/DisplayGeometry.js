@@ -94,7 +94,7 @@ function DisplayGeometry () {
             THREE.Geometry.call(self);
 
             lookDownImage = new THREE.WebGLRenderTarget(256, 179, {
-                minFilter: THREE.LinearMipMapLinearFilter,
+                minFilter: THREE.LinearFilter,
                 magFilter: THREE.LinearFilter,
                 format: THREE.RGBFormat
             });
@@ -102,13 +102,12 @@ function DisplayGeometry () {
             faceMaterials = [
                 new THREE.MeshBasicMaterial({ // screen
                     color: 0xDDDDDD,
-                    shading: THREE.FlatShading,
                     vertexColors: THREE.VertexColors,
                     map: lookDownImage
                 }),
                 new THREE.MeshBasicMaterial({ // frame
                     color: 0xFFFFFF,
-                    vertexColors: THREE.VertexColors
+                    vertexColors: THREE.VertexColors,
                 }),
             ];
 

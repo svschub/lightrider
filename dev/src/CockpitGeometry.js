@@ -42,11 +42,13 @@ function CockpitGeometry () {
             faceMaterials = [
                 new THREE.MeshBasicMaterial({
                     color: 0xDDDDDD,
-                    vertexColors: THREE.VertexColors
+                    vertexColors: THREE.VertexColors,
+                    shading: THREE.FlatShading,
                 }),
                 new THREE.MeshBasicMaterial({
                     color: 0x333333,
-                    vertexColors: THREE.VertexColors
+                    vertexColors: THREE.VertexColors,
+                    shading: THREE.FlatShading,
                 }),
             ];
 

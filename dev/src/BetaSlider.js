@@ -1,12 +1,8 @@
 function BetaSlider (properties) {
     var self = this,
 
-        renderCanvasWidth,
-        renderCanvasHeight,
-
         enabled = true,
         scale,
-        scaleHeight,
         scaleOffset,
         sliderHeight,
         handleSlider = properties.handle,
@@ -60,12 +56,18 @@ function BetaSlider (properties) {
             }
         },
 
-        addScale = function (width, height) {
-            var instrumentContainer = $("#instrumentContainer > div"),
+        updateScaleSize = function () {
+            var renderCanvas = $("#renderContainer > canvas"),
+                renderCanvasWidth = renderCanvas[0].width,
+                renderCanvasHeight = renderCanvas[0].height,
+                instrumentContainer = $("#instrumentContainer > div"),
                 betaScale = $("#betaScale"),
                 betaSlider = $("#betaSlider"),
                 betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),
-                betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom"));
+                betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom")),
+                width = 100, 
+                height = 0.7*renderCanvasHeight,
+                scaleHeight;
 
             sliderHeight = height;
             betaSlider.css("height", sliderHeight.toFixed(0));
@@ -78,11 +80,6 @@ function BetaSlider (properties) {
 
             instrumentContainer.css("top", 0.5 * (renderCanvasHeight - instrumentContainer.height()));
             instrumentContainer.css("left", renderCanvasWidth - instrumentContainer.width() - 20);
-
-            scale = betaScale[0].getContext('2d');
-            scale.lineWidth = 3;
-            scale.strokeStyle = "#FFFF00";
-            scale.fillStyle = "#FFFF00";
         },
 
         drawScaleEntry = function (beta, precision, lineWidth, fontsize) {
@@ -100,6 +97,15 @@ function BetaSlider (properties) {
         },
 
         drawScale = function () {
+            var betaScale = $("#betaScale");
+
+            scale = betaScale[0].getContext('2d');
+            scale.lineWidth = 3;
+            scale.strokeStyle = "#FFFF00";
+            scale.fillStyle = "#FFFF00";
+
+           // scale.clearRect(0,0,betaScale[0].width, betaScale[0].height);
+
             scale.font = "normal 16pt Calibri";
             drawScaleEntry(0.5, 1, 13, 16);
             drawScaleEntry(0.8, 1, 13, 16);
@@ -113,9 +119,6 @@ function BetaSlider (properties) {
         },
  
         init = function () {
-            renderCanvasWidth = $("#renderContainer > canvas").attr("width");
-            renderCanvasHeight = $("#renderContainer > canvas").attr("height");
-    
             $("#instrumentContainer").css("height", $(window).height().toFixed(0));
 
             $("#betaSlider").slider({
@@ -130,8 +133,7 @@ function BetaSlider (properties) {
             $("#betaSlider .ui-slider-handle").unbind("keydown");
             bindMouseWheelEvents();
 
-            addScale(100, 0.7*renderCanvasHeight);
-
+            updateScaleSize();
             drawScale();
         };
     

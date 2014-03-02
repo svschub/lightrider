@@ -106,6 +106,7 @@ function Horizon(boost) {
                 horizonFragmentShaderCode = loadAscii("lambertFragmentShader");
 
             horizonArcMaterial = boost.setMaterial({
+                shading: THREE.SmoothShading,
                 vertexShader: [
                     "#define HORIZON_ARC",
                     horizonVertexShaderCode
@@ -120,6 +121,7 @@ function Horizon(boost) {
             });
 
             horizonBackgroundMaterial = boost.setMaterial({
+                shading: THREE.SmoothShading,
                 vertexShader: [
                     "#define HORIZON_BACKGROUND",
                     horizonVertexShaderCode
