@@ -93,8 +93,6 @@ function BetaSlider (properties) {
         },
  
         init = function () {
-            $("#instrumentContainer").css("height", $(window).height().toFixed(0));
-
             $("#betaSlider").slider({
                 orientation: "vertical",
                 min: 0.0,
@@ -123,7 +121,7 @@ function BetaSlider (properties) {
         var renderCanvas = $("#renderContainer > canvas"),
             renderCanvasWidth = renderCanvas[0].width,
             renderCanvasHeight = renderCanvas[0].height,
-            instrumentContainer = $("#instrumentContainer > div"),
+            instrumentContainer = $("#instrumentContainer"),
             betaScale = $("#betaScale"),
             betaSlider = $("#betaSlider"),
             betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),

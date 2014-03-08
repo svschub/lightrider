@@ -86,13 +86,6 @@ body {
     z-index: 2;
 }
 
-#instrumentContainer > div {
-    position: relative;
-    margin: 0;
-    padding: 0;
-    z-index: 2;
-}
-
 #betaSlider {
     margin-top: 10px;
     margin-bottom: 10px;
