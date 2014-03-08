@@ -1,6 +1,11 @@
 function BetaSlider (properties) {
     var self = this,
 
+        renderCanvas = $("#renderContainer > canvas"),
+        instrumentContainer = $("#instrumentContainer"),
+        betaScale = $("#betaScale"),
+        betaSlider = $("#betaSlider"),
+
         enabled = true,
         scale,
         scaleOffset,
@@ -10,11 +15,11 @@ function BetaSlider (properties) {
         b = Math.log((1+a)/a),
 
         setValue = function (value) {
-            $("#betaSlider").slider("value", value);
+            betaSlider.slider("value", value);
         },
 
         getValue = function () {
-            return $("#betaSlider").slider("value");
+            return betaSlider.slider("value");
         },
 
         getBeta = function () {
@@ -71,8 +76,6 @@ function BetaSlider (properties) {
         },
 
         drawScale = function () {
-            var betaScale = $("#betaScale");
-
             scale = betaScale[0].getContext('2d');
             scale.lineWidth = 3;
             scale.strokeStyle = "#FFFF00";
@@ -93,7 +96,7 @@ function BetaSlider (properties) {
         },
  
         init = function () {
-            $("#betaSlider").slider({
+            betaSlider.slider({
                 orientation: "vertical",
                 min: 0.0,
                 max: 1.0,
@@ -118,12 +121,8 @@ function BetaSlider (properties) {
     };
 
     self.update = function () {
-        var renderCanvas = $("#renderContainer > canvas"),
-            renderCanvasWidth = renderCanvas[0].width,
+        var renderCanvasWidth = renderCanvas[0].width,
             renderCanvasHeight = renderCanvas[0].height,
-            instrumentContainer = $("#instrumentContainer"),
-            betaScale = $("#betaScale"),
-            betaSlider = $("#betaSlider"),
             betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),
             betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom")),
             width = 100, 
