@@ -162,6 +162,8 @@ function Renderer() {
 
         calculateFontScaleRatio(canvasWidth, canvasHeight);
 
+        $("#pageContent").css("width", canvasWidth.toFixed(0) + "px");
+
         glRenderer.setSize(canvasWidth, canvasHeight);
         observer.setViewport(canvasWidth, canvasHeight); 
     };

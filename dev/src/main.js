@@ -10,7 +10,7 @@ function printCopyrightMessage() {
 function updateCopyrightMessage() {
     var copyrightMessage = $("#grr"),
         renderCanvas = $("#renderContainer > canvas"),
-        renderCanvasPosition = renderCanvas.position(),
+        renderCanvasPosition = renderCanvas.offset(),
         copyrightFontSize = renderer.getFontScaleRatio() * 16;
 
     copyrightMessage.css("font-size", copyrightFontSize.toFixed(0) + "px");
