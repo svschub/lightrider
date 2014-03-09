@@ -10,12 +10,22 @@ function printCopyrightMessage() {
 function updateCopyrightMessage() {
     var copyrightMessage = $("#grr"),
         renderCanvas = $("#renderContainer > canvas"),
-        renderCanvasPosition = renderCanvas.position();
+        renderCanvasPosition = renderCanvas.position(),
+        copyrightFontSize = renderer.getFontScaleRatio() * 16;
+
+    copyrightMessage.css("font-size", copyrightFontSize.toFixed(0) + "px");
 
     copyrightMessage.offset({
         top: renderCanvasPosition.top + renderCanvas.height() - copyrightMessage.height() - 10,
         left: renderCanvasPosition.left + 10
     });
+}
+
+function updateHud() {
+    var hud = $("#hudIndicators"),
+        hudFontSize = renderer.getFontScaleRatio() * 24;
+    
+    hud.css("font-size", hudFontSize.toFixed(0) + "px");
 }
 
 function toggleLightbox() {
@@ -134,15 +144,22 @@ function bindEvents() {
     initKeyHandler();
 
     $(window).bind('resize', function () {
+        var fontScaleRatio;
+
         renderer.updateViewport();
+        fontScaleRatio = renderer.getFontScaleRatio();
+
+        slider.setFontScaleRatio(fontScaleRatio);
         slider.update();
 
+        updateHud();
         updateCopyrightMessage();
     });
 }
 
 function initWidgets() {
     slider = new BetaSlider({
+        fontScaleRatio: renderer.getFontScaleRatio(),
         halfScale: 0.9,
         handle: function (value) {
             renderer.setBeta(value);

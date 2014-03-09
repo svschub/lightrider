@@ -14,7 +14,9 @@ function Renderer() {
         world,
         cabin,
         observer,
-        
+
+        fontScaleRatio = 1,
+
         setVisibility = function (object3d, visible) {
             object3d.traverse(function (child) {
                 child.visible = visible;
@@ -77,6 +79,10 @@ function Renderer() {
             glRenderer.render(world.getScene(), observer.getCamera());
         },
 
+        calculateFontScaleRatio = function (canvasWidth, canvasHeight) {
+            fontScaleRatio = Math.max(0.5, canvasHeight/600.0);
+        },
+
         init = function () {
             glRenderer.setClearColor(0x446600, 1);
 
@@ -130,13 +136,33 @@ function Renderer() {
         dopplerShiftRescale_next = dopplerShiftRescale;
     };
 
+    self.getFontScaleRatio = function () {
+        return fontScaleRatio;
+    };
+
     self.updateViewport = function () {
         var canvas = $("#renderContainer > canvas"),
-            canvasWidth = $(window).width(), 
-            canvasHeight = Math.min(canvasWidth*0.75, $(window).height());
+            windowWidth = $(window).width(),
+            windowHeight = $(window).height(),
+            maxRatio = 16.0/9.0,
+            minRatio = 4.0/3.0,
+            canvasWidth, 
+            canvasHeight;
+
+        if (windowWidth/windowHeight < minRatio) {
+            canvasWidth = windowWidth;
+            canvasHeight = windowWidth / minRatio;
+        } else if (windowWidth/windowHeight > maxRatio) {
+            canvasHeight = windowHeight;
+            canvasWidth = windowHeight * maxRatio;
+        } else {
+            canvasWidth = windowWidth;
+            canvasHeight = windowHeight;
+        }
+
+        calculateFontScaleRatio(canvasWidth, canvasHeight);
 
         glRenderer.setSize(canvasWidth, canvasHeight);
-
         observer.setViewport(canvasWidth, canvasHeight); 
     };
 
