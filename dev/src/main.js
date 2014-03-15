@@ -4,8 +4,7 @@ var plane,
     keyHandler, 
     slider, 
     firstFrame,
-    paused,
-    recentlyResized;
+    paused;
 
 function printCopyrightMessage() {
     $("#hudIndicators").after('<div id="grr" class="overlay mediumFont yellow">by Sven Schubert, 2012</div>');
@@ -151,14 +150,13 @@ function bindEvents() {
 
     $(window).bind('resize', function () {
         renderer.updateViewport();
+        renderer.drawFrame();
 
         slider.setFontScaleRatio(renderer.getFontScaleRatio());
         slider.update();
 
         updateHud();
         updateCopyrightMessage();
-        
-        recentlyResized = true;
     });
 }
 
@@ -177,9 +175,8 @@ function initWidgets() {
 function animate() {
     requestAnimationFrame(animate);
 
-    if (!paused || recentlyResized) {
+    if (!paused) {
         renderer.drawFrame();
-        recentlyResized = false;
     }
 
     if (firstFrame) {
@@ -190,7 +187,6 @@ function animate() {
 
 function init() {
     paused = false;
-    recentlyResized = false;
 
     renderer = new Renderer();
     if (renderer.isRenderContextAvailable()) {
