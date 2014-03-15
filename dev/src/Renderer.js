@@ -1,8 +1,6 @@
 function Renderer() {
     var self = this,
     
-        paused,
-
         glRenderer,
         renderContextAvailable,
 
@@ -103,8 +101,6 @@ function Renderer() {
             dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
 
             self.updateViewport();
-
-            paused = false;
         };
         
 
@@ -114,14 +110,6 @@ function Renderer() {
 
     self.setFlightModel = function (flightmodel) {
         plane = flightmodel;
-    };
-
-    self.pause = function () {
-        paused = true;
-    };
-
-    self.restart = function () {
-        paused = false;
     };
 
     self.getBoost = function () {
@@ -169,11 +157,8 @@ function Renderer() {
     };
 
     self.drawFrame = function () {
-        if (!paused) {
-            updateBoostParameters();
-
-            renderObserverView();
-        }
+        updateBoostParameters();
+        renderObserverView();
     };
 
     try {

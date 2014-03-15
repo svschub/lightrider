@@ -1,5 +1,10 @@
 
-var plane, renderer, keyHandler, slider, firstFrame;
+var plane, 
+    renderer, 
+    keyHandler, 
+    slider, 
+    firstFrame,
+    paused;
 
 function printCopyrightMessage() {
     $("#hudIndicators").after('<div id="grr" class="overlay mediumFont yellow">by Sven Schubert, 2012</div>');
@@ -33,13 +38,13 @@ function toggleLightbox() {
 
     if ($("#lightbox").css("display") === "block") {
         cssDisplayValue = "none";
+        paused = false;
         plane.setPaused(false);
-        renderer.restart();
         slider.enable();
     } else {
         cssDisplayValue = "block";
+        paused = true;
         plane.setPaused(true);
-        renderer.pause();
         slider.disable();
     }
 
@@ -144,12 +149,10 @@ function bindEvents() {
     initKeyHandler();
 
     $(window).bind('resize', function () {
-        var fontScaleRatio;
-
         renderer.updateViewport();
-        fontScaleRatio = renderer.getFontScaleRatio();
+        renderer.drawFrame();
 
-        slider.setFontScaleRatio(fontScaleRatio);
+        slider.setFontScaleRatio(renderer.getFontScaleRatio());
         slider.update();
 
         updateHud();
@@ -171,7 +174,10 @@ function initWidgets() {
 
 function animate() {
     requestAnimationFrame(animate);
-    renderer.drawFrame();
+
+    if (!paused) {
+        renderer.drawFrame();
+    }
 
     if (firstFrame) {
         toggleLightbox();
@@ -180,6 +186,8 @@ function animate() {
 }
 
 function init() {
+    paused = false;
+
     renderer = new Renderer();
     if (renderer.isRenderContextAvailable()) {
         $("#page").css("display", "block");
