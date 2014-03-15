@@ -19,11 +19,11 @@
     position: absolute;
     margin: 0;
     padding: 0;
-    top: 20%;
-    left: 30%;
-    width: 40%;
-    height: 60%;
-    border: 16px solid #3399bb;
+    top: 10%;
+    left: 10%;
+    width: 80%;
+    height: 80%;
+    border: 4px solid #3399bb;
     background-color: white;
     z-index: 1001;
     overflow: hidden;
@@ -35,7 +35,7 @@
     padding-left: 0px;
     padding-right: 0px;
     padding-top: 0px;
-    padding-bottom: 70px;
+    padding-bottom: 35px;
     width: 100%;
     height: 100%;
     background: #eeeeee;
@@ -51,54 +51,79 @@
     padding: 0;
     width: 100%;
     height: 100%;
-    background: #ffffff;
-    text-align: center;
+    background-image: -webkit-linear-gradient(top, #ffffff 0%, #A6B0BA 100%);
+    background-image: -moz-linear-gradient(top, #ffffff 0%, #A6B0BA 100%);
+    background-image: -o-linear-gradient(top, #ffffff 0%, #A6B0BA 100%);
+    background-image: linear-gradient(top, #ffffff 0%, #A6B0BA 100%);
     font-family: Arial;
-    font-size: 14pt;
+    font-size: 1em;
     font-weight: normal;
     overflow: auto;
 }
 
 #lightboxContent h3 {
-    font-size: 18pt;
     font-weight: bold;
+    text-align: center;
 }
 
 #lightboxContent hr.separator {
     width: 90%;
-    height: 1pt;
+    height: 1px;
     border: 0;
     color: #3399bb;
     background-color: #3399bb;
 }
 
-#lightbox .button {
-    margin-top: 10px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0;
-    padding-top: 10px;
-    width: 100px;
-    height: 50px;
-    border: 2px solid #000000;
-    background: #ffffff;
+#lightboxContent p {
+    display: block;
+    width: 90%; 
+    margin-left: auto; 
+    margin-right: auto;    
+}
+
+#lightbox .headlineContent {
+    display: block;
+    position: relative;
+    margin: 0;
+    padding: 3px;
+    height: 35px;
+    background-image: -webkit-linear-gradient(top, #3399bb 0%, #353556 100%);
+    background-image: -moz-linear-gradient(top, #3399bb 0%, #353556 100%);
+    background-image: -o-linear-gradient(top, #3399bb 0%, #353556 100%);
+    background-image: linear-gradient(top, #3399bb 0%, #353556 100%);
     color: #000000;
-    text-align: center;
     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
     box-sizing: border-box;         /* Opera/IE 8+ */
 }
 
-#lightbox .button > a {
-    color: #000000;
+#lightbox .headlineContent span {
+    display: block;
+    padding: 2px;
     font-family: Arial;
-    font-size: 16pt;
-    font-weight: normal;
+    font-size: 1em;
+    font-weight: bold;
     text-decoration: none;
 }
 
-#lightbox .button > a:hover {
-    color: #cc0000;
+#lightbox .headlineContent span.headline {
+    float: left;
+    color: #DAECFF;
+}
+
+#lightbox .headlineContent span.button {
+    float: right;
+    border: 2px solid #000000;
+    background: #F1F1FF;
+}
+
+#lightbox .headlineContent span.button a {
+    color: #000000;
+    text-decoration: none;
+}
+
+#lightbox .headlineContent span.button a:hover {
+    color: #CC0000;
 }
 
 #options {
@@ -119,7 +144,7 @@
 
 #explanations > table {
     font-family: Arial;
-    font-size: 14pt;
+    font-size: 1em;
     font-weight: normal;
 }
 
