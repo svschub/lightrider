@@ -159,14 +159,6 @@ function BetaSlider (properties) {
 
         // redraw the beta slider scale:
         drawScale();
-
-        // update left and top to get the correct width and height:
-        instrumentContainer.css("left", instrumentContainer.css("left"));
-        instrumentContainer.css("top", instrumentContainer.css("top"));
-
-        // move the beta slider container to the correct top and left position:
-        instrumentContainer.css("left", renderCanvasLeft + renderCanvasWidth - instrumentContainer.width() - 20);
-        instrumentContainer.css("top", 0.5 * (renderCanvasHeight - instrumentContainer.height()));
     };
 
     init();

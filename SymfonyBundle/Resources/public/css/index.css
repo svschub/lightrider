@@ -45,12 +45,6 @@
     color: yellow;
 }
 
-.overlay {
-    display: block;
-    position: absolute;
-    z-index: 4;
-}
-
 body {
     margin: 0px;
     padding: 0px;
@@ -77,25 +71,48 @@ body {
     z-index: 0;
 }
 
-#hudIndicators {
+#renderOverlay {
     display: block;
     position: absolute;
     z-index: 1;
+}
+
+#leftBar {
+    display: block;
+    float: left;
+    height: 100%;
+}
+
+#rightBar {
+    display: block;
+    float: right;
+    height: 100%;
+}
+
+#hudIndicators {
+    display: block;
+    float: top;
     font-family: Monospace;
     font-size: 24px;
     font-weight: bold;
 }
 
-#instrumentContainer {
+#grr {
     display: block;
     position: absolute;
+    bottom: 0;
+}
+
+#instrumentContainer {
+    float: top;
+    display: block;
+    margin-top: 10%;
     padding: 0px;
-    z-index: 2;
 }
 
 #betaSlider {
-    margin-top: 10px;
-    margin-bottom: 10px;
+    float: right;
+    margin: 10px 20px 10px 0;
     padding: 0;
     width: 10px;
     height: 200px;
@@ -116,6 +133,7 @@ body {
 }
 
 #betaScale {
+    float: right;
     width: 100px;
 }
 

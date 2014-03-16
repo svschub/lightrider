@@ -17,23 +17,32 @@
         <div id="pageContent">
             <div id="renderContainer" class="horizontal"></div>
 
-            <div id="hudIndicators">
-                <div class="vertical yellow" id="speed"></div>
-                <div class="vertical yellow" id="altitude"></div>
-                <div class="vertical yellow" id="viewConeAngle"></div>
-                <div class="clearBoth"></div>
-            </div>
-
-            <div id="instrumentContainer">
-                <div id="betaScaleTitle" class="vertical yellow">v/c</div>
-                <div class="verticalSmallSpace"></div>
-                <div class="vertical">
-                    <canvas id="betaScale" class="horizontal" width="1" height="1">Browser does not support canvas!</canvas>
-                    <div id="betaSlider" class="horizontal"></div>
+            <div id="renderOverlay">
+                <div id="leftBar">
+                    <div id="hudIndicators">
+                        <div class="vertical yellow" id="speed"></div>
+                        <div class="vertical yellow" id="altitude"></div>
+                        <div class="vertical yellow" id="viewConeAngle"></div>
+                        <div class="clearBoth"></div>
+                    </div>
+                    <div id="grr" class="mediumFont yellow">
+                        by Sven Schubert, 2012
+                    </div>
                 </div>
-                <div class="clearBoth"></div>
+                <div id="rightBar">
+                    <div id="instrumentContainer">
+                        <div id="betaScaleTitle" class="vertical yellow">v/c</div>
+                        <div class="verticalSmallSpace"></div>
+                        <div class="vertical">
+                            <div id="betaSlider"></div>
+                            <canvas id="betaScale" width="1" height="1">
+                                Browser does not support canvas!
+                            </canvas>
+                        </div>
+                    </div>
+                </div>    
             </div>
-
+            
             <div class="clearBoth"></div>
 
             <div id="lightboxbackground"></div>

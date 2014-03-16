@@ -130,6 +130,7 @@ function Renderer() {
 
     self.updateViewport = function () {
         var canvas = $("#renderContainer > canvas"),
+            overlay = $("#renderOverlay"),
             windowWidth = $(window).width(),
             windowHeight = $(window).height(),
             maxRatio = 16.0/9.0,
@@ -151,6 +152,9 @@ function Renderer() {
         calculateFontScaleRatio(canvasWidth, canvasHeight);
 
         $("#pageContent").css("width", canvasWidth.toFixed(0) + "px");
+
+        overlay.css("width", canvasWidth.toFixed(0) + "px");
+        overlay.css("height", canvasHeight.toFixed(0) + "px");
 
         glRenderer.setSize(canvasWidth, canvasHeight);
         observer.setViewport(canvasWidth, canvasHeight); 

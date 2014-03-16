@@ -7,31 +7,16 @@ var plane,
     paused,
     recentlyResized;
 
-function printCopyrightMessage() {
-    $("#hudIndicators").after('<div id="grr" class="overlay mediumFont yellow">by Sven Schubert, 2012</div>');
-
-    updateCopyrightMessage();
-}
-
 function updateCopyrightMessage() {
-    var copyrightMessage = $("#grr"),
-        renderCanvas = $("#renderContainer > canvas"),
-        renderCanvasPosition = renderCanvas.offset(),
-        copyrightFontSize = renderer.getFontScaleRatio() * 16;
+    var copyrightFontSize = renderer.getFontScaleRatio() * 16;
 
-    copyrightMessage.css("font-size", copyrightFontSize.toFixed(0) + "px");
-
-    copyrightMessage.offset({
-        top: renderCanvasPosition.top + renderCanvas.height() - copyrightMessage.height() - 10,
-        left: renderCanvasPosition.left + 10
-    });
+    $("#grr").css("font-size", copyrightFontSize.toFixed(0) + "px");
 }
 
 function updateHud() {
-    var hud = $("#hudIndicators"),
-        hudFontSize = renderer.getFontScaleRatio() * 24;
+    var hudFontSize = renderer.getFontScaleRatio() * 24;
     
-    hud.css("font-size", hudFontSize.toFixed(0) + "px");
+    $("#hudIndicators").css("font-size", hudFontSize.toFixed(0) + "px");
 }
 
 function toggleLightbox() {
@@ -152,11 +137,7 @@ function bindEvents() {
     $(window).bind('resize', function () {
         renderer.updateViewport();
 
-        slider.setFontScaleRatio(renderer.getFontScaleRatio());
-        slider.update();
-
-        updateHud();
-        updateCopyrightMessage();
+        updateWidgets();
         
         recentlyResized = true;
     });
@@ -172,6 +153,14 @@ function initWidgets() {
     });
 
     initLightbox();
+}
+
+function updateWidgets() {
+    slider.setFontScaleRatio(renderer.getFontScaleRatio());
+    slider.update();
+
+    updateHud();
+    updateCopyrightMessage();
 }
 
 function animate() {
@@ -197,7 +186,7 @@ function init() {
         $("#page").css("display", "block");
 
         initWidgets();
-        printCopyrightMessage();
+        updateWidgets();
         
         bindEvents();
 
