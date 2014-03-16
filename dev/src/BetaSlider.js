@@ -135,9 +135,8 @@ function BetaSlider (properties) {
     };
 
     self.update = function () {
-        var renderCanvasWidth = renderCanvas[0].width,
-            renderCanvasHeight = renderCanvas[0].height,
-            renderCanvasLeft = renderCanvas.offset().left,
+        var renderCanvasWidth = renderCanvas.width(),
+            renderCanvasHeight = renderCanvas.height(),
             betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),
             betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom")),
             width = Math.max(50, fontScaleRatio * 100), 
