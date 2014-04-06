@@ -10,6 +10,7 @@ function FlightModel() {
         position = new THREE.Vector3(0, 0, 0),
         speed = 0.0,
         acceleration = 0.0,
+        resetAcceleration = false,
 
         // Rollen:
         rollAction = new THREE.Quaternion(),
@@ -82,6 +83,11 @@ function FlightModel() {
             direction.copy(rollAxis);
             direction.multiplyScalar(speed);
             position.add(direction);
+
+            if (resetAcceleration) {
+                acceleration = 0.0;
+                resetAcceleration = false;
+            }
         },
 
         move = function () {
@@ -202,7 +208,11 @@ function FlightModel() {
     self.setAcceleration = function (accel) {
         acceleration = accel;
     };
-    
+
+    self.resetAccelerationAfterUpdate = function () {
+        resetAcceleration = true;
+    };
+
     self.setRollAngle = function (rollangle) {
         rollAngle = rollangle;
     };

@@ -1,3 +1,44 @@
+form .horizontal {
+    padding-left: 10px;
+    margin-left: 10px;
+}
+
+.red {
+    color: #800000;
+}
+
+.vertical {
+    float: top;
+}
+
+.horizontal {
+    float: left;
+}
+
+.clearBoth {
+    clear: both;
+    width: 100%;
+}
+
+.thumbnails {
+    width: 50%;
+}
+
+.thumbnails img {
+    display: block;
+    float: top;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10%;
+}
+
+.thumbnails span {
+    display: block;
+    float: top;
+    text-align: center;
+}
+
 #lightboxbackground {
     display: none;
     position: absolute;
@@ -107,23 +148,29 @@
 }
 
 #lightbox .headlineContent span.headline {
-    float: left;
+    text-align: center;
     color: #DAECFF;
 }
 
-#lightbox .headlineContent span.button {
-    float: right;
-    border: 2px solid #000000;
-    background: #F1F1FF;
+#lightbox span.button {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 20%;
+    padding: 10px;
+    background-image: -webkit-linear-gradient(top, #0E0E0E 0%, #898989 100%);
+    background-image: -moz-linear-gradient(top, #0E0E0E 0%, #898989 100%);
+    background-image: -o-linear-gradient(top, #0E0E0E 0%, #898989 100%);
+    background-image: linear-gradient(top, #0E0E0E 0%, #898989 100%);
+    text-align: center;
 }
 
-#lightbox .headlineContent span.button a {
-    color: #000000;
+#lightbox span.button a {
+    color: #ffffff;
     text-decoration: none;
 }
 
-#lightbox .headlineContent span.button a:hover {
-    color: #CC0000;
+#lightbox span.button a:hover {
 }
 
 #options {
@@ -152,7 +199,22 @@
     font-weight: bold;
 }
 
-form .horizontal {
-    padding-left: 10px;
-    margin-left: 10px;
+#mobileExplanations {
+    width: 100%;
+}
+
+#mobileHowToFly {
+    width: 80%; 
+    margin-left: auto; 
+    margin-right: auto;    
+}
+
+#panoramaView {
+    width: 40%;
+    margin-left: auto; 
+    margin-right: auto;    
+}
+
+#panoramaView img {
+    width: 100%;
 }

@@ -13,4 +13,5 @@ World.js
 FlightModel.js
 Renderer.js
 KeyHandler.js
+OrientableDevice.js
 main.js

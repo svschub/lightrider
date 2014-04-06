@@ -1,11 +1,28 @@
 
 var plane, 
     renderer, 
-    keyHandler, 
+    keyHandler,
+    orientableDevice,
     slider, 
     firstFrame,
     paused,
-    recentlyResized;
+    recentlyResized,
+    orientationDetectionEnabled,
+    isMobile;
+
+function isMobileDevice() {
+    var userAgent = navigator.userAgent;
+
+    return (
+       userAgent.match(/Android/i) || 
+       userAgent.match(/webOS/i) || 
+       userAgent.match(/iPhone/i) || 
+       userAgent.match(/iPad/i) || 
+       userAgent.match(/iPod/i) || 
+       userAgent.match(/BlackBerry/i)|| 
+       userAgent.match(/Windows Phone/i)
+    );
+}
 
 function updateCopyrightMessage() {
     var copyrightFontSize = renderer.getFontScaleRatio() * 16;
@@ -23,11 +40,25 @@ function toggleLightbox() {
     var cssDisplayValue;
 
     if ($("#lightbox").css("display") === "block") {
-        cssDisplayValue = "none";
-        paused = false;
-        plane.setPaused(false);
-        slider.enable();
+        if (orientableDevice) {
+            orientableDevice.registerPitchAngle0();
+        }
+
+        if (!orientableDevice || orientableDevice.isPanoramaView()) {
+            cssDisplayValue = "none";
+            paused = false;
+            plane.setPaused(false);
+            slider.enable();
+        }
     } else {
+        if (isMobile) {
+            $('#mobileExplanations').css('display', 'block');
+            $('#desktopExplanations').css('display', 'none');
+        } else {
+            $('#mobileExplanations').css('display', 'none');
+            $('#desktopExplanations').css('display', 'block');
+        }
+        
         cssDisplayValue = "block";
         paused = true;
         plane.setPaused(true);
@@ -39,8 +70,22 @@ function toggleLightbox() {
 }
 
 function initLightbox() {
+    var touchTime = 0, touchTimePrevious;
+
     $("#lightbox .button > a").bind("click", function () {
         toggleLightbox();
+    });
+
+    $("#renderOverlay").on('dblclick', function () {
+        toggleLightbox();
+    });
+
+    $("#renderOverlay").on('touchstart', function () {
+        touchTimePrevious = touchTime;
+        touchTime = Date.now();
+        if (touchTime - touchTimePrevious < 300) {
+            toggleLightbox();
+        }
     });
 
     $("#dopplerForm").bind('submit', function () {
@@ -125,14 +170,50 @@ function initKeyHandler() {
 
         handleKey: function (keyCode) {
             if (keyCode === 27) {
+                console.log('toggle');
                 toggleLightbox();
             }
         }
     });
 }
 
+function initOrientableDevice() {
+    orientationDetectionEnabled = false;
+
+    orientableDevice = new OrientableDevice();
+
+    orientableDevice.bindUpdateOrientationHandler(function(orientation) {
+        // @todo orientation.angle, orientation.isPanoramaView
+        /**
+         * show warning message if in portrait mode
+         */
+    });
+
+    orientableDevice.bindUpdateOrientationAnglesHandler(function(angles) {
+        if (!paused && 
+            orientationDetectionEnabled &&
+            orientableDevice.isPanoramaView()) {
+            plane.setPitchAngle(0.06*angles.boundedPitchAngle);
+            plane.setRollAngle(-0.06*angles.boundedRollAngle);
+        }
+    });
+
+    orientableDevice.bindUpdateSpeedHandler(function(acceleration) {
+        if (!paused && 
+            orientationDetectionEnabled &&
+            orientableDevice.isPanoramaView()) {
+            plane.setAcceleration(-0.2*acceleration);
+            plane.resetAccelerationAfterUpdate();
+        }
+    });
+}
+
 function bindEvents() {
-    initKeyHandler();
+    if (isMobile) {
+        initOrientableDevice();
+    } else {
+        initKeyHandler();
+    }
 
     $(window).bind('resize', function () {
         renderer.updateViewport();
@@ -174,10 +255,13 @@ function animate() {
     if (firstFrame) {
         toggleLightbox();
         firstFrame = false;
+        orientationDetectionEnabled = true;
     }
 }
 
 function init() {
+    isMobile = isMobileDevice();
+
     paused = false;
     recentlyResized = false;
 
