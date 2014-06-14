@@ -94,10 +94,12 @@ function initLightbox() {
 
     $("#setDopplerEffect").attr('checked', false);
     $("#setDopplerEffect").bind('click', function () {
+        var covariantMaterial = new CovariantMaterial();
+
         if ($(this).is(':checked')) {
-            renderer.getBoost().enableDopplerEffect();
+            covariantMaterial.enableDopplerEffect();
         } else {
-            renderer.getBoost().disableDopplerEffect();
+            covariantMaterial.disableDopplerEffect();
         }
     });
 

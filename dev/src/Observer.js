@@ -1,5 +1,7 @@
-function Observer(boost) {
+function Observer() {
     var self = this,
+
+        boost,
 
         camera,
         lookDownCamera,
@@ -64,13 +66,15 @@ function Observer(boost) {
         },
 
         init = function () {
+            boost = new Boost();
+
             camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.3, 10000);
  
             lookDownCamera = new THREE.OrthographicCamera(-80,+80, +70,-70, 1, 1000);
             lookDownCamera.up = new THREE.Vector3(0,0,1);
             lookDownCamera.lookAt(new THREE.Vector3(0,-1,0));
 
-            horizon = new Horizon(boost);
+            horizon = new Horizon();
             horizon.setZ(5000);
             horizon.setFrustumParametersFromCamera(camera);
 

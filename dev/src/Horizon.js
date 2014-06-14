@@ -1,6 +1,8 @@
-function Horizon(boost) {
+function Horizon() {
     var self = this,
     
+        boost,
+
         mesh,
 
         position,
@@ -102,10 +104,11 @@ function Horizon(boost) {
         },
 
         initShaders = function () {
-            var horizonVertexShaderCode = loadAscii("horizonVertexShader"),
+            var covariantMaterial = new CovariantMaterial(),
+                horizonVertexShaderCode = loadAscii("horizonVertexShader"),
                 horizonFragmentShaderCode = loadAscii("lambertFragmentShader");
 
-            horizonArcMaterial = boost.setMaterial({
+            horizonArcMaterial = covariantMaterial.getMaterial({
                 shading: THREE.SmoothShading,
                 vertexShader: [
                     "#define HORIZON_ARC",
@@ -120,7 +123,7 @@ function Horizon(boost) {
                 uniforms: { "horizonArcColor": { type: "c", value: skyColor}}
             });
 
-            horizonBackgroundMaterial = boost.setMaterial({
+            horizonBackgroundMaterial = covariantMaterial.getMaterial({
                 shading: THREE.SmoothShading,
                 vertexShader: [
                     "#define HORIZON_BACKGROUND",
@@ -137,6 +140,8 @@ function Horizon(boost) {
         },
 
         init = function () {
+            boost = new Boost();
+
             initShaders();
 
             mesh = new THREE.Object3D();

@@ -1,5 +1,7 @@
-function World(boost) {
+function World() {
     var self = this,
+
+        covariantMaterial,
 
         LOD = 4,  // level of detail
         scene,
@@ -14,7 +16,7 @@ function World(boost) {
             for (i = 0; i < number; i++) {
                 column = new THREE.Mesh(
                     new THREE.CylinderGeometry(radius, radius, height, 12, 4 * LOD, false),
-                    boost.setMaterial({
+                    covariantMaterial.getMaterial({
                         color: 0x999999,
                         ambient: 0x777777,
                         shading: THREE.SmoothShading
@@ -61,7 +63,7 @@ function World(boost) {
 
             building = new THREE.Mesh(
                 new THREE.CubeGeometry(13, 6, 7, LOD * 2, LOD, LOD),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xCCEECC,
                     color: 0xCCEECC,
                     shading: THREE.SmoothShading
@@ -72,7 +74,7 @@ function World(boost) {
 
             roof = new THREE.Mesh(
                 new THREE.CubeGeometry(17, 11, 0.5, LOD * 2, LOD * 2, 1),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xCCEECC,
                     color: 0xCCEECC,
                     shading: THREE.SmoothShading
@@ -84,7 +86,7 @@ function World(boost) {
 
             top = new THREE.Mesh(
                 new THREE.CubeGeometry(6, 3, 4, LOD * 2, LOD, LOD),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xCACA9C,
                     color: 0xCACA9C,
                     shading: THREE.SmoothShading
@@ -109,7 +111,7 @@ function World(boost) {
 
             building = new THREE.Mesh(
                 new THREE.CubeGeometry(6, 4, 8, LOD * 2, LOD, LOD * 2),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xCCEECC,
                     color: 0xCCEECC,
                     shading: THREE.SmoothShading
@@ -120,7 +122,7 @@ function World(boost) {
 
             tower = new THREE.Mesh(
                 new THREE.CubeGeometry(3, 9, 3, LOD, LOD * 2, LOD),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xCCEECC,
                     color: 0xCCEECC,
                     shading: THREE.SmoothShading
@@ -132,7 +134,7 @@ function World(boost) {
             r = 0.2;
             towerRoof = new THREE.Mesh(
                 new THREE.CylinderGeometry(r, 2.5, 3, 16, 4 * LOD, false),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xFFAA99,
                     color: 0xFFAA99,
                     shading: THREE.FlatShading
@@ -144,7 +146,7 @@ function World(boost) {
 
             crossVerticalBar = new THREE.Mesh(
                 new THREE.CubeGeometry(r * 1.41, r * 1.41, 4, 1, 1, LOD),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xCACA9C,
                     color: 0xCACA9C,
                     shading: THREE.SmoothShading
@@ -156,7 +158,7 @@ function World(boost) {
 
             crossHorizontalBar = new THREE.Mesh(
                 new THREE.CubeGeometry(r * 1.41, r * 1.41, 2, 1, 1, LOD),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xCACA9C,
                     color: 0xCACA9C,
                     shading: THREE.SmoothShading
@@ -172,7 +174,7 @@ function World(boost) {
         createRunway = function () {
             var runway = new THREE.Mesh(
                 new THREE.PlaneGeometry(10, 100, 2 * LOD, 8 * LOD),
-                boost.setMaterial({
+                covariantMaterial.getMaterial({
                     ambient: 0xAAAAAA,
                     color: 0x777777,
                     shading: THREE.SmoothShading
@@ -190,6 +192,8 @@ function World(boost) {
                 runway, 
                 ambientLight, 
                 pointLight;
+
+            covariantMaterial = new CovariantMaterial();
 
             scene = new THREE.Scene();
 

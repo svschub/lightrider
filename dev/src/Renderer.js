@@ -5,6 +5,8 @@ function Renderer() {
         renderContextAvailable,
 
         boost,
+        covariantMaterial,
+
         beta, beta_next,
         dopplerShiftRescale, dopplerShiftRescale_next,
 
@@ -24,14 +26,13 @@ function Renderer() {
         updateBoostParameters = function () {
             if (dopplerShiftRescale_next !== dopplerShiftRescale) {
                 dopplerShiftRescale = dopplerShiftRescale_next;
-                boost.getDopplerShiftTable().update({
-                    dopplerShiftRescale: dopplerShiftRescale
-                });
+                covariantMaterial.updateDopplerShiftRescale(dopplerShiftRescale);
             }
 
             if (beta_next !== beta) {
                 beta = beta_next;
-                boost.setBoostParameters(beta);
+                boost.setBeta(beta);
+                covariantMaterial.updateBoostParameters(boost);
             }
         },
   
@@ -53,14 +54,14 @@ function Renderer() {
 
             // render lookdown image:
 
-            boost.disableBoost();
+            covariantMaterial.disableBoost();
 
             setVisibility(cabin.getMesh(), false);
             glRenderer.render(world.getScene(), observer.getLookDownCamera(), cabin.getCockpit().getLookDownImage(), true);
 
             // render observer view:
 
-            boost.enableBoost();
+            covariantMaterial.enableBoost();
 
             cabin.setPosition(plane.getPosition());
             cabin.setAltitude(plane.getAltitude());
@@ -84,11 +85,12 @@ function Renderer() {
         init = function () {
             glRenderer.setClearColor(0x446600, 1);
 
-            boost = new BoostFactory();
+            boost = new Boost();
+            covariantMaterial = new CovariantMaterial();
 
-            world = new World(boost);
+            world = new World();
 
-            observer = new Observer(boost);
+            observer = new Observer();
             world.add(observer.getHorizonMesh());
 
             cabin = new Cabin();
@@ -110,10 +112,6 @@ function Renderer() {
 
     self.setFlightModel = function (flightmodel) {
         plane = flightmodel;
-    };
-
-    self.getBoost = function () {
-        return boost;
     };
 
     self.setBeta = function (beta) {

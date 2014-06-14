@@ -1,7 +1,8 @@
 common.js
 BetaSlider.js
 DopplerShiftTable.js
-BoostFactory.js
+Boost.js
+CovariantMaterial.js
 CockpitGeometry.js
 DisplayGeometry.js
 AngleIndicator.js
