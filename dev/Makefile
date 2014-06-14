@@ -1,12 +1,11 @@
-LIB=../../../js
+LIB=lib
 SYMFONY_JS=../SymfonyBundle/Resources/public/js
 
 all: $(SYMFONY_JS)/lightrider.min.js $(SYMFONY_JS)/lightrider.debug.js $(SYMFONY_JS)/Three.js $(SYMFONY_JS)/Detector.js
 
 $(SYMFONY_JS)/lightrider.min.js: $(SYMFONY_JS)/lightrider.debug.js
 	rm -f $(SYMFONY_JS)/lightrider.min.js
-	java -jar $(LIB)/yuicompressor.jar $(SYMFONY_JS)/lightrider.debug.js -o $(SYMFONY_JS)/lightrider.min.js
-#	java -jar $(LIB)/compiler.jar --compilation_level ADVANCED_OPTIMIZATIONS --js lightrider.debug.js ../THREE.js ../Detector.js --externs $(LIB)/jquery/jquery.externs.js --js_output_file ../lightrider.min.js
+	yuicompressor.sh $(SYMFONY_JS)/lightrider.debug.js -o $(SYMFONY_JS)/lightrider.min.js
 
 $(SYMFONY_JS)/lightrider.debug.js: Makefile src/*.js
 	./concat.sh > lightrider.debug.js.temp
