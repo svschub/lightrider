@@ -1,12 +1,10 @@
-function loadAscii (objectName) {
+function loadObject(objectName) {
     var asciiData;
 
     $.ajax({
-        url: "/Lightrider/loadObject/",
+        url: "/Lightrider/Objects/" + objectName,
         type: 'GET',
-        data: {
-            name: objectName
-        },
+        data: {},
         async: false,
         cache: false,
         timeout: 30000,
@@ -19,17 +17,4 @@ function loadAscii (objectName) {
     });
 
     return asciiData;
-}
-
-function loadTexture (imageName) {
-    var image = new Image(),
-        texture = new THREE.Texture(image);
-
-    image.onload = function () {
-        texture.needsUpdate = true;
-    };
-
-	image.src = loadAscii(imageName);
-
-    return texture;
 }

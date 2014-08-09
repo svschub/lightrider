@@ -2,82 +2,108 @@
 
 namespace Homepage\LightriderBundle\Controller;
 
-
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
-
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-
-class ObjectLoaderController extends Controller
-{
-    public function indexAction()
-    {
-        $kernel = $this->get('kernel');
-
+class ObjectLoaderController extends Controller {
+    public function indexAction($scope, $filename) {
         $request = Request::createFromGlobals();
         if ($request->getMethod() !== 'GET') {
             throw $this->createNotFoundException('This page only receives GET requests.');
         }
-        if (!$request->query->has('name')) {
-            throw $this->createNotFoundException('The mandatory GET parameters are not specified.');
+
+        if (empty($scope) || empty($filename)) {
+            throw $this->createNotFoundException('Invalid object requested.');
         }
 
-        $objects = $this->readObjectsFromCsv(
-            $kernel->locateResource('@HomepageLightriderBundle/Resources/data/objects.csv')
-        );
-
-        $objectName = $request->query->get('name');
-        if (!array_key_exists($objectName, $objects)) {
-            throw $this->createNotFoundException("Object '$objectName' does not exist.");
+        $objectFilePath = $this->getObjectFilePath($scope, $filename);
+        if (empty($objectFilePath)) {
+            throw $this->createNotFoundException("Object '{$scope}/{$filename}' not found.");
         }
 
-        $responseContent = $this->readObjectData($objectName, $objects, $kernel);
-        if ($responseContent === '') {
-            throw $this->createNotFoundException("Can not read Object '$objectName'.");
-        }
+        $objectMimeType = $this->getMimeTypeOfFile(basename($objectFilePath));
 
-        $response = new Response(); 
-        $response->headers->set('Content-Type', 'text/plain');
-        $response->setContent($responseContent);
+        $objectContent = $this->getObjectContent($objectFilePath);
+
+        $response = new Response();
+        $response->headers->set('Content-Type', $objectMimeType);
+        $response->setContent($objectContent);
         $response->setStatusCode(200);
-        
+
         return $response;
     }
 
-    private function readObjectsFromCsv($csvPath) {
-		$objectsFile = fopen($csvPath, 'r') or die("can not read objects");
-		while($columns = fgetcsv($objectsFile, 1024)) {
-		    $objects[$columns[0]] = array(
-		        "filename" => $columns[1],
-		        "filetype" => $columns[2],
-		    );
-		}
-		fclose($objectsFile) or die("can not close objects file");
-        return $objects;
+    private function getObjectFilePath($requestedObjectScope, $requestedObjectName) {
+        $kernel = $this->get('kernel');
+
+        $objectsFilePath = $kernel->locateResource('@HomepageLightriderBundle/Resources/data/objects.csv');
+
+        $relObjectPath = '';
+        $objectsFile = fopen($objectsFilePath, 'r') or die("can not read objects");
+        while ($objectRow = fgetcsv($objectsFile, 1024)) {
+            if (empty($objectRow)) {
+                continue;
+            }
+
+            $objectName = $objectRow[0];
+            $objectScope = $objectRow[1];
+            if ($objectScope = $requestedObjectScope && $objectName == $requestedObjectName) {
+                $relObjectPath = $objectRow[2];
+                break;
+            }
+        }
+        fclose($objectsFile) or die("can not close objects file");
+
+        if (!empty($relObjectPath)) {
+            $objectFilePath = $kernel->locateResource('@HomepageLightriderBundle/Resources/data/' . $relObjectPath);
+        } else {
+            $objectFilePath = null;
+        }
+
+        return $objectFilePath;
     }
 
-    private function readObjectData($objectName, &$objects, &$kernel) {
-		$object = $objects[$objectName];
-		$filename = $object["filename"];
-		$fileext = pathinfo($filename, PATHINFO_EXTENSION);
-        $filepath = $kernel->locateResource('@HomepageLightriderBundle/Resources/data/'.$filename);
-        $objectData = "reading file: ".$filepath;
+    private function getObjectContent($objectFilePath) {
+        $objectFile = fopen($objectFilePath, "r");
+        $objectContent = fread($objectFile, filesize($objectFilePath));
+        fclose($objectFile);
 
-		$file = fopen($filepath, "r");
-		$data = fread($file, filesize($filepath));
-		fclose($file);
+        return $objectContent;
+    }
 
-		if ($object["filetype"] == "ascii") {
-		    $objectData = $data;
-		} elseif ($object["filetype"] == "image") {
-		    $mimeType = array(
-		        "png" => "image/png",
-		        "jpg" => "image/jpeg",
-		    );
-		    $objectData = "data:".$mimeType[$fileext].";base64,".base64_encode($data);
-		}
+    private function getMimeTypeOfFile($fileName) {
+        // some standard MIME types:
+        $mimeTypes = array(
+            'txt' => 'text/plain',
+            'csv' => 'text/comma-separated-values',
+            'htm,html' => 'text/html',
+            'xml' => 'application/xml', // 'text/xml'
+            'x3d' => 'application/xml',
+            'vs' => 'x-shader/x-vertex',
+            'fs' => 'x-shader/x-fragment',
+            'gif' => 'image/gif',
+            'png' => 'image/png',
+            'jpg,jpeg' => 'image/jpeg',
+            'zip' => 'application/zip',
+            'gz' => 'application/gzip',
+            'tar' => 'application/x-tar',
+            'pdf' => 'application/pdf',
+            'swf' => 'application/x-shockwave-flash',
+            'js' => 'application/javascript', // 'text/javascript'
+        );
 
-        return $objectData;
+        // check, if the MIME type of the file is in the list:
+        $fileExt = pathinfo($fileName, PATHINFO_EXTENSION);
+        foreach ($mimeTypes as $fileExtensionsList => $mimeType) {
+            $fileExtensions = explode(',', $fileExtensionsList);
+            if (in_array($fileExt, $fileExtensions)) {
+                // file extension found in list, return corresponding MIME type:
+                return $mimeType;
+            }
+        }
+
+        // file extension not found in list, return default MIME type:
+        return $mimeTypes['txt'];
     }
 }

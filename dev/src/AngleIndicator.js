@@ -6,16 +6,25 @@ function AngleIndicator (options) {
         indicatorBackplane,
         planeSketch,
         planeSketchGeometry,
+        backplaneTexture,
 
         init = function () {
             indicator = new THREE.Object3D();
+
+            backplaneTexture = THREE.ImageUtils.loadTexture(
+                options.textureUrl, 
+                THREE.UVMapping, 
+                function () {
+                    backplaneTexture.needsUpdate = true;
+                }
+            );
 
             indicatorBackplane = new THREE.Mesh(
                 new THREE.PlaneGeometry(0.1, 0.1),
                 new THREE.MeshBasicMaterial({
                     ambient: 0xFFFFFF,
                     color: 0xFFFFFF,
-                    map: options.texture
+                    map: backplaneTexture
                 })
             );
             indicator.add(indicatorBackplane);

@@ -105,8 +105,8 @@ function Horizon() {
 
         initShaders = function () {
             var covariantMaterial = new CovariantMaterial(),
-                horizonVertexShaderCode = loadAscii("horizonVertexShader"),
-                horizonFragmentShaderCode = loadAscii("lambertFragmentShader");
+                horizonVertexShaderCode = loadObject("Shaders/covariantHorizon.vs"),
+                horizonFragmentShaderCode = loadObject("Shaders/covariantLambert.fs");
 
             horizonArcMaterial = covariantMaterial.getMaterial({
                 shading: THREE.SmoothShading,

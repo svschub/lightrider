@@ -12,8 +12,8 @@ function CovariantMaterial () {
                 dopplerShiftTable,
 
                 init = function () {
-                    vertexShaderCode = loadAscii("lambertVertexShader");
-                    fragmentShaderCode = loadAscii("lambertFragmentShader");
+                    vertexShaderCode = loadObject("Shaders/covariantLambert.vs");
+                    fragmentShaderCode = loadObject("Shaders/covariantLambert.fs");
                     dopplerShiftTable = new DopplerShiftTable();
 
                     relativityUniforms = {
@@ -28,7 +28,14 @@ function CovariantMaterial () {
                         "rgbrange" : { type: "v4", value: dopplerShiftTable.getRgbRangeVector() }
                     };
 
-                    dopplerMap = loadTexture("dopplerMap");
+                    dopplerMap = THREE.ImageUtils.loadTexture(
+                        "/Lightrider/Objects/Shaders/dopplerMap.png", 
+                        THREE.UVMapping, 
+                        function () {
+                            dopplerMap.needsUpdate = true;
+                        }
+                    );
+
                     relativityUniforms.dopplerMap.value = dopplerMap;
 
                     relativityUniforms.dopplerShift.value = dopplerShiftTable.getTexture();

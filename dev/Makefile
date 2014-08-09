@@ -5,14 +5,12 @@ all: $(SYMFONY_JS)/lightrider.min.js $(SYMFONY_JS)/lightrider.debug.js $(SYMFONY
 
 $(SYMFONY_JS)/lightrider.min.js: $(SYMFONY_JS)/lightrider.debug.js
 	rm -f $(SYMFONY_JS)/lightrider.min.js
-	yuicompressor.sh $(SYMFONY_JS)/lightrider.debug.js -o $(SYMFONY_JS)/lightrider.min.js
+	yuicompressor.sh $(SYMFONY_JS)/lightrider.debug.js -o $@
 
 $(SYMFONY_JS)/lightrider.debug.js: Makefile src/*.js
 	./concat.sh > lightrider.debug.js.temp
-	./filterJs.pl lightrider.debug.js.temp > $(SYMFONY_JS)/lightrider.debug.js
+	./filterJs.pl lightrider.debug.js.temp > $@
 	rm lightrider.debug.js.temp
-#	./mergeWithLibs.sh lightrider.debug.js > lightrider.debug.js.temp
-#	mv lightrider.debug.js.temp lightrider.debug.js
 
 $(SYMFONY_JS)/Three.js: $(LIB)/three/build/three.min.js
 	cp $(LIB)/three/build/three.min.js $(SYMFONY_JS)/Three.js

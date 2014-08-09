@@ -52,7 +52,7 @@ function Cockpit () {
                     [0.007, 0.008],
                     [0, 0.028],
                 ],
-                texture: loadTexture("vorIndicator"),
+                textureUrl: "/Lightrider/Objects/Textures/vor_indicator.jpg",
                 position: new THREE.Vector3(-0.18, -0.21, 0.75)
             });
 
@@ -70,7 +70,7 @@ function Cockpit () {
                     [0.004, 0.005],
                     [0, 0.02],
                 ],
-                texture: loadTexture("rollIndicator"),
+                textureUrl: "/Lightrider/Objects/Textures/roll_indicator.jpg",
                 position: new THREE.Vector3(0.18, -0.21, 0.75)
             });
 
@@ -90,7 +90,7 @@ function Cockpit () {
                     [-0.004, -0.005],
                     [-0.008, -0.012],
                 ],
-                texture: loadTexture("pitchIndicator"),
+                textureUrl: "/Lightrider/Objects/Textures/pitch_indicator.jpg",
                 position: new THREE.Vector3(0.29, -0.23, 0.75)
             });
 

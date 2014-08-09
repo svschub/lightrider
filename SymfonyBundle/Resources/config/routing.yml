@@ -1,5 +1,5 @@
 homepage_lightrider_objectloader:
-    pattern:  /Lightrider/loadObject/
+    pattern:  /Lightrider/Objects/{scope}/{filename}
     defaults: { _controller: HomepageLightriderBundle:ObjectLoader:index }
 
 homepage_lightrider_main:
