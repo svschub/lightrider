@@ -172,7 +172,6 @@ function initKeyHandler() {
 
         handleKey: function (keyCode) {
             if (keyCode === 27) {
-                console.log('toggle');
                 toggleLightbox();
             }
         }

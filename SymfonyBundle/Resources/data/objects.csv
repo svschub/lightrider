@@ -1,11 +1,8 @@
 textures.xml,Textures,textures/textures.xml
 indicators.jpg,Textures,textures/indicators.jpg
-cockpit.x3d,scene,Scene/cockpit.x3d
+display_background.jpg,Textures,textures/display_background.jpg
+cockpit.x3d,Scene,scene/cockpit.x3d
 covariantLambert.vs,Shaders,shaders/covariantLambert.vs
 covariantLambert.fs,Shaders,shaders/covariantLambert.fs
 covariantHorizon.vs,Shaders,shaders/covariantHorizon.vs
 dopplerMap.png,Shaders,shaders/dopplerMap.png
-
-pitch_indicator.jpg,Textures,textures/pitch_indicator.jpg
-roll_indicator.jpg,Textures,textures/roll_indicator.jpg
-vor_indicator.jpg,Textures,textures/vor_indicator.jpg

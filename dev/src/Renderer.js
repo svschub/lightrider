@@ -17,12 +17,6 @@ function Renderer() {
 
         fontScaleRatio = 1,
 
-        setVisibility = function (object3d, visible) {
-            object3d.traverse(function (child) {
-                child.visible = visible;
-            });
-        },
-
         updateBoostParameters = function () {
             if (dopplerShiftRescale_next !== dopplerShiftRescale) {
                 dopplerShiftRescale = dopplerShiftRescale_next;
@@ -37,12 +31,6 @@ function Renderer() {
         },
   
         renderObserverView = function () {
-            /**
-             * update observer variables:
-             * @todo check if observer.update() can be called directly
-             * after setting these variables and before rendering the
-             * lookdown image!
-             */
             observer.setPosition(plane.getPosition());
             observer.setLookAtVector(plane.getLookAtVector());
             observer.setUpVector(plane.getYawAxis());
@@ -52,29 +40,19 @@ function Renderer() {
 
             observer.updateLookDownCamera();
 
-            // render lookdown image:
-
-            covariantMaterial.disableBoost();
-
-            setVisibility(cabin.getMesh(), false);
-            glRenderer.render(world.getScene(), observer.getLookDownCamera(), cabin.getCockpit().getLookDownImage(), true);
-
             // render observer view:
-
-            covariantMaterial.enableBoost();
-
             cabin.setPosition(plane.getPosition());
-            cabin.setAltitude(plane.getAltitude());
             cabin.setLookAtVector(plane.getLookAtVector());
             cabin.setUpVector(plane.getYawAxis());
             cabin.setAngles(plane.getAngles());
-            cabin.setSpeed(plane.getSpeed());
             cabin.update();
 
             observer.update();
 
-            setVisibility(cabin.getMesh(), true);  
+            // render topview scene into cockpit display:
+            glRenderer.render(world.getTopviewScene(), observer.getLookDownCamera(), cabin.getDisplayImage(), true);
 
+            // render observer view into screen:
             glRenderer.render(world.getScene(), observer.getCamera());
         },
 
@@ -89,6 +67,7 @@ function Renderer() {
             covariantMaterial = new CovariantMaterial();
 
             world = new World();
+            glRenderer.render(world.getScene(), world.getTopviewCamera(), world.getTopviewImage(), true);
 
             observer = new Observer();
             world.add(observer.getHorizonMesh());

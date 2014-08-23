@@ -3,10 +3,6 @@ BetaSlider.js
 DopplerShiftTable.js
 Boost.js
 CovariantMaterial.js
-CockpitGeometry.js
-DisplayGeometry.js
-AngleIndicator.js
-Cockpit.js
 Horizon.js
 Observer.js
 Cabin.js
