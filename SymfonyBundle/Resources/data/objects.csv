@@ -2,6 +2,7 @@ textures.xml,Textures,textures/textures.xml
 indicators.jpg,Textures,textures/indicators.jpg
 display_background.jpg,Textures,textures/display_background.jpg
 cockpit.x3d,Scene,scene/cockpit.x3d
+world.x3d,Scene,scene/world.x3d
 covariantLambert.vs,Shaders,shaders/covariantLambert.vs
 covariantLambert.fs,Shaders,shaders/covariantLambert.fs
 covariantHorizon.vs,Shaders,shaders/covariantHorizon.vs

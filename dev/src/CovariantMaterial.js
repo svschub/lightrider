@@ -103,7 +103,8 @@ function CovariantMaterial () {
             };
 
             self.getMaterial = function(newMaterial) {
-                var i, vsCode, fsCode, uniforms;
+                var i, vsCode, fsCode, uniforms,
+                    shaderDefinitions = [];
 
                 for (i = 0; i < material.length; i++) {
                     if ( isMaterialEqual(newMaterial, material[i]) ) {
@@ -135,23 +136,28 @@ function CovariantMaterial () {
 
                 if (newMaterial.ambient) {
                     uniforms.ambient.value = new THREE.Color(newMaterial.ambient);
+                } else {
+                    uniforms.ambient.value = new THREE.Color(0xAAAAAA);
                 }
+
                 if (newMaterial.color) {
                     uniforms.diffuse.value = new THREE.Color(newMaterial.color);
+                } else {
+                    uniforms.diffuse.value = new THREE.Color(0xAAAAAA);
+                }
+
+                if (newMaterial.vertexColors && newMaterial.vertexColors == THREE.VertexColors) {
+                    shaderDefinitions.push("#define USE_COLOR");
                 }
 
                 if (newMaterial.map) {
+                    shaderDefinitions.push("#define USE_MAP");
                     uniforms.map.texture = THREE.ImageUtils.loadTexture(newMaterial.map);
+                }
 
-                    vsCode = [
-                        "#define USE_MAP",
-                        vsCode,
-                    ].join("\n");
-
-                    fsCode = [
-                        "#define USE_MAP",
-                        fsCode,
-                    ].join("\n");
+                if (shaderDefinitions.length > 0) {
+                    vsCode = shaderDefinitions.concat([vsCode]).join("\n");
+                    fsCode = shaderDefinitions.concat([fsCode]).join("\n");
                 }
 
                 material.push({
@@ -161,6 +167,7 @@ function CovariantMaterial () {
                     ambient: newMaterial.ambient,
                     color: newMaterial.color,
                     shading: newMaterial.shading,
+                    vertexColors: newMaterial.vertexColors,
 
                     map: newMaterial.map,
 
@@ -169,6 +176,7 @@ function CovariantMaterial () {
                         vertexShader:   vsCode,
                         fragmentShader: fsCode,
                         shading:        newMaterial.shading,
+                        vertexColors:   newMaterial.vertexColors,
                         lights:         true
                     })
                 });

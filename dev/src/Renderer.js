@@ -52,6 +52,8 @@ function Renderer() {
             // render topview scene into cockpit display:
             glRenderer.render(world.getTopviewScene(), observer.getLookDownCamera(), cabin.getDisplayImage(), true);
 
+            covariantMaterial.enableBoost();
+
             // render observer view into screen:
             glRenderer.render(world.getScene(), observer.getCamera());
         },
