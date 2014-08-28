@@ -1,4 +1,4 @@
-AsyncLoader = function () {
+function AsyncLoader () {
 };
 
 AsyncLoader.cache = {};
