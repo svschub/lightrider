@@ -101,6 +101,13 @@ function World() {
         },
 
         init = function () {
+            var church, 
+                palace, 
+                runway, 
+                ambientLight, 
+                pointLight, 
+                defaultMaterialCallback;
+
             covariantMaterial = new CovariantMaterial();
 
             worldLoader = new X3d.SceneLoader();
