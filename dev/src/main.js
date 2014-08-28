@@ -267,7 +267,8 @@ function init() {
     recentlyResized = false;
 
     renderer = new Renderer();
-    if (renderer.isRenderContextAvailable()) {
+
+    $.when(renderer.getPromise()).done(function () {
         $("#page").css("display", "block");
 
         initWidgets();
@@ -293,12 +294,14 @@ function init() {
 
         firstFrame = true;
         animate();
-    } else if (! Detector.webgl) {
-        document.body.innerHTML = "";
-        Detector.addGetWebGLMessage();
-    } else {
-        document.body.innerHTML = "unknown error";
-    }
+    }).fail(function(error) {
+        if (!Detector.webgl) {
+            document.body.innerHTML = "";
+            Detector.addGetWebGLMessage();
+        } else {
+            document.body.innerHTML = error;
+        }    
+    });
 }
 
 $(document).ready(init);

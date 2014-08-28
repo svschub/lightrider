@@ -1,6 +1,8 @@
 function Renderer() {
     var self = this,
     
+        deferred,
+
         glRenderer,
         renderContextAvailable,
 
@@ -84,8 +86,14 @@ function Renderer() {
             dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
 
             self.updateViewport();
+
+            deferred.resolve();
         };
-        
+
+
+    self.getPromise = function () {
+        return deferred.promise();
+    };
 
     self.isRenderContextAvailable = function () {
         return renderContextAvailable;
@@ -145,13 +153,15 @@ function Renderer() {
     };
 
     try {
+        deferred = new $.Deferred();
+
         glRenderer = new THREE.WebGLRenderer();
         $("#renderContainer").append(glRenderer.domElement);
         renderContextAvailable = true;
 
         init();
     } catch (e) {
-        console.log("error message: " + e.message);
+        deferred.reject(e.message);
         renderContextAvailable = false;
     }
 }
