@@ -268,7 +268,14 @@ function init() {
 
     renderer = new Renderer();
 
+    $('#loading_page').height($(window).height());
+    $('#loading_icon').offset({
+        top: 0.5*$(window).height() - 50,
+        left: 0.5*$(window).width() - 50
+    });
+
     $.when(renderer.getPromise()).done(function () {
+        $('#loading_page').css("display", "none");
         $("#page").css("display", "block");
 
         initWidgets();

@@ -240,7 +240,7 @@ function World() {
 
                         facesToSubdivide = facesToSubdivideNext;
                         numOfFacesToSubdivide = numOfFacesToSubdivideNext;
-                        console.log('faces to check for subdivision: ' + JSON.stringify(facesToSubdivide));
+//                        console.log('faces to check for subdivision: ' + JSON.stringify(facesToSubdivide));
 
                         facesToSubdivideNext = new Array(2*numOfFacesToSubdivide);
                         numOfFacesToSubdivideNext = 0;

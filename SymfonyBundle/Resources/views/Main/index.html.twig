@@ -16,9 +16,13 @@
     </head>
 
     <body>
+        <div id="loading_page" style="width: 100%; background-color: white;">
+            <img id="loading_icon" src="{{ asset('public/lightrider/images/ajax-loader.gif') }}" />
+        </div>
         <div id="page">
         <div id="pageContent">
-            <div id="renderContainer" class="horizontal"></div>
+            <div id="renderContainer" class="horizontal">
+            </div>
 
             <div id="renderOverlay">
                 <div id="leftBar">
