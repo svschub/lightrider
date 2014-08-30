@@ -212,7 +212,7 @@ X3d.SceneLoader.prototype.parseX3dNode = function(node) {
 
     if (identifier && self.cachedNodes[identifier]) {
         parsedNode = self.cachedNodes[identifier];
-        console.log('cached node: ' + identifier);
+        // console.log('cached node: ' + identifier);
     } else {
         if (node.attr('USE')) {
             nodeToParse = self.x3dSceneNode.find('[DEF="' + node.attr('USE') + '"]');
@@ -408,12 +408,12 @@ X3d.TextureTree.prototype.loadTexture = function(textureProperties, onLoadCallba
             parentTextureId = this.textures[textureId].parentId;
             if (this.textures[parentTextureId]) {
                 texture = this.textures[parentTextureId];
-                console.log('texture ' + textureId + ' found in tree, loading parent url ' + texture.url);
+                // console.log('texture ' + textureId + ' found in tree, loading parent url ' + texture.url);
             }
         } else {
             // This texture is a root level texture:
             texture = this.textures[textureId];
-            console.log('root level texture ' + textureId + ' found in tree, loading url ' + texture.url);
+            // console.log('root level texture ' + textureId + ' found in tree, loading url ' + texture.url);
         }
     } else {
         /**
@@ -428,7 +428,7 @@ X3d.TextureTree.prototype.loadTexture = function(textureProperties, onLoadCallba
         }
 
         texture = this.textures[textureId];
-        console.log('texture ' + textureId + ' not found in tree, loading ' + texture.url);
+        // console.log('texture ' + textureId + ' not found in tree, loading ' + texture.url);
     }
 
     if (texture.url && !texture.parentId) {
@@ -475,7 +475,7 @@ X3d.TextureTree.prototype.getAbsoluteCoordinates = function(textureName, coordin
 //    console.log('texture UVs: ' + JSON.stringify(coordinates));
 
     if (this.textures[textureId] && this.textures[textureId].parentId) {
-        console.log('texture ' + textureName + '(id=' + textureId + ') has parent with id=' + this.textures[textureId].parentId);
+        // console.log('texture ' + textureName + '(id=' + textureId + ') has parent with id=' + this.textures[textureId].parentId);
         texture = this.textures[textureId];
 
         coordinates.forEach(function(uv) {
@@ -490,7 +490,7 @@ X3d.TextureTree.prototype.getAbsoluteCoordinates = function(textureName, coordin
             absCoordinates.push(new THREE.Vector2(u, v));
         });
     } else {
-        console.log('texture ' + textureName + ' (id=' + textureId + ') has no parent');
+        // console.log('texture ' + textureName + ' (id=' + textureId + ') has no parent');
         absCoordinates = coordinates;
     }
 
@@ -553,7 +553,7 @@ X3d.LightNode.prototype.parseBasicLightProperties = function(sceneLoader) {
         ambientIntensity,
         ambientColor;
 
-    console.log('parsing X3D light');
+    // console.log('parsing X3D light');
 
     attribute = this.node.attr('on');
     if (attribute) {
@@ -584,7 +584,7 @@ X3d.LightNode.prototype.parseBasicLightProperties = function(sceneLoader) {
         values = this.parseFloatArray(attribute);
         ambientIntensity = values[0];
         if (ambientIntensity > 0.0) {
-            console.log('adding ambient light component with intensity ' + ambientIntensity);
+            // console.log('adding ambient light component with intensity ' + ambientIntensity);
             ambientColor = new THREE.Color();
             ambientColor.copy(this.color);
             ambientColor.multiplyScalar(ambientIntensity);
@@ -601,7 +601,7 @@ X3d.AppearanceNode.prototype = Object.create(X3d.Node.prototype);
 X3d.AppearanceNode.prototype.parse = function(sceneLoader) {
     var self = this;
 
-    console.log('parsing X3D appearance');
+    // console.log('parsing X3D appearance');
 
     self.node.children().each(function() {
         var child, childNode = $(this);
@@ -668,7 +668,7 @@ X3d.BackgroundNode.prototype.parse = function(sceneLoader) {
         attribute,
         values;
 
-    console.log('parsing X3D background');
+    // console.log('parsing X3D background');
 
     background.groundColor = new THREE.Color();
     attribute = this.node.attr('groundColor');
@@ -708,7 +708,7 @@ X3d.ColorNode.prototype.parse = function(sceneLoader) {
 
     self.colors = [];
 
-    console.log('parsing X3D color');
+    // console.log('parsing X3D color');
 
     attribute = this.node.attr('color');
     if (attribute) {
@@ -732,7 +732,7 @@ X3d.CoordinateNode.prototype.parse = function(sceneLoader) {
     var self = this,
         attribute;
 
-    console.log('parsing X3D coordinate');
+    // console.log('parsing X3D coordinate');
 
     attribute = this.node.attr('point');
     if (attribute) {
@@ -754,7 +754,7 @@ X3d.DirectionalLightNode.prototype.parse = function(sceneLoader) {
         values,
         light;
 
-    console.log('parsing X3D directional light');
+    // console.log('parsing X3D directional light');
 
     this.parseBasicLightProperties(sceneLoader);
 
@@ -779,7 +779,7 @@ X3d.GroupNode.prototype.parse = function(sceneLoader) {
     var object3d = new THREE.Object3D(),
         child;
 
-    console.log('parsing X3D group ' + this.node.attr('DEF'));
+    // console.log('parsing X3D group ' + this.node.attr('DEF'));
 
     this.node.children().each(function() {
         try {
@@ -803,7 +803,7 @@ X3d.ImageTextureNode.prototype.parse = function(sceneLoader) {
         attribute,
         matches;
 
-    console.log('parsing X3D image texture');
+    // console.log('parsing X3D image texture');
 
     attribute = this.node.attr('url');
     if (attribute) {
@@ -827,7 +827,7 @@ X3d.IndexedFaceSetNode.prototype.parse = function(sceneLoader) {
         creaseAngle,
         results;
 
-    console.log('parsing X3D indexed face set');
+    // console.log('parsing X3D indexed face set');
 
     attribute = self.node.attr('solid');
     if (attribute) {
@@ -1021,10 +1021,10 @@ X3d.IndexedFaceSetNode.prototype.createMesh = function(appearance, sceneLoader) 
             }
         };
 
-    console.log("creating face geometry...");
+    // console.log("creating face geometry...");
 
     if (typeof appearance.material === "undefined") {
-        console.log('no material found, adding standard material');
+        // console.log('no material found, adding standard material');
         appearance.material = {
             diffuseColor: new THREE.Color()
         };
@@ -1116,7 +1116,7 @@ X3d.IndexedLineSetNode.prototype.parse = function(sceneLoader) {
         child,
         attribute;
 
-    console.log('parsing X3D indexed line set');
+    // console.log('parsing X3D indexed line set');
 
     attribute = self.node.attr('coordIndex');
     if (attribute) {
@@ -1167,7 +1167,7 @@ X3d.IndexedLineSetNode.prototype.createMesh = function(appearance, sceneLoader) 
             lineStripCounter++;
         };
 
-    console.log("creating line strips...");
+    // console.log("creating line strips...");
 
 
     if (self.colorIndex && self.vertexColors) {
@@ -1250,7 +1250,7 @@ X3d.LinePropertiesNode.prototype.parse = function(sceneLoader) {
         attribute,
         values;
 
-    console.log('parsing X3D line properties');
+    // console.log('parsing X3D line properties');
 
     attribute = this.node.attr('applied');
     if (attribute) {
@@ -1288,7 +1288,7 @@ X3d.MaterialNode.prototype.parse = function(sceneLoader) {
         attribute,
         values;
 
-    console.log('parsing X3D material');
+    // console.log('parsing X3D material');
 
     attribute = this.node.attr('diffuseColor');
     if (attribute) {
@@ -1339,7 +1339,7 @@ X3d.NavigationInfoNode.prototype = Object.create(X3d.Node.prototype);
 
 X3d.NavigationInfoNode.prototype.parse = function(sceneLoader) {
     // @todo to be implemented
-    console.log('parsing X3D navigation info');
+    // console.log('parsing X3D navigation info');
 
     return null;
 };
@@ -1354,7 +1354,7 @@ X3d.PointLightNode.prototype.parse = function(sceneLoader) {
         values, 
         light;
 
-    console.log('parsing X3D point light');
+    // console.log('parsing X3D point light');
 
     this.parseBasicLightProperties(sceneLoader);
 
@@ -1380,7 +1380,7 @@ X3d.SceneNode.prototype.parse = function(sceneLoader) {
     var scene = new THREE.Scene(),
         child;
 
-    console.log('parsing X3D scene');
+    // console.log('parsing X3D scene');
 
     this.node.children().each(function () {
         try {
@@ -1408,7 +1408,7 @@ X3d.ShapeNode.prototype.parse = function(sceneLoader) {
         mesh = null;
         
 
-    console.log('parsing X3D shape');
+    // console.log('parsing X3D shape');
 
     this.node.children().each(function() {
         try {
@@ -1443,7 +1443,7 @@ X3d.SpotLightNode.prototype.parse = function(sceneLoader) {
         values,
         light;
 
-    console.log('parsing X3D spot light');
+    // console.log('parsing X3D spot light');
 
     this.parseBasicLightProperties(sceneLoader);
 
@@ -1510,7 +1510,7 @@ X3d.TextureCoordinateNode.prototype.parse = function(sceneLoader) {
     var self = this,
         attribute;
 
-    console.log('parsing X3D texture coordinates');
+    // console.log('parsing X3D texture coordinates');
 
     attribute = this.node.attr('point');
     if (attribute) {
@@ -1532,7 +1532,7 @@ X3d.TextureTransformNode.prototype.parse = function(sceneLoader) {
         attribute,
         values;
 
-    console.log('parsing X3D texture transform');
+    // console.log('parsing X3D texture transform');
 
     attribute = this.node.attr('translation');
     if (attribute) {
@@ -1568,7 +1568,7 @@ X3d.TransformNode.prototype.parse = function(sceneLoader) {
         quaternion,
         transformationMatrix;
 
-    console.log('parsing X3D transform ' + self.node.attr('DEF'));
+    // console.log('parsing X3D transform ' + self.node.attr('DEF'));
 
     transformationMatrix = new THREE.Matrix4();
 
@@ -1641,7 +1641,7 @@ X3d.ViewpointNode.prototype.parse = function(node) {
         values,
         fieldOfView;
 
-    console.log('parsing X3D viewpoint (camera)');
+    // console.log('parsing X3D viewpoint (camera)');
 
     attribute = this.node.attr('fieldOfView');
     if (attribute) {
