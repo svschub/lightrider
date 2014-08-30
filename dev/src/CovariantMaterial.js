@@ -3,6 +3,8 @@ function CovariantMaterial () {
     var instance = null,
         covariantMaterial = function () {
             var self = this,
+                
+                deferred,
 
                 material = [],
                 vertexShaderCode,
@@ -12,33 +14,45 @@ function CovariantMaterial () {
                 dopplerShiftTable,
 
                 init = function () {
-                    vertexShaderCode = loadObject("Shaders/covariantLambert.vs");
-                    fragmentShaderCode = loadObject("Shaders/covariantLambert.fs");
-                    dopplerShiftTable = new DopplerShiftTable();
+                    deferred = new $.Deferred();
 
-                    relativityUniforms = {
-                        "isBoostEnabled": { type: "i", value: 0 },
-                        "isDopplerEffectEnabled": { type: "i", value: 0 },
-                        "beta": { type: "f", value: 0.0 },
-                        "gamma": { type: "f", value: 1.0 },
-                        "tanObserverViewConeAngle": { type: "f", value: 0.0 },
-                        "dopplerShift": { type: "t" },
-                        "dopplerMap": { type: "t" },
-                        "rgbmin" : { type: "v4", value: dopplerShiftTable.getRgbMinVector() },
-                        "rgbrange" : { type: "v4", value: dopplerShiftTable.getRgbRangeVector() }
-                    };
+                    $.when(
+                        AsyncLoader.get("Shaders/covariantLambert.vs"),
+                        AsyncLoader.get("Shaders/covariantLambert.fs")
+                    ).then(function(vsResponse, fsResponse) {
+                        vertexShaderCode = vsResponse;
+                        fragmentShaderCode = fsResponse;
 
-                    dopplerMap = THREE.ImageUtils.loadTexture(
-                        "/Lightrider/Objects/Shaders/dopplerMap.png", 
-                        THREE.UVMapping, 
-                        function () {
-                            dopplerMap.needsUpdate = true;
-                        }
-                    );
+                        dopplerShiftTable = new DopplerShiftTable();
 
-                    relativityUniforms.dopplerMap.value = dopplerMap;
+                        relativityUniforms = {
+                            "isBoostEnabled": { type: "i", value: 0 },
+                            "isDopplerEffectEnabled": { type: "i", value: 0 },
+                            "beta": { type: "f", value: 0.0 },
+                            "gamma": { type: "f", value: 1.0 },
+                            "tanObserverViewConeAngle": { type: "f", value: 0.0 },
+                            "dopplerShift": { type: "t" },
+                            "dopplerMap": { type: "t" },
+                            "rgbmin" : { type: "v4", value: dopplerShiftTable.getRgbMinVector() },
+                            "rgbrange" : { type: "v4", value: dopplerShiftTable.getRgbRangeVector() }
+                        };
 
-                    relativityUniforms.dopplerShift.value = dopplerShiftTable.getTexture();
+                        dopplerMap = THREE.ImageUtils.loadTexture(
+                            "/Lightrider/Objects/Shaders/dopplerMap.png", 
+                            THREE.UVMapping, 
+                            function () {
+                                dopplerMap.needsUpdate = true;
+                            }
+                        );
+
+                        relativityUniforms.dopplerMap.value = dopplerMap;
+
+                        relativityUniforms.dopplerShift.value = dopplerShiftTable.getTexture();
+
+                        deferred.resolve();
+                    }).fail(function(error) {
+                        deferred.reject(error); 
+                    });
                 },
 
                 setUniforms = function(uniformName, value) {
@@ -60,6 +74,11 @@ function CovariantMaterial () {
 
                     return true;
                 };
+
+
+            self.getPromise = function () {
+                return deferred.promise();                
+            };
 
             self.enableBoost = function () {
                 setUniforms("isBoostEnabled", 1);

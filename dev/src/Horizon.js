@@ -1,6 +1,8 @@
 function Horizon() {
     var self = this,
     
+        deferred,
+
         boost,
 
         mesh,
@@ -103,10 +105,8 @@ function Horizon() {
             }
         },
 
-        initShaders = function () {
-            var covariantMaterial = new CovariantMaterial(),
-                horizonVertexShaderCode = loadObject("Shaders/covariantHorizon.vs"),
-                horizonFragmentShaderCode = loadObject("Shaders/covariantLambert.fs");
+        initShaders = function(horizonVertexShaderCode, horizonFragmentShaderCode) {
+            var covariantMaterial = new CovariantMaterial();
 
             horizonArcMaterial = covariantMaterial.getMaterial({
                 shading: THREE.SmoothShading,
@@ -140,34 +140,45 @@ function Horizon() {
         },
 
         init = function () {
-            boost = new Boost();
+            deferred = new $.Deferred();
 
-            initShaders();
+            $.when(
+                AsyncLoader.get("Shaders/covariantHorizon.vs"),
+                AsyncLoader.get("Shaders/covariantLambert.fs")
+            ).then(function(horizonVertexShaderCode, horizonFragmentShaderCode) {
+                boost = new Boost();
 
-            mesh = new THREE.Object3D();
+                initShaders(horizonVertexShaderCode, horizonFragmentShaderCode);
 
-            horizon = new THREE.Object3D();
+                mesh = new THREE.Object3D();
 
-            horizonBackground = createRectangle(horizonBackgroundMaterial);
-            horizon.add(horizonBackground);
+                horizon = new THREE.Object3D();
 
-            horizonArc = createHorizonArc();
-            horizonArc.position.z = -horizonArcZshift;
-            horizon.add(horizonArc);
+                horizonBackground = createRectangle(horizonBackgroundMaterial);
+                horizon.add(horizonBackground);
 
-            verticalRect = createRectangle(horizonArcMaterial);
-            verticalRect.position.z = -horizonArcZshift;
-            horizon.add(verticalRect);
+                horizonArc = createHorizonArc();
+                horizonArc.position.z = -horizonArcZshift;
+                horizon.add(horizonArc);
 
-            horizontalRect = createRectangle(horizonArcMaterial);
-            horizontalRect.position.z = -horizonArcZshift;
-            horizon.add(horizontalRect);
+                verticalRect = createRectangle(horizonArcMaterial);
+                verticalRect.position.z = -horizonArcZshift;
+                horizon.add(verticalRect);
 
-            edgeRect = createRectangle(horizonArcMaterial);
-            edgeRect.position.z = -horizonArcZshift;
-            horizon.add(edgeRect);
-            
-            mesh.add(horizon);
+                horizontalRect = createRectangle(horizonArcMaterial);
+                horizontalRect.position.z = -horizonArcZshift;
+                horizon.add(horizontalRect);
+
+                edgeRect = createRectangle(horizonArcMaterial);
+                edgeRect.position.z = -horizonArcZshift;
+                horizon.add(edgeRect);
+
+                mesh.add(horizon);
+                
+                deferred.resolve();
+            }).fail(function(error) {
+                deferred.reject(error); 
+            });
         },
 
         calculateGroundNormal = function (angles) {
@@ -632,6 +643,10 @@ function Horizon() {
             horizonArc.visible = true;
         };
 
+
+    self.getPromise = function () {
+        return deferred.promise();
+    };
 
     self.getMesh = function () {
         return mesh;

@@ -60,7 +60,7 @@ function Renderer() {
             glRenderer.render(world.getScene(), observer.getCamera());
         },
 
-        calculateFontScaleRatio = function (canvasWidth, canvasHeight) {
+        calculateFontScaleRatio = function(canvasWidth, canvasHeight) {
             fontScaleRatio = Math.max(0.5, canvasHeight/600.0);
         },
 
@@ -68,26 +68,35 @@ function Renderer() {
             glRenderer.setClearColor(0x446600, 1);
 
             boost = new Boost();
-            covariantMaterial = new CovariantMaterial();
 
             world = new World();
-            glRenderer.render(world.getScene(), world.getTopviewCamera(), world.getTopviewImage(), true);
-
-            observer = new Observer();
-            world.add(observer.getHorizonMesh());
-
             cabin = new Cabin();
-            world.add(cabin.getMesh());
+            observer = new Observer();
 
-            beta = -1000.0;
-            beta_next = 0.0;
+            $.when(
+                world.getPromise(), 
+                cabin.getPromise()
+            ).then(function(worldResponse, cabinResponse) {
+                covariantMaterial = new CovariantMaterial();
 
-            dopplerShiftRescale = -1;
-            dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
+                glRenderer.render(world.getScene(), world.getTopviewCamera(), world.getTopviewImage(), true);
 
-            self.updateViewport();
+                world.add(cabin.getMesh());
 
-            deferred.resolve();
+                world.add(observer.getHorizonMesh());
+
+                beta = -1000.0;
+                beta_next = 0.0;
+
+                dopplerShiftRescale = -1;
+                dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
+
+                self.updateViewport();
+
+                deferred.resolve();
+            }).fail(function(error) {
+                deferred.reject(error);                
+            })
         };
 
 
@@ -160,7 +169,7 @@ function Renderer() {
         renderContextAvailable = true;
 
         init();
-    } catch (e) {
+    } catch(e) {
         deferred.reject(e.message);
         renderContextAvailable = false;
     }

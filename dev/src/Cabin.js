@@ -1,5 +1,7 @@
 function Cabin() {
     var self = this,
+            
+        deferred,
 
         cabinLoader,
         cabinScene,
@@ -15,6 +17,8 @@ function Cabin() {
         displayImage,
 
         init = function () {
+            deferred = new $.Deferred();
+
             cabin = new THREE.Object3D();
 
             cabinLoader = new X3d.SceneLoader();
@@ -23,29 +27,37 @@ function Cabin() {
 
             cabinLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/cockpit.x3d');
 
-            cabinScene = cabinLoader.getScene();
-            
-            cockpit = cabinLoader.getNode('cockpit_TRANSFORM');
-            cockpit.position = new THREE.Vector3(0, -0.7, 0.3);
-            cabin.add(cockpit);
+            $.when(cabinLoader.getPromise()).done(function () {
+                cabinScene = cabinLoader.getScene();
 
-            pitchAngleIndicator = cabinLoader.getNode('group_ME_pitch_plane_sketch_mesh');
-            rollAngleIndicator = cabinLoader.getNode('group_ME_roll_plane_sketch_mesh');
-            vorAngleIndicator = cabinLoader.getNode('group_ME_vor_plane_sketch_mesh');
+                cockpit = cabinLoader.getNode('cockpit_TRANSFORM');
+                cockpit.position = new THREE.Vector3(0, -0.7, 0.3);
+                cabin.add(cockpit);
+
+                pitchAngleIndicator = cabinLoader.getNode('group_ME_pitch_plane_sketch_mesh');
+                rollAngleIndicator = cabinLoader.getNode('group_ME_roll_plane_sketch_mesh');
+                vorAngleIndicator = cabinLoader.getNode('group_ME_vor_plane_sketch_mesh');
 
 
-            display = cabinLoader.getNode('shape_display_plane_mesh');
+                display = cabinLoader.getNode('shape_display_plane_mesh');
 
-            displayImage = new THREE.WebGLRenderTarget(256, 182, {
-                minFilter: THREE.LinearFilter,
-                magFilter: THREE.LinearFilter,
-                format: THREE.RGBFormat
-            });
-            
-            display.material = new THREE.MeshBasicMaterial({
-                color: 0xDDDDDD,
-                vertexColors: THREE.VertexColors,
-                map: displayImage
+                displayImage = new THREE.WebGLRenderTarget(256, 182, {
+                    minFilter: THREE.LinearFilter,
+                    magFilter: THREE.LinearFilter,
+                    format: THREE.RGBFormat
+                });
+
+                display.material = new THREE.MeshBasicMaterial({
+                    color: 0xDDDDDD,
+                    vertexColors: THREE.VertexColors,
+                    map: displayImage
+                });
+
+                console.log('resolve Cabin');
+                deferred.resolve();
+            }).fail(function(error) {
+                console.log('reject Cabin');
+                deferred.reject(error);
             });
         },
 
@@ -57,6 +69,10 @@ function Cabin() {
             ));
         };
 
+
+    self.getPromise = function () {
+        return deferred.promise();
+    };
 
     self.getMesh = function () {
         return cabin;

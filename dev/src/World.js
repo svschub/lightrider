@@ -1,6 +1,8 @@
 function World() {
     var self = this,
 
+        deferred,
+
         covariantMaterial,
 
         scene,
@@ -101,27 +103,41 @@ function World() {
         },
 
         init = function () {
+            deferred = new $.Deferred();
+
             covariantMaterial = new CovariantMaterial();
 
             worldLoader = new X3d.SceneLoader();
-
             worldLoader.setCreateMaterialHandler(function(properties) {
                 return covariantMaterial.getMaterial(properties);
             });
 
-            worldLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/world.x3d');
-            scene = worldLoader.getScene();            
-            scene.traverse(function (child) {
-                child.frustumCulled = false;
+            $.when(covariantMaterial.getPromise()).then(function(covariantMaterialResponse) {
+                worldLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/world.x3d');
+                return worldLoader.getPromise();
+            }).done(function(worldLoaderResponse) {
+                scene = worldLoader.getScene();
+                scene.traverse(function(child) {
+                    child.frustumCulled = false;
+                });
+
+                world = worldLoader.getNode('world_TRANSFORM');
+                world.scale = new THREE.Vector3(10, 10, 10);
+
+                sceneBoundingBox = computeBoundingBox(scene);
+                topviewScene = createTopviewSceneFromBoundingBox(sceneBoundingBox);
+
+                deferred.resolve();
+            }).fail(function(error) {
+                deferred.reject(error);
             });
-
-            world = worldLoader.getNode('world_TRANSFORM');
-            world.scale = new THREE.Vector3(10, 10, 10);
-
-            sceneBoundingBox = computeBoundingBox(scene);
-            topviewScene = createTopviewSceneFromBoundingBox(sceneBoundingBox);
         };
  
+
+    self.getPromise = function () {
+        return deferred.promise();
+    };
+
     self.getScene = function () {
         return scene;
     };

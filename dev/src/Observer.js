@@ -1,6 +1,8 @@
 function Observer() {
     var self = this,
 
+        deferred,
+
         boost,
 
         camera,
@@ -66,6 +68,8 @@ function Observer() {
         },
 
         init = function () {
+            deferred = new $.Deferred();
+
             boost = new Boost();
 
             camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.3, 10000);
@@ -75,11 +79,23 @@ function Observer() {
             lookDownCamera.lookAt(new THREE.Vector3(0,-1,0));
 
             horizon = new Horizon();
-            horizon.setZ(5000);
-            horizon.setFrustumParametersFromCamera(camera);
+            
+            $.when(horizon.getPromise()).done(function(horizonResponse) {
+                horizon.setZ(5000);
+                horizon.setFrustumParametersFromCamera(camera);
 
-            updateObserverViewCone();
+                updateObserverViewCone();
+
+                deferred.resolve();
+            }).fail(function(error) {
+                deferred.reject(error); 
+            });
         };
+
+
+    self.getPromise = function () {
+        return deferred.promise();
+    };
 
     self.getCamera = function () {
         return camera;
