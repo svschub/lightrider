@@ -71,12 +71,14 @@ function Renderer() {
 
             world = new World();
             cabin = new Cabin();
-            observer = new Observer();
 
             $.when(
                 world.getPromise(), 
                 cabin.getPromise()
             ).then(function(worldResponse, cabinResponse) {
+                observer = new Observer();
+                return observer.getPromise();
+            }).done(function(observerResponse) {
                 covariantMaterial = new CovariantMaterial();
 
                 glRenderer.render(world.getScene(), world.getTopviewCamera(), world.getTopviewImage(), true);
