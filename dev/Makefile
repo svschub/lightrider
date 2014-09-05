@@ -3,7 +3,7 @@ SYMFONY_JS=../SymfonyBundle/Resources/public/js
 SYMFONY_DATA=../SymfonyBundle/Resources/data
 
 JS_TARGETS=$(SYMFONY_JS)/lightrider.min.js $(SYMFONY_JS)/lightrider.debug.js $(SYMFONY_JS)/Three.js $(SYMFONY_JS)/Detector.js $(SYMFONY_JS)/jquery.ui.touch-punch.js
-DATA_TARGETS=$(SYMFONY_DATA)/scene/cockpit.x3d $(SYMFONY_DATA)/scene/world.x3d
+DATA_TARGETS=$(SYMFONY_DATA)/scene/cockpit.x3d $(SYMFONY_DATA)/scene/world.x3d $(SYMFONY_DATA)/textures/textures.xml
 
 all: $(JS_TARGETS) $(DATA_TARGETS)
 
@@ -26,8 +26,11 @@ $(SYMFONY_JS)/jquery.ui.touch-punch.js: $(LIB)/jquery/ui/jquery.ui.touch-punch.j
 	cp $(LIB)/jquery/ui/jquery.ui.touch-punch.js $(SYMFONY_JS)
 
 $(SYMFONY_DATA)/scene/cockpit.x3d: data/cockpit.x3d
-	htmlcompressor.sh data/cockpit.x3d >> $@
+	htmlcompressor.sh data/cockpit.x3d > $@
 
 $(SYMFONY_DATA)/scene/world.x3d: data/world.x3d
-	htmlcompressor.sh data/world.x3d >> $@
+	htmlcompressor.sh data/world.x3d > $@
+
+$(SYMFONY_DATA)/textures/textures.xml: data/textures.xml
+	htmlcompressor.sh data/textures.xml > $@
 
