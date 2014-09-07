@@ -3,7 +3,8 @@ SYMFONY_JS=../SymfonyBundle/Resources/public/js
 SYMFONY_DATA=../SymfonyBundle/Resources/data
 
 JS_TARGETS=$(SYMFONY_JS)/lightrider.min.js $(SYMFONY_JS)/lightrider.debug.js $(SYMFONY_JS)/Three.js $(SYMFONY_JS)/Detector.js $(SYMFONY_JS)/jquery.ui.touch-punch.js
-DATA_TARGETS=$(SYMFONY_DATA)/scene/cockpit.x3d $(SYMFONY_DATA)/scene/world.x3d $(SYMFONY_DATA)/textures/textures.xml
+DATA_TARGETS=$(SYMFONY_DATA)/scene/cockpit.x3d $(SYMFONY_DATA)/scene/world.x3d $(SYMFONY_DATA)/textures/textures.xml $(SYMFONY_DATA)/shaders/covariantLambert.vs $(SYMFONY_DATA)/shaders/covariantLambert.fs $(SYMFONY_DATA)/shaders/covariantHorizon.vs
+
 
 all: $(JS_TARGETS) $(DATA_TARGETS)
 
@@ -33,4 +34,14 @@ $(SYMFONY_DATA)/scene/world.x3d: data/world.x3d
 
 $(SYMFONY_DATA)/textures/textures.xml: data/textures.xml
 	htmlcompressor.sh data/textures.xml > $@
+
+
+$(SYMFONY_DATA)/shaders/covariantLambert.vs: data/covariantLambert.vs
+	cat data/covariantLambert.vs > $@
+
+$(SYMFONY_DATA)/shaders/covariantLambert.fs: data/covariantLambert.fs
+	cat data/covariantLambert.fs > $@
+
+$(SYMFONY_DATA)/shaders/covariantHorizon.vs: data/covariantHorizon.vs
+	cat data/covariantHorizon.vs > $@
 
