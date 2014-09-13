@@ -17,6 +17,8 @@ function Cabin() {
         displayImage,
 
         init = function () {
+            console.log('DEBUG: Cabin init');
+
             deferred = new $.Deferred();
 
             cabin = new THREE.Object3D();
@@ -28,6 +30,7 @@ function Cabin() {
             cabinLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/cockpit.x3d');
 
             $.when(cabinLoader.getPromise()).done(function () {
+                console.log('DEBUG: Cabin ready');
                 cabinScene = cabinLoader.getScene();
 
                 cockpit = cabinLoader.getNode('cockpit_TRANSFORM');
@@ -38,6 +41,15 @@ function Cabin() {
                 rollAngleIndicator = cabinLoader.getNode('group_ME_roll_plane_sketch_mesh');
                 vorAngleIndicator = cabinLoader.getNode('group_ME_vor_plane_sketch_mesh');
 
+                if (pitchAngleIndicator) {
+                    console.log('DEBUG: group_ME_pitch_plane_sketch_mesh found');
+                }
+                if (rollAngleIndicator) {
+                    console.log('DEBUG: group_ME_roll_plane_sketch_mesh found');
+                }
+                if (rollAngleIndicator) {
+                    console.log('DEBUG: group_ME_vor_plane_sketch_mesh found');
+                }
 
                 display = cabinLoader.getNode('shape_display_plane_mesh');
 
@@ -53,10 +65,10 @@ function Cabin() {
                     map: displayImage
                 });
 
-                console.log('resolve Cabin');
+                console.log('DEBUG: Cabin resolve');
                 deferred.resolve();
             }).fail(function(error) {
-                console.log('reject Cabin');
+                console.log('DEBUG: Cabin reject');
                 deferred.reject(error);
             });
         },

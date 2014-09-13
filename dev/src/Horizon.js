@@ -140,12 +140,15 @@ function Horizon() {
         },
 
         init = function () {
+            console.log('DEBUG: Horizon init');
+
             deferred = new $.Deferred();
 
             $.when(
                 AsyncLoader.get("Shaders/covariantHorizon.vs"),
                 AsyncLoader.get("Shaders/covariantLambert.fs")
             ).then(function(horizonVertexShaderCode, horizonFragmentShaderCode) {
+                console.log('DEBUG: Horizon ready');
                 boost = new Boost();
 
                 initShaders(horizonVertexShaderCode, horizonFragmentShaderCode);
@@ -175,8 +178,10 @@ function Horizon() {
 
                 mesh.add(horizon);
                 
+                console.log('DEBUG: Horizon resolve');
                 deferred.resolve();
             }).fail(function(error) {
+                console.log('DEBUG: Horizon reject');
                 deferred.reject(error); 
             });
         },

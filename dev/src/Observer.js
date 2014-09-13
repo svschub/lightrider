@@ -68,6 +68,8 @@ function Observer() {
         },
 
         init = function () {
+            console.log('DEBUG: Observer init');
+
             deferred = new $.Deferred();
 
             boost = new Boost();
@@ -81,13 +83,16 @@ function Observer() {
             horizon = new Horizon();
             
             $.when(horizon.getPromise()).done(function(horizonResponse) {
+                console.log('DEBUG: Observer ready');
                 horizon.setZ(5000);
                 horizon.setFrustumParametersFromCamera(camera);
 
                 updateObserverViewCone();
 
+                console.log('DEBUG: Observer resolve');
                 deferred.resolve();
             }).fail(function(error) {
+                console.log('DEBUG: Observer reject');
                 deferred.reject(error); 
             });
         };

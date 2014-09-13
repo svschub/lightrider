@@ -275,6 +275,8 @@ function init() {
     });
 
     $.when(renderer.getPromise()).done(function () {
+        console.log('DEBUG: main ready');
+
         $('#loading_page').css("display", "none");
         $("#page").css("display", "block");
 
