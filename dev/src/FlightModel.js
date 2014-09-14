@@ -3,7 +3,6 @@ function FlightModel() {
 
         cabin, cockpit, observer,
         loopMilliseconds,
-        timerLoopHandle,
         moveHandler,
         paused,
 
@@ -124,46 +123,15 @@ function FlightModel() {
             axis.normalize();
             cosYawAngle = axis.z;
             sinYawAngle = axis.x;
-        },
-
-        update = function () {
-            if (paused) {
-                return;
-            }
-
-            move();
-
-            if (typeof moveHandler !== "undefined") {
-                moveHandler(self.getPosition());
-            }
-
-            calculateAngles();
         };
 
 
-    self.startLoop = function (milliseconds) {
+    self.setIntervalMilliseconds = function(milliseconds) {
         loopMilliseconds = milliseconds;
-
-        paused = false;
-
-        update();
-
-        timerLoopHandle = setInterval(function () {
-            update();
-        }, loopMilliseconds);
-    };
-
-    self.stopLoop = function () {
-        clearInterval(timerLoopHandle);
     };
 
     self.setMoveHandler = function (handler) {
         moveHandler = handler;
-    };
-
-    self.setPaused = function (isPaused) {
-        // @todo pause(), continue()
-        paused = isPaused;
     };
 
     self.setPosition = function (pos) {
@@ -225,5 +193,25 @@ function FlightModel() {
         yawAngle = yawangle;
     };
 
-    update();
+    self.start = function () {
+        paused = false;
+    };
+
+    self.stop = function () {
+        paused = true;
+    };
+
+    self.update = function () {
+        if (paused) {
+            return;
+        }
+
+        move();
+
+        if (typeof moveHandler !== "undefined") {
+            moveHandler(self.getPosition());
+        }
+
+        calculateAngles();
+    };
 }

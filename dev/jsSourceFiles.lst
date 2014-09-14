@@ -11,4 +11,5 @@ FlightModel.js
 Renderer.js
 KeyHandler.js
 OrientableDevice.js
+Timer.js
 main.js

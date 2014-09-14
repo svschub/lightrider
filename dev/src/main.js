@@ -1,5 +1,6 @@
 
-var plane, 
+var timer,
+    plane, 
     renderer, 
     keyHandler,
     orientableDevice,
@@ -37,13 +38,13 @@ function toggleLightbox() {
         if (!orientableDevice || orientableDevice.isPanoramaView()) {
             cssDisplayValue = "none";
             paused = false;
-            plane.setPaused(false);
+            plane.start();
             slider.enable();
         }
     } else {
         cssDisplayValue = "block";
         paused = true;
-        plane.setPaused(true);
+        plane.stop();
         slider.disable();
     }
 
@@ -296,11 +297,15 @@ function initRendererWindow() {
         
         bindEvents();
 
+        timer = new Timer();
+        timer.setIntervalMilliseconds(30);
+
         plane = new FlightModel();
+        plane.setIntervalMilliseconds(timer.getIntervalMilliseconds());
         plane.setPosition(new THREE.Vector3(0, 10, 13));
-        plane.setMoveHandler(function (position) {
+        plane.setMoveHandler(function(position) {
             if (position.y <= 0.0) {
-                plane.stopLoop();
+                timer.stop();
                 document.body.innerHTML = "";
                 $(document).ready(function () {
                     alert("Crashed!");
@@ -310,7 +315,11 @@ function initRendererWindow() {
 
         renderer.setFlightModel(plane);
 
-        plane.startLoop(30);
+        plane.start();
+        plane.update();
+
+        timer.addCallback(plane.update);
+        timer.start();
 
         firstFrame = true;
         animate();
