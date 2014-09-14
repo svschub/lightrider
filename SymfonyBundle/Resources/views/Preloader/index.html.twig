@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title>Relativity with WebGL</title>
+
+        <meta name="author" content="Sven Schubert">
+        <meta name="date" content="2014-04-06T10:00:00+02:00">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+        <link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css">
+        <link rel="stylesheet" type="text/css" href="{{ asset('public/lightrider/css/index.css') }}" />
+        <link rel="stylesheet" type="text/css" href="{{ asset('public/lightrider/css/lightbox.css') }}" />
+    </head>
+
+    <body>
+        <input type="hidden" name="is_mobile_device" id="is_mobile_device" value="{{ is_mobile }}" />
+
+        <div id="loading_page" style="width: 100%; background-color: white; display: none;">
+            <img id="loading_icon" src="{{ asset('public/lightrider/images/ajax-loader.gif') }}" />
+        </div>
+        <div id="page"></div>
+
+        <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        <script type="text/javascript" src="http://code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="{{ asset('public/lightrider/js/jquery.ui.touch-punch.min.js') }}"></script>
+
+        <script type="text/javascript" src="{{ asset('public/lightrider/js/Three.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('public/lightrider/js/Detector.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('public/lightrider/js/x3djs.debug.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('public/lightrider/js/lightrider.debug.js') }}"></script>
+    </body>
+
+</html>

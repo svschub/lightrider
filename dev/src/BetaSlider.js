@@ -6,6 +6,8 @@ function BetaSlider (properties) {
         betaScale = $("#betaScale"),
         betaScaleTitle = $("#betaScaleTitle"),
         betaSlider = $("#betaSlider"),
+        dopplerTitle = $("#dopplerTitle"),
+        dopplerCheckboxImage = $("#doppler_checkbox_image"),
         
         enabled = true,
 
@@ -140,8 +142,10 @@ function BetaSlider (properties) {
             betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),
             betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom")),
             width = Math.max(50, fontScaleRatio * 100), 
-            height = 0.7*renderCanvasHeight,
-            betaScaleTitleSize = fontScaleRatio * 26;
+            height = 0.65*renderCanvasHeight,
+            betaScaleTitleSize = fontScaleRatio * 26,
+            dopperTitleSize = fontScaleRatio * 14,
+            dopplerCheckboxImageSize = fontScaleRatio * 28;
 
         betaScaleTitle.css("font-size", betaScaleTitleSize.toFixed(0) + "px");
 
@@ -155,6 +159,11 @@ function BetaSlider (properties) {
         betaScale.css("width", scaleWidth.toFixed(0) + "px");
         betaScale.attr("width", scaleWidth.toFixed(0));
         betaScale.attr("height", scaleHeight.toFixed(0));
+
+        dopplerTitle.css("font-size", dopperTitleSize.toFixed(0) + "px");
+
+        dopplerCheckboxImage.css("width", dopplerCheckboxImageSize.toFixed(0) + "px");
+        dopplerCheckboxImage.css("height", dopplerCheckboxImageSize.toFixed(0) + "px");
 
         // redraw the beta slider scale:
         drawScale();

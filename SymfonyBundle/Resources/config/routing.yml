@@ -2,7 +2,15 @@ homepage_lightrider_objectloader:
     pattern:  /Lightrider/Objects/{scope}/{filename}
     defaults: { _controller: HomepageLightriderBundle:ObjectLoader:index }
 
-homepage_lightrider_main:
+hompeage_lightrider_settings:
+    pattern:  /Lightrider/Settings/
+    defaults: { _controller: HomepageLightriderBundle:Settings:index }
+
+hompeage_lightrider_render_window:
+    pattern:  /Lightrider/RenderWindow/
+    defaults: { _controller: HomepageLightriderBundle:RenderWindow:index }
+    
+homepage_lightrider_preloader:
     pattern:  /Lightrider/
-    defaults: { _controller: HomepageLightriderBundle:Main:index }
+    defaults: { _controller: HomepageLightriderBundle:Preloader:index }
 

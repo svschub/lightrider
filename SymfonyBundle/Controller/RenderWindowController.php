@@ -4,14 +4,15 @@ namespace Homepage\LightriderBundle\Controller;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\Request;
 
 
-class MainController extends Controller
+class RenderWindowController extends Controller
 {
     public function indexAction()
     {
         return $this->render(
-            'HomepageLightriderBundle:Main:index.html.twig', 
+            'HomepageLightriderBundle:RenderWindow:index.html.twig', 
              array()
         );
     }

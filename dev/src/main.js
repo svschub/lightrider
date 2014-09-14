@@ -11,17 +11,7 @@ var plane,
     isMobile;
 
 function isMobileDevice() {
-    var userAgent = navigator.userAgent;
-
-    return (
-       userAgent.match(/Android/i) || 
-       userAgent.match(/webOS/i) || 
-       userAgent.match(/iPhone/i) || 
-       userAgent.match(/iPad/i) || 
-       userAgent.match(/iPod/i) || 
-       userAgent.match(/BlackBerry/i)|| 
-       userAgent.match(/Windows Phone/i)
-    );
+    return ($("#is_mobile_device").val() == 1);
 }
 
 function updateCopyrightMessage() {
@@ -51,14 +41,6 @@ function toggleLightbox() {
             slider.enable();
         }
     } else {
-        if (isMobile) {
-            $('#mobileExplanations').css('display', 'block');
-            $('#desktopExplanations').css('display', 'none');
-        } else {
-            $('#mobileExplanations').css('display', 'none');
-            $('#desktopExplanations').css('display', 'block');
-        }
-        
         cssDisplayValue = "block";
         paused = true;
         plane.setPaused(true);
@@ -69,48 +51,71 @@ function toggleLightbox() {
     $("#lightboxbackground").css("display", cssDisplayValue);
 }
 
-function initLightbox() {
-    var touchTime = 0, touchTimePrevious;
+function loadSettingsBox() {
+    var deferred = new $.Deferred(),
+        touchTime = 0, 
+        touchTimePrevious;
 
-    $("#lightbox .button > a").bind("click", function () {
-        toggleLightbox();
-    });
+    $.ajax({
+        url: '/Lightrider/Settings',
+        type: 'GET',
+        data: {
+            is_mobile: isMobileDevice() ? 1 : 0
+        },
+        success: function(response) {
+            $("#lightbox").html(response);
 
-    $("#renderOverlay").on('dblclick', function () {
-        toggleLightbox();
-    });
+            $("#lightbox .button > a").bind("click", function () {
+                toggleLightbox();
+            });
 
-    $("#renderOverlay").on('touchstart', function () {
-        touchTimePrevious = touchTime;
-        touchTime = Date.now();
-        if (touchTime - touchTimePrevious < 300) {
-            toggleLightbox();
+            $("#renderOverlay").on('dblclick', function () {
+                toggleLightbox();
+            });
+
+            $("#renderOverlay").on('touchstart', function () {
+                touchTimePrevious = touchTime;
+                touchTime = Date.now();
+                if (touchTime - touchTimePrevious < 300) {
+                    toggleLightbox();
+                }
+            });
+
+            deferred.resolve(response);
+        },
+        error: function(response) {
+            deferred.reject(response);
         }
     });
 
-    $("#dopplerForm").bind('submit', function () {
-        return false;
-    });
+    return deferred.promise();
+}
 
-    $("#setDopplerEffect").attr('checked', false);
-    $("#setDopplerEffect").bind('click', function () {
-        var covariantMaterial = new CovariantMaterial();
+function bindDopplerCheckboxEvents() {
+    var checkboxEnableDopplerEffect = $('#setDopplerEffect'),
+        dopplerCheckboxImage = $('#doppler_checkbox_image'),
+        covariantMaterial = new CovariantMaterial();
 
-        if ($(this).is(':checked')) {
-            covariantMaterial.enableDopplerEffect();
-        } else {
+    if (checkboxEnableDopplerEffect.prop('checked')) {
+        dopplerCheckboxImage.addClass('checked');
+        dopplerCheckboxImage.removeClass('unchecked');
+    } else {
+        dopplerCheckboxImage.addClass('unchecked');
+        dopplerCheckboxImage.removeClass('checked');
+    }
+
+    dopplerCheckboxImage.bind('click', function(event) {
+        if (checkboxEnableDopplerEffect.prop('checked')) {
+            checkboxEnableDopplerEffect.prop('checked', false);
+            dopplerCheckboxImage.addClass('unchecked');
+            dopplerCheckboxImage.removeClass('checked');
             covariantMaterial.disableDopplerEffect();
+        } else {
+            checkboxEnableDopplerEffect.prop('checked', true);
+            dopplerCheckboxImage.addClass('checked');
+            dopplerCheckboxImage.removeClass('unchecked');
+            covariantMaterial.enableDopplerEffect();
         }
-    });
-
-    $("#dopplerShiftRescale").bind('change', function () {
-        renderer.setDopplerShiftRescale(parseFloat($(this).val()));
-    });
-    $("#dopplerShiftRescale").focus(function () {
-        keyHandler.disable();
-    });
-    $("#dopplerShiftRescale").blur(function () {
-        keyHandler.enable();
     });
 }
 
@@ -216,6 +221,18 @@ function bindEvents() {
         initKeyHandler();
     }
 
+    bindDopplerCheckboxEvents();
+
+    $("#dopplerShiftRescale").bind('change', function () {
+        renderer.setDopplerShiftRescale(parseFloat($(this).val()));
+    });
+    $("#dopplerShiftRescale").focus(function () {
+        keyHandler.disable();
+    });
+    $("#dopplerShiftRescale").blur(function () {
+        keyHandler.enable();
+    });
+
     $(window).bind('resize', function () {
         renderer.updateViewport();
 
@@ -233,8 +250,6 @@ function initWidgets() {
             renderer.setBeta(value);
         }
     });
-
-    initLightbox();
 }
 
 function updateWidgets() {
@@ -260,7 +275,7 @@ function animate() {
     }
 }
 
-function init() {
+function initRendererWindow() {
     isMobile = isMobileDevice();
 
     paused = false;
@@ -268,16 +283,12 @@ function init() {
 
     renderer = new Renderer();
 
-    $('#loading_page').height($(window).height());
-    $('#loading_icon').offset({
-        top: 0.5*$(window).height() - 50,
-        left: 0.5*$(window).width() - 50
-    });
-
-    $.when(renderer.getPromise()).done(function () {
+    $.when(renderer.getPromise(), loadSettingsBox()).done(function () {
         console.log('DEBUG: main ready');
 
         $('#loading_page').css("display", "none");
+        $('#loading_page').html('');
+
         $("#page").css("display", "block");
 
         initWidgets();
@@ -313,4 +324,26 @@ function init() {
     });
 }
 
-$(document).ready(init);
+function initPreloader () {
+    $('#loading_page').height($(window).height());
+    $('#loading_icon').offset({
+        top: 0.5*$(window).height() - 50,
+        left: 0.5*$(window).width() - 50
+    });
+
+    $('#loading_page').css('display', 'block');
+    
+    $.ajax({
+        url: '/Lightrider/RenderWindow',
+        type: 'GET',
+        data: {},
+        success: function(response) {
+            $('#page').html(response);
+            $(document).ready(initRendererWindow);
+        },
+        error: function(response) {
+        }
+    });
+}
+
+$(document).ready(initPreloader);

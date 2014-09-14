@@ -1,0 +1,19 @@
+{% extends 'HomepageLightriderBundle:Settings:settings.html.twig' %}
+
+{% block content %}
+    <h3>Press ESC to start or continue the flight or to open this dialog during the flight!</h3>
+    <div class="verticalSmallSpace"></div>
+    <h3>How to fly the plane:</h3>
+    <div class="verticalSmallSpace"></div>
+    <div id="explanations" class="vertical">
+        <table>
+            <tr><td>&uarr; / &darr;</td> <td>&nbsp;&nbsp;</td> <td>nose down / up</td></tr>
+            <tr><td>&larr; / &rarr;</td> <td>&nbsp;&nbsp;</td> <td>roll left / right</td></tr>
+            <tr><td>a / d</td> <td>&nbsp;&nbsp;</td> <td>yaw left / right</td></tr>
+            <tr><td>&nbsp;</td></tr>
+            <tr><td>w</td> <td>&nbsp;&nbsp;</td> <td>accelerate</td></tr>
+            <tr><td>s</td> <td>&nbsp;&nbsp;</td> <td>decelerate</td></tr>
+        </table>
+    </div>
+    <div class="verticalSmallSpace"></div>
+{% endblock %}      

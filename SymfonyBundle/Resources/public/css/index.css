@@ -1,3 +1,6 @@
+.hidden {
+    display: none;
+}
 
 .horizontal {
     display: block;
@@ -142,5 +145,28 @@ body {
     padding-right: 5px;
     font-family: Monospace;
     font-weight: bold;
+    text-align: right;
+}
+
+#doppler_checkbox_image {
+    width: 32px; 
+    height: 32px;
+    background-size: 100% 100%;
+}
+
+.checked {
+    background-image: url(../images/checkbox_checked.png);
+}
+
+.unchecked {
+    background-image: url(../images/checkbox_unchecked.png);
+}
+
+.right {
+    float: right;
+}
+
+#dopplerTitle {
+    font-family: Monospace;
     text-align: right;
 }

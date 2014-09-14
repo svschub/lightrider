@@ -1,0 +1,49 @@
+{% extends 'HomepageLightriderBundle:Settings:settings.html.twig' %}
+
+{% block content %}
+    <div class="verticalSmallSpace"></div>
+    <h3 class="red">To start or continue the flight<br/>move your mobile device into the panorama view</h3>
+    <div id="panoramaView">
+        <img src="{{ asset('public/lightrider/images/mobile_panorama.png') }}" />
+    </div>
+    <h3 class="red">and press</h3>
+    <span class="button"><a href="javascript:void(0)">Take Off!</a></span>
+    <div class="verticalSmallSpace"></div>
+    <h3>To open this dialog during the flight,</br>tap twice the screen!</h3>
+    <div class="verticalSmallSpace"></div>
+    <h3>How to fly the plane:</h3>
+    <div id="mobileHowToFly" class="vertical">
+        <div class="horizontal thumbnails">
+            <span>roll left:</span>
+            <img src="{{ asset('public/lightrider/images/mobile_roll_left.png') }}"> 
+            <div class="clearBoth"></div>
+        </div>
+        <div class="horizontal thumbnails">
+            <span>roll right:</span>
+            <img src="{{ asset('public/lightrider/images/mobile_roll_right.png') }}"> 
+            <div class="clearBoth"></div>
+        </div>
+        <div class="horizontal thumbnails">
+            <span>nose up:</span>
+            <img src="{{ asset('public/lightrider/images/mobile_nose_up.png') }}"> 
+            <div class="clearBoth"></div>
+        </div>
+        <div class="horizontal thumbnails">
+            <span>nose down:</span>
+            <img src="{{ asset('public/lightrider/images/mobile_nose_down.png') }}"> 
+            <div class="clearBoth"></div>
+        </div>
+        <div class="horizontal thumbnails">
+            <span>accelerate:</span>
+            <img src="{{ asset('public/lightrider/images/mobile_accelerate.png') }}"> 
+            <div class="clearBoth"></div>
+        </div>
+        <div class="horizontal thumbnails">
+            <span>decelerate:</span>
+            <img src="{{ asset('public/lightrider/images/mobile_decelerate.png') }}"> 
+            <div class="clearBoth"></div>
+        </div>
+    </div>
+    <div class="clearBoth"></div>
+    <div class="verticalSmallSpace"></div>
+{% endblock %}      

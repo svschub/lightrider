@@ -5,12 +5,19 @@ namespace Homepage\LightriderBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 
 class ObjectLoaderController extends Controller {
     public function indexAction($scope, $filename) {
         $request = Request::createFromGlobals();
+
+        if (!$request->isXmlHttpRequest()) {
+//            throw new AccessDeniedHttpException('This page only receives AJAX requests.');
+        }
+
         if ($request->getMethod() !== 'GET') {
-            throw $this->createNotFoundException('This page only receives GET requests.');
+            throw new AccessDeniedHttpException('This page only receives GET requests.');
         }
 
         if (empty($scope) || empty($filename)) {
