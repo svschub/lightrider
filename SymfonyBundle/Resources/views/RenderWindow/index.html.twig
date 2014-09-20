@@ -5,49 +5,45 @@
     <div id="renderOverlay">
         <div id="leftBar">
             <div id="hudIndicators">
-                <div class="vertical yellow" id="speed"></div>
-                <div class="vertical yellow" id="altitude"></div>
-                <div class="vertical yellow" id="viewConeAngle"></div>
-                <div class="clearBoth"></div>
+                <span id="speed"></span>
+                <span id="altitude"></span>
+                <span id="viewConeAngle"></span>
             </div>
-            <div id="grr" class="mediumFont yellow">
-                by Sven Schubert, 2012
+            <div id="grr" class="mediumFont">
+                <span>by Sven Schubert, 2012</span>
             </div>
         </div>
         <div id="rightBar">
             <div id="instrumentContainer">
-                <div id="betaScaleTitle" class="vertical yellow">v/c</div>
-                <div class="vertical">
+                <div id="betaScaleTitle">
+                    <span>v/c</span>
+                </div>
+                <div>
                     <div id="betaSlider"></div>
                     <canvas id="betaScale" width="1" height="1">
                         Browser does not support canvas!
                     </canvas>
                 </div>
-                <div class="clearBoth"></div>
                 <div class="verticalSmallSpace"></div>
-                <div class="clearBoth"></div>
-                <div class="vertical" style="margin-right: 10px; margin-top: 5px;">
-                    <div id="dopplerTitle" class="right yellow">
-                        Doppler
+                <div>
+                    <div id="dopplerTitle">
+                        <span>Doppler</span>
                     </div>
                 </div>
-                <div class="clearBoth"></div>
-                <div class="vertical" style="margin-right: 10px; margin-top: 5px;">
-                    <div class="right hidden">
+                <div>
+                    <div class="hidden">
                         <input type="checkbox" id="setDopplerEffect" />
                     </div>
-                    <div id="doppler_checkbox_image" class="right unchecked"></div>
-                    <div id="doppler_shift_rescale_scrollbar" class="right" style="display: none">
-                        <div class="right" style="margin: 8px 5px 0 0; color: #ffff00;">
-                            100%
+                    <div id="doppler_checkbox_image" class="unchecked"></div>
+                    <div id="doppler_shift_rescale_scrollbar" style="display: none">
+                        <div>
+                            <span>100%</span>
                         </div>
-                        <div class="right">
-                            <div id="dopplerShiftRescaleSlider"></div>
+                        <div id="dopplerShiftRescaleSlider"></div>
+                        <div>
+                            <span>0%</span>
                         </div>
-                        <div class="right" style="margin: 8px 5px 0 0; color: #ffff00;">
-                            0%
-                        </div>
-                        <div id="doppler_shift_rescale_value" class="right">
+                        <div>
                             <input type="hidden" id="dopplerShiftRescale" value="0"/>
                         </div>
                     </div>

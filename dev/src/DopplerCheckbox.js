@@ -22,7 +22,7 @@ function DopplerCheckbox(properties) {
 
         setDopplerShiftRescaleValue = function(value) {
             var percentValue = value*100;
-            $("#doppler_shift_rescale_value").html(percentValue.toFixed(0) + '%');
+            $("#dopplerShiftRescaleSlider > a > span").html(percentValue.toFixed(0) + '%');
         },
 
         bindDopplerCheckboxEvents = function () {
@@ -77,7 +77,6 @@ function DopplerCheckbox(properties) {
             });
             $("#dopplerShiftRescaleSlider .ui-slider-handle").unbind("keydown");
             $("#dopplerShiftRescaleSlider > a").append('<span></span>');
-            $("#dopplerShiftRescaleSlider > a > span").attr('id', "doppler_shift_rescale_value")
 
             dopplerShiftRescaleScrollbar.bind('mouseenter', function(event) {
                 isDopplerShiftRescaleScrollbarOnFocus = true;

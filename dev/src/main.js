@@ -16,16 +16,10 @@ function isMobileDevice() {
     return ($("#is_mobile_device").val() == 1);
 }
 
-function updateCopyrightMessage() {
+function rescaleCopyrightMessage() {
     var copyrightFontSize = renderer.getWidgetScaleRatio() * 16;
 
     $("#grr").css("font-size", copyrightFontSize.toFixed(0) + "px");
-}
-
-function updateHud() {
-    var hudFontSize = renderer.getWidgetScaleRatio() * 24;
-    
-    $("#hudIndicators").css("font-size", hudFontSize.toFixed(0) + "px");
 }
 
 function toggleLightbox() {
@@ -234,8 +228,7 @@ function updateWidgets() {
     dopplerCheckbox.setWidgetScaleRatio(renderer.getWidgetScaleRatio());
     dopplerCheckbox.update();
 
-    updateHud();
-    updateCopyrightMessage();
+    rescaleCopyrightMessage();
 }
 
 function animate() {

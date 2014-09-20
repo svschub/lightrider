@@ -158,7 +158,9 @@ function Renderer() {
         overlay.css("height", canvasHeight.toFixed(0) + "px");
 
         glRenderer.setSize(canvasWidth, canvasHeight);
-        observer.setViewport(canvasWidth, canvasHeight); 
+
+        observer.setViewport(canvasWidth, canvasHeight);
+        observer.rescaleHudFondSize(widgetScaleRatio);
     };
 
     self.drawFrame = function () {
