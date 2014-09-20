@@ -4,7 +4,8 @@ var timer,
     renderer, 
     keyHandler,
     orientableDevice,
-    slider, 
+    betaSlider,
+    dopplerCheckbox,
     firstFrame,
     paused,
     recentlyResized,
@@ -16,13 +17,13 @@ function isMobileDevice() {
 }
 
 function updateCopyrightMessage() {
-    var copyrightFontSize = renderer.getFontScaleRatio() * 16;
+    var copyrightFontSize = renderer.getWidgetScaleRatio() * 16;
 
     $("#grr").css("font-size", copyrightFontSize.toFixed(0) + "px");
 }
 
 function updateHud() {
-    var hudFontSize = renderer.getFontScaleRatio() * 24;
+    var hudFontSize = renderer.getWidgetScaleRatio() * 24;
     
     $("#hudIndicators").css("font-size", hudFontSize.toFixed(0) + "px");
 }
@@ -39,13 +40,13 @@ function toggleLightbox() {
             cssDisplayValue = "none";
             paused = false;
             plane.start();
-            slider.enable();
+            betaSlider.enable();
         }
     } else {
         cssDisplayValue = "block";
         paused = true;
         plane.stop();
-        slider.disable();
+        betaSlider.disable();
     }
 
     $("#lightbox").css("display", cssDisplayValue);
@@ -90,34 +91,6 @@ function loadSettingsBox() {
     });
 
     return deferred.promise();
-}
-
-function bindDopplerCheckboxEvents() {
-    var checkboxEnableDopplerEffect = $('#setDopplerEffect'),
-        dopplerCheckboxImage = $('#doppler_checkbox_image'),
-        covariantMaterial = new CovariantMaterial();
-
-    if (checkboxEnableDopplerEffect.prop('checked')) {
-        dopplerCheckboxImage.addClass('checked');
-        dopplerCheckboxImage.removeClass('unchecked');
-    } else {
-        dopplerCheckboxImage.addClass('unchecked');
-        dopplerCheckboxImage.removeClass('checked');
-    }
-
-    dopplerCheckboxImage.bind('click', function(event) {
-        if (checkboxEnableDopplerEffect.prop('checked')) {
-            checkboxEnableDopplerEffect.prop('checked', false);
-            dopplerCheckboxImage.addClass('unchecked');
-            dopplerCheckboxImage.removeClass('checked');
-            covariantMaterial.disableDopplerEffect();
-        } else {
-            checkboxEnableDopplerEffect.prop('checked', true);
-            dopplerCheckboxImage.addClass('checked');
-            dopplerCheckboxImage.removeClass('unchecked');
-            covariantMaterial.enableDopplerEffect();
-        }
-    });
 }
 
 function initKeyHandler() {
@@ -215,24 +188,35 @@ function initOrientableDevice() {
     });
 }
 
-function bindEvents() {
+function initWidgets() {
+    var covariantMaterial = new CovariantMaterial();
+
+    betaSlider = new BetaSlider({
+        widgetScaleRatio: renderer.getWidgetScaleRatio(),
+        halfScale: 0.9,
+        handleBetaSlider: function(value) {
+            renderer.setBeta(value);
+        }
+    });
+
+    dopplerCheckbox = new DopplerCheckbox({
+        widgetScaleRatio: renderer.getWidgetScaleRatio(),
+        handleDopplerShiftRescaleSlider: function(value) {
+            renderer.setDopplerShiftRescale(value);
+        },
+        enableDopplerEffectHandler: function () {
+            covariantMaterial.enableDopplerEffect();
+        },
+        disableDopplerEffectHandler: function () {
+            covariantMaterial.disableDopplerEffect();
+        }
+    });
+
     if (isMobile) {
         initOrientableDevice();
     } else {
         initKeyHandler();
     }
-
-    bindDopplerCheckboxEvents();
-
-    $("#dopplerShiftRescale").bind('change', function () {
-        renderer.setDopplerShiftRescale(parseFloat($(this).val()));
-    });
-    $("#dopplerShiftRescale").focus(function () {
-        keyHandler.disable();
-    });
-    $("#dopplerShiftRescale").blur(function () {
-        keyHandler.enable();
-    });
 
     $(window).bind('resize', function () {
         renderer.updateViewport();
@@ -243,19 +227,12 @@ function bindEvents() {
     });
 }
 
-function initWidgets() {
-    slider = new BetaSlider({
-        fontScaleRatio: renderer.getFontScaleRatio(),
-        halfScale: 0.9,
-        handle: function (value) {
-            renderer.setBeta(value);
-        }
-    });
-}
-
 function updateWidgets() {
-    slider.setFontScaleRatio(renderer.getFontScaleRatio());
-    slider.update();
+    betaSlider.setWidgetScaleRatio(renderer.getWidgetScaleRatio());
+    betaSlider.update();
+
+    dopplerCheckbox.setWidgetScaleRatio(renderer.getWidgetScaleRatio());
+    dopplerCheckbox.update();
 
     updateHud();
     updateCopyrightMessage();
@@ -294,8 +271,6 @@ function initRendererWindow() {
 
         initWidgets();
         updateWidgets();
-        
-        bindEvents();
 
         timer = new Timer();
         timer.setIntervalMilliseconds(30);
@@ -315,10 +290,14 @@ function initRendererWindow() {
 
         renderer.setFlightModel(plane);
 
+        renderer.setBeta(betaSlider.getBeta());
+        renderer.setDopplerShiftRescale(dopplerCheckbox.getDopplerShiftRescaleValue());
+
         plane.start();
         plane.update();
 
         timer.addCallback(plane.update);
+        timer.addCallback(dopplerCheckbox.hideDopplerShiftRescaleScrollbarIfNecessary);
         timer.start();
 
         firstFrame = true;

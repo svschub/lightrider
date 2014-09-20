@@ -170,3 +170,36 @@ body {
     font-family: Monospace;
     text-align: right;
 }
+
+
+#dopplerShiftRescaleSlider {
+    float: right;
+    margin: 10px 5px 0 0;
+    padding: 0;
+    width: 150px;
+    height: 10px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffff00;
+    border-radius: 0;
+    background: rgba(255,255,0,0.3);
+}
+
+#dopplerShiftRescaleSlider > a.ui-slider-handle {
+    width: 8px;
+    height: 36px;
+    color: #ffff00;
+    top: -14px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ffff00;
+    background: rgba(0,0,0,0.5);
+    text-decoration: none;
+}
+
+#doppler_shift_rescale_value {
+    display: block;
+    position: relative;
+    top: 38px;
+    color: #ffff00;
+}

@@ -17,7 +17,7 @@ function Renderer() {
         cabin,
         observer,
 
-        fontScaleRatio = 1,
+        widgetScaleRatio = 1,
 
         updateBoostParameters = function () {
             if (dopplerShiftRescale_next !== dopplerShiftRescale) {
@@ -60,8 +60,8 @@ function Renderer() {
             glRenderer.render(world.getScene(), observer.getCamera());
         },
 
-        calculateFontScaleRatio = function(canvasWidth, canvasHeight) {
-            fontScaleRatio = Math.max(0.5, canvasHeight/600.0);
+        calculateWidgetScaleRatio = function(canvasWidth, canvasHeight) {
+            widgetScaleRatio = Math.max(0.5, canvasHeight/600.0);
         },
 
         init = function () {
@@ -92,10 +92,7 @@ function Renderer() {
                 world.add(observer.getHorizonMesh());
 
                 beta = -1000.0;
-                beta_next = 0.0;
-
                 dopplerShiftRescale = -1;
-                dopplerShiftRescale_next = parseFloat($("#dopplerShiftRescale").val());
 
                 self.updateViewport();
 
@@ -120,7 +117,7 @@ function Renderer() {
         plane = flightmodel;
     };
 
-    self.setBeta = function (beta) {
+    self.setBeta = function(beta) {
         beta_next = Math.min(beta, 0.9999);
     };
 
@@ -128,8 +125,8 @@ function Renderer() {
         dopplerShiftRescale_next = dopplerShiftRescale;
     };
 
-    self.getFontScaleRatio = function () {
-        return fontScaleRatio;
+    self.getWidgetScaleRatio = function () {
+        return widgetScaleRatio;
     };
 
     self.updateViewport = function () {
@@ -153,7 +150,7 @@ function Renderer() {
             canvasHeight = windowHeight;
         }
 
-        calculateFontScaleRatio(canvasWidth, canvasHeight);
+        calculateWidgetScaleRatio(canvasWidth, canvasHeight);
 
         $("#pageContent").css("width", canvasWidth.toFixed(0) + "px");
 

@@ -1,4 +1,4 @@
-function BetaSlider (properties) {
+function BetaSlider(properties) {
     var self = this,
 
         renderCanvas = $("#renderContainer > canvas"),
@@ -6,9 +6,7 @@ function BetaSlider (properties) {
         betaScale = $("#betaScale"),
         betaScaleTitle = $("#betaScaleTitle"),
         betaSlider = $("#betaSlider"),
-        dopplerTitle = $("#dopplerTitle"),
-        dopplerCheckboxImage = $("#doppler_checkbox_image"),
-        
+
         enabled = true,
 
         scale,
@@ -17,41 +15,38 @@ function BetaSlider (properties) {
         scaleOffset,
         sliderHeight,
 
-        handleSlider = properties.handle,
-        fontScaleRatio = properties.fontScaleRatio || 1,
+        handleBetaSlider = properties.handleBetaSlider,
+
+        widgetScaleRatio = properties.widgetScaleRatio || 1,
         a = properties.halfScale*properties.halfScale/(1-2*properties.halfScale),
         b = Math.log((1+a)/a),
 
-        setValue = function (value) {
+        setBetaSliderValue = function(value) {
             betaSlider.slider("value", value);
         },
 
-        getValue = function () {
+        getBetaSliderValue = function () {
             return betaSlider.slider("value");
         },
 
-        getBeta = function () {
-            return Math.max(0.0, a*Math.exp(b*getValue()) - a);
-        },
-
-        getScaleY = function (beta) {
+        getScaleY = function(beta) {
             return Math.log(beta/a + 1)/b;
         },
 
-        handleMouseWheel = function (e) {
+        handleMouseWheel = function(e) {
             var event, delta, value;
 
             if (enabled) {
                 event = window.event || e, // equalize event object
                 delta = event.detail? -event.detail : event.wheelDelta, // check for detail first so Opera uses that instead of wheelDelta
-                value = getValue();
+                value = getBetaSliderValue();
 
                 value += 0.05*delta/Math.abs(delta);
                 if (value < 0.0) value = 0.0;
                 if (value > 1.0) value = 1.0;
 
-                setValue(value);
-                handleSlider(getBeta());
+                setBetaSliderValue(value);
+                handleBetaSlider(self.getBeta());
             }
         },
 
@@ -93,7 +88,7 @@ function BetaSlider (properties) {
 
             scale.clearRect(0, 0, betaScale[0].width, betaScale[0].height);
 
-            scaleEntryFontSize = fontScaleRatio * 16;
+            scaleEntryFontSize = widgetScaleRatio * 16;
             scale.font = "normal " + scaleEntryFontSize.toFixed(0) + "px Calibri";
             drawScaleEntry(0.5, 1, 13, 16);
             drawScaleEntry(0.8, 1, 13, 16);
@@ -101,7 +96,7 @@ function BetaSlider (properties) {
             drawScaleEntry(0.95, 2, 13, 16);
             drawScaleEntry(0.99, 2, 13, 16);
 
-            scaleEntryFontSize = fontScaleRatio * 20;
+            scaleEntryFontSize = widgetScaleRatio * 20;
             scale.font = "normal " + scaleEntryFontSize.toFixed(0) + "px Calibri";
             drawScaleEntry(0, 0, 18, 20);
             drawScaleEntry(1, 0, 18, 20);
@@ -114,7 +109,7 @@ function BetaSlider (properties) {
                 max: 1.0,
                 step: 0.01,
                 slide: function(e, ui) {
-                    handleSlider(a*Math.exp(b*ui.value)-a);
+                    handleBetaSlider(a*Math.exp(b*ui.value)-a);
                 }
             });
             $("#betaSlider .ui-slider-handle").unbind("keydown");
@@ -132,8 +127,12 @@ function BetaSlider (properties) {
         enabled = false;
     };
 
-    self.setFontScaleRatio = function (ratio) {
-        fontScaleRatio = ratio;
+    self.setWidgetScaleRatio = function (ratio) {
+        widgetScaleRatio = ratio;
+    };
+
+    self.getBeta = function () {
+        return Math.max(0.0, a*Math.exp(b*getBetaSliderValue()) - a);
     };
 
     self.update = function () {
@@ -141,11 +140,9 @@ function BetaSlider (properties) {
             renderCanvasHeight = renderCanvas.height(),
             betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),
             betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom")),
-            width = Math.max(50, fontScaleRatio * 100), 
+            width = Math.max(50, widgetScaleRatio * 100), 
             height = 0.65*renderCanvasHeight,
-            betaScaleTitleSize = fontScaleRatio * 26,
-            dopperTitleSize = fontScaleRatio * 14,
-            dopplerCheckboxImageSize = fontScaleRatio * 28;
+            betaScaleTitleSize = widgetScaleRatio * 26;
 
         betaScaleTitle.css("font-size", betaScaleTitleSize.toFixed(0) + "px");
 
@@ -159,11 +156,6 @@ function BetaSlider (properties) {
         betaScale.css("width", scaleWidth.toFixed(0) + "px");
         betaScale.attr("width", scaleWidth.toFixed(0));
         betaScale.attr("height", scaleHeight.toFixed(0));
-
-        dopplerTitle.css("font-size", dopperTitleSize.toFixed(0) + "px");
-
-        dopplerCheckboxImage.css("width", dopplerCheckboxImageSize.toFixed(0) + "px");
-        dopplerCheckboxImage.css("height", dopplerCheckboxImageSize.toFixed(0) + "px");
 
         // redraw the beta slider scale:
         drawScale();
