@@ -141,13 +141,13 @@ function BetaSlider(properties) {
             betaSliderMarginTop = parseFloat(betaSlider.css("margin-top")),
             betaSliderMarginBottom = parseFloat(betaSlider.css("margin-bottom")),
             width = Math.max(50, widgetScaleRatio * 100), 
-            height = 0.65*renderCanvasHeight,
+            height = 0.6*renderCanvasHeight,
             betaScaleTitleSize = widgetScaleRatio * 26;
 
         betaScaleTitle.css("font-size", betaScaleTitleSize.toFixed(0) + "px");
 
         sliderHeight = height;
-        betaSlider.css("height", sliderHeight.toFixed(0));
+        betaSlider.css("height", sliderHeight.toFixed(0) + "px");
 
         scaleWidth = width;
         scaleHeight = height + betaSliderMarginTop + betaSliderMarginBottom;

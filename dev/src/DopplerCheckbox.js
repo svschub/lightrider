@@ -5,8 +5,12 @@ function DopplerCheckbox(properties) {
         dopplerCheckboxImage = $("#doppler_checkbox_image"),
         dopplerShiftRescaleSlider = $('#dopplerShiftRescaleSlider'),
         dopplerShiftRescaleScrollbar = $('#doppler_shift_rescale_scrollbar'),
+        sliderScrollbarTitle = $('#dopplerShiftRescaleSlider > span'),
         checkboxEnableDopplerEffect = $('#setDopplerEffect'),
         dopplerCheckboxImage = $('#doppler_checkbox_image'),
+        sliderBoundaryTextLabels = $('#doppler_shift_rescale_scrollbar span'),
+        sliderHandle,
+        sliderHandleTextLabel,
 
         handleDopplerShiftRescaleSlider = properties.handleDopplerShiftRescaleSlider,
         enableDopplerEffectHandler = properties.enableDopplerEffectHandler,
@@ -78,6 +82,9 @@ function DopplerCheckbox(properties) {
             $("#dopplerShiftRescaleSlider .ui-slider-handle").unbind("keydown");
             $("#dopplerShiftRescaleSlider > a").append('<span></span>');
 
+            sliderHandle = $("#dopplerShiftRescaleSlider > a.ui-slider-handle");
+            sliderHandleTextLabel = $('#dopplerShiftRescaleSlider > a > span');
+
             dopplerShiftRescaleScrollbar.bind('mouseenter', function(event) {
                 isDopplerShiftRescaleScrollbarOnFocus = true;
                 if (isDopplerShiftRescaleScrollbarVisible) {
@@ -126,19 +133,42 @@ function DopplerCheckbox(properties) {
             counter++;
         }
 
-        if (counter - lastUpdateCounter > 60) {
+        if (counter - lastUpdateCounter > 50) {
             self.hideDopplerShiftRescaleScrollbar();
         }
     };
 
     self.update = function () {
-        var dopperTitleSize = widgetScaleRatio * 14,
-            dopplerCheckboxImageSize = widgetScaleRatio * 28;
+        var fontSize = widgetScaleRatio * 14,
+            dopplerCheckboxImageSize = widgetScaleRatio * 28,
+            sliderWidth = widgetScaleRatio * 150,
+            sliderHeight = widgetScaleRatio * 9,
+            sliderMarginTop = 0.5*(dopplerCheckboxImageSize - sliderHeight),
+            sliderHandleHeight = 3.5*sliderHeight,
+            sliderHandleTop = -0.8*sliderHeight,
+            sliderHandleTextLabelTop = 0.8*sliderHandleHeight,
+            sliderLabelMarginTop = Math.max(0, 0.5*(dopplerCheckboxImageSize - fontSize)),
+            sliderScrollbarTitleTop = -3.7*sliderHeight;
 
-        dopplerTitle.css("font-size", dopperTitleSize.toFixed(0) + "px");
+        dopplerTitle.css("font-size", fontSize.toFixed(0) + "px");
+
+        sliderBoundaryTextLabels.css("font-size", fontSize.toFixed(0) + "px");
+        sliderBoundaryTextLabels.css("margin-top", sliderLabelMarginTop.toFixed(0) + "px");
 
         dopplerCheckboxImage.css("width", dopplerCheckboxImageSize.toFixed(0) + "px");
         dopplerCheckboxImage.css("height", dopplerCheckboxImageSize.toFixed(0) + "px");
+
+        dopplerShiftRescaleSlider.css("width", sliderWidth.toFixed(0) + "px");
+        dopplerShiftRescaleSlider.css("height", sliderHeight.toFixed(0) + "px");
+        dopplerShiftRescaleSlider.css("margin-top", sliderMarginTop.toFixed(0) + "px");
+        
+        sliderScrollbarTitle.css("top", sliderScrollbarTitleTop.toFixed(0) + "px");
+
+        sliderHandle.css("height", sliderHandleHeight.toFixed(0) + "px");
+        sliderHandle.css("top", sliderHandleTop.toFixed(0) + "px");
+
+        sliderHandleTextLabel.css("font-size", fontSize.toFixed(0) + "px");
+        sliderHandleTextLabel.css("top", sliderHandleTextLabelTop.toFixed(0) + "px");
     };
 
     init();
