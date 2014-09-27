@@ -2,13 +2,8 @@
     display: none;
 }
 
-.horizontal {
-    display: block;
-    float: left;
-}
-
-.vertical {
-    display: block;
+.yellow {
+    color: yellow;
 }
 
 .verticalSmallSpace {
@@ -23,14 +18,6 @@
 
 .clearBoth {
     clear: both;
-}
-
-.right {
-    float: right;
-}
-
-.yellow {
-    color: yellow;
 }
 
 .smallFont {
@@ -230,4 +217,26 @@ body {
 #dopplerShiftRescaleSlider > span {
     position: relative; 
     top: -37px;
+}
+
+
+#open_settings_box_button {
+    display: block;
+    margin: 2px;
+    width: 24px;
+    height: 24px;
+    clear: both;
+    border: #ffff00 solid 1px;
+    background: rgba(255,255,0,0.2);
+    text-align: center;
+    cursor: pointer;
+}
+
+#open_settings_box_button > span {
+    font-family: Monospace;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #ffff00;
+    cursor: pointer;
 }
