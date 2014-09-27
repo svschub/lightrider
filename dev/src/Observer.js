@@ -169,7 +169,7 @@ function Observer() {
     };
 
     self.rescaleHudFondSize = function(widgetScaleRatio) {
-        var hudFontSize = 24*widgetScaleRatio;
+        var hudFontSize = 20*widgetScaleRatio;
 
         $("#hudIndicators > span").css("font-size", hudFontSize.toFixed(0) + "px");
     };
