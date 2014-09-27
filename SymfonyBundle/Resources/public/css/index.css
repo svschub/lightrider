@@ -80,13 +80,11 @@ body {
 #leftBar {
     display: block;
     float: left;
-    height: 100%;
 }
 
 #rightBar {
     display: block;
     float: right;
-    height: 100%;
 }
 
 #hudIndicators {
@@ -96,7 +94,7 @@ body {
 #hudIndicators > span {
     display: block;
     font-family: Monospace;
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     color: #ffff00;
 }
