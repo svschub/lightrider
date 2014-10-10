@@ -1,6 +1,6 @@
 
 var timer,
-    plane, 
+    flightModel, 
     renderer, 
     keyHandler,
     orientableDevice,
@@ -49,7 +49,7 @@ function initKeyHandler() {
             if (speedDown) {
                 acceleration -= accelerationIncr;
             }
-            plane.setAcceleration(acceleration);
+            flightModel.setAcceleration(acceleration);
 
             if (rollLeft) {
                 rollAngle -= rollAngleIncr;
@@ -57,7 +57,7 @@ function initKeyHandler() {
             if (rollRight) {
                 rollAngle += rollAngleIncr;
             }
-            plane.setRollAngle(rollAngle);
+            flightModel.setRollAngle(rollAngle);
 
             if (pitchUp) {
                 pitchAngle += pitchAngleIncr;
@@ -65,7 +65,7 @@ function initKeyHandler() {
             if (pitchDown) {
                 pitchAngle -= pitchAngleIncr;
             }
-            plane.setPitchAngle(pitchAngle);
+            flightModel.setPitchAngle(pitchAngle);
 
             if (yawLeft) {
                 yawAngle += yawAngleIncr;
@@ -73,7 +73,7 @@ function initKeyHandler() {
             if (yawRight) {
                 yawAngle -= yawAngleIncr;
             }
-            plane.setYawAngle(yawAngle);
+            flightModel.setYawAngle(yawAngle);
         },
 
         handleKey: function (keyCode) {
@@ -94,16 +94,16 @@ function initOrientableDevice() {
     orientableDevice.bindUpdateOrientationAnglesHandler(function(angles) {
         if (!timer.isPaused() && 
             orientableDevice.isPanoramaView()) {
-            plane.setPitchAngle(0.06*angles.boundedPitchAngle);
-            plane.setRollAngle(-0.06*angles.boundedRollAngle);
+            flightModel.setPitchAngle(0.06*angles.boundedPitchAngle);
+            flightModel.setRollAngle(-0.06*angles.boundedRollAngle);
         }
     });
 
     orientableDevice.bindUpdateSpeedHandler(function(acceleration) {
         if (!timer.isPaused() && 
             orientableDevice.isPanoramaView()) {
-            plane.setAcceleration(-0.2*acceleration);
-            plane.resetAccelerationAfterUpdate();
+            flightModel.setAcceleration(-0.2*acceleration);
+            flightModel.resetAccelerationAfterUpdate();
         }
     });
 }
@@ -187,10 +187,10 @@ function initRendererWindow() {
         timer = new Timer();
         timer.setIntervalMilliseconds(30);
 
-        plane = new FlightModel();
-        plane.setIntervalMilliseconds(timer.getIntervalMilliseconds());
-        plane.setPosition(new THREE.Vector3(0, 10, 13));
-        plane.setMoveHandler(function(position) {
+        flightModel = new FlightModel();
+        flightModel.setIntervalMilliseconds(timer.getIntervalMilliseconds());
+        flightModel.setPosition(new THREE.Vector3(0, 10, 13));
+        flightModel.setMoveHandler(function(position) {
             if (position.y <= 0.0) {
                 timer.stop();
                 document.body.innerHTML = "";
@@ -218,15 +218,15 @@ function initRendererWindow() {
     }).then(function () {
 //        console.log('main 2 ready');
 
-        renderer.setFlightModel(plane);
+        renderer.setFlightModel(flightModel);
 
         renderer.setBeta(betaSlider.getBeta());
         renderer.setDopplerShiftRescale(dopplerCheckbox.getDopplerShiftRescaleValue());
 
-        plane.update();
+        flightModel.update();
         renderer.drawFrame();
 
-        timer.addCallback(plane.update);
+        timer.addCallback(flightModel.update);
         timer.addCallback(dopplerCheckbox.hideDopplerShiftRescaleScrollbarIfNecessary);
         timer.start();
 
