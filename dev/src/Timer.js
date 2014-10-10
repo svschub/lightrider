@@ -4,13 +4,16 @@ function Timer () {
         timerLoopHandle,
         loopMilliseconds,
         callbacks = [],
+        isPaused = true,
 
         intervalHandler = function () {
-            callbacks.forEach(function(callback) {
-                callback({
-                    loopMilliseconds: loopMilliseconds
+            if (!isPaused) {
+                callbacks.forEach(function(callback) {
+                    callback({
+                        loopMilliseconds: loopMilliseconds
+                    });
                 });
-            });
+            }
         };
 
 
@@ -27,6 +30,7 @@ function Timer () {
     };
 
     self.start = function () {
+        isPaused = false;
         timerLoopHandle = setInterval(function () {
             intervalHandler();
         }, loopMilliseconds);
@@ -34,5 +38,17 @@ function Timer () {
 
     self.stop = function () {
         clearInterval(timerLoopHandle);
+    };
+
+    self.pause = function () {
+        isPaused = true;
+    };
+
+    self.restart = function () {
+        isPaused = false;
+    };
+
+    self.isPaused = function () {
+        return isPaused;  
     };
 }

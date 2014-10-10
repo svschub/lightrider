@@ -6,10 +6,7 @@ var timer,
     orientableDevice,
     betaSlider,
     dopplerCheckbox,
-    firstFrame,
-    paused,
     recentlyResized,
-    orientationDetectionEnabled,
     settingsBox,
     isMobile;
 
@@ -85,8 +82,6 @@ function initKeyHandler() {
 }
 
 function initOrientableDevice() {
-    orientationDetectionEnabled = false;
-
     orientableDevice = new OrientableDevice();
 
     orientableDevice.bindUpdateOrientationHandler(function(orientation) {
@@ -97,8 +92,7 @@ function initOrientableDevice() {
     });
 
     orientableDevice.bindUpdateOrientationAnglesHandler(function(angles) {
-        if (!paused && 
-            orientationDetectionEnabled &&
+        if (!timer.isPaused() && 
             orientableDevice.isPanoramaView()) {
             plane.setPitchAngle(0.06*angles.boundedPitchAngle);
             plane.setRollAngle(-0.06*angles.boundedRollAngle);
@@ -106,8 +100,7 @@ function initOrientableDevice() {
     });
 
     orientableDevice.bindUpdateSpeedHandler(function(acceleration) {
-        if (!paused && 
-            orientationDetectionEnabled &&
+        if (!timer.isPaused() && 
             orientableDevice.isPanoramaView()) {
             plane.setAcceleration(-0.2*acceleration);
             plane.resetAccelerationAfterUpdate();
@@ -167,22 +160,15 @@ function updateWidgets() {
 function animate() {
     requestAnimationFrame(animate);
 
-    if (!paused || recentlyResized) {
+    if (!timer.isPaused() || recentlyResized) {
         renderer.drawFrame();
         recentlyResized = false;
-    }
-
-    if (firstFrame) {
-        settingsBox.open();
-        firstFrame = false;
-        orientationDetectionEnabled = true;
     }
 }
 
 function initRendererWindow() {
     isMobile = isMobileDevice();
 
-    paused = false;
     recentlyResized = false;
 
     renderer = new Renderer();
@@ -218,13 +204,12 @@ function initRendererWindow() {
             isMobileDevice: isMobileDevice(),
             orientableDevice: orientableDevice,
             openHandler: function () {
-                paused = true;
-                plane.stop();
+                timer.pause();
                 betaSlider.disable();
+                dopplerCheckbox.hideDopplerShiftRescaleScrollbar();
             },
             closeHandler: function () {
-                paused = false;
-                plane.start();
+                timer.restart();
                 betaSlider.enable();
             }
         });
@@ -238,14 +223,15 @@ function initRendererWindow() {
         renderer.setBeta(betaSlider.getBeta());
         renderer.setDopplerShiftRescale(dopplerCheckbox.getDopplerShiftRescaleValue());
 
-        plane.start();
         plane.update();
+        renderer.drawFrame();
 
         timer.addCallback(plane.update);
         timer.addCallback(dopplerCheckbox.hideDopplerShiftRescaleScrollbarIfNecessary);
         timer.start();
 
-        firstFrame = true;
+        settingsBox.open();
+
         animate();
     }).fail(function(error) {
         if (!Detector.webgl) {

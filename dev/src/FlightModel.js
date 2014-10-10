@@ -1,10 +1,8 @@
 function FlightModel() {
     var self = this,
 
-        cabin, cockpit, observer,
         loopMilliseconds,
         moveHandler,
-        paused,
 
         position = new THREE.Vector3(0, 0, 0),
         speed = 0.0,
@@ -193,19 +191,7 @@ function FlightModel() {
         yawAngle = yawangle;
     };
 
-    self.start = function () {
-        paused = false;
-    };
-
-    self.stop = function () {
-        paused = true;
-    };
-
     self.update = function () {
-        if (paused) {
-            return;
-        }
-
         move();
 
         if (typeof moveHandler !== "undefined") {
