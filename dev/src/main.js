@@ -10,6 +10,7 @@ var timer,
     paused,
     recentlyResized,
     orientationDetectionEnabled,
+    settingsBox,
     isMobile;
 
 function isMobileDevice () {
@@ -20,81 +21,6 @@ function rescaleCopyrightMessage () {
     var copyrightFontSize = renderer.getWidgetScaleRatio() * 16;
 
     $("#grr").css("font-size", copyrightFontSize.toFixed(0) + "px");
-}
-
-function openSettingsBox () {
-    paused = true;
-    plane.stop();
-    betaSlider.disable();
-
-    $("#how_to_fly_instructions").removeClass("hidden");
-    $("#center_mobile_device").addClass("hidden");
-
-    $("#settings_box").css("display", "block");
-    $("#settings_box_background").css("display", "block");
-}
-
-function closeSettingsBox () {
-    $("#settings_box").css("display", "none");
-    $("#settings_box_background").css("display", "none");
-
-    paused = false;
-    plane.start();
-    betaSlider.enable();
-}
-
-function initSettingsBox () {
-    $("#open_settings_box_button").bind("click", function(event) {
-        event.preventDefault();
-
-        openSettingsBox();
-    });
-
-    $("#center_mobile_device_button").bind("click", function(event) {
-        event.preventDefault();
-
-        $("#how_to_fly_instructions").addClass("hidden");
-        $("#center_mobile_device").removeClass("hidden");
-    });
-
-    $("#take_off_button").bind("click", function(event) {
-        event.preventDefault();
-
-        if (orientableDevice) {
-            if (orientableDevice.isPanoramaView()) {
-                orientableDevice.registerPitchAngle0();
-                closeSettingsBox(); 
-            }
-        } else {
-            closeSettingsBox(); 
-        }
-    });
-}
-
-function loadSettingsBox() {
-    var deferred = new $.Deferred(),
-        touchTime = 0, 
-        touchTimePrevious;
-
-    $.ajax({
-        url: '/Lightrider/Settings',
-        type: 'GET',
-        data: {
-            is_mobile: isMobileDevice() ? 1 : 0
-        },
-        success: function(response) {
-            $("#settings_box").html(response);
-
-            initSettingsBox();
-
-            deferred.resolve(response);
-        },
-        error: function(response) {
-            deferred.reject(response);
-        }
-    });
-
-    return deferred.promise();
 }
 
 function initKeyHandler() {
@@ -247,7 +173,7 @@ function animate() {
     }
 
     if (firstFrame) {
-        openSettingsBox();
+        settingsBox.open();
         firstFrame = false;
         orientationDetectionEnabled = true;
     }
@@ -261,8 +187,8 @@ function initRendererWindow() {
 
     renderer = new Renderer();
 
-    $.when(renderer.getPromise(), loadSettingsBox()).done(function () {
-        console.log('DEBUG: main ready');
+    $.when(renderer.getPromise()).then(function () {
+//        console.log('main 1 ready');
 
         $('#loading_page').css("display", "none");
         $('#loading_page').html('');
@@ -288,6 +214,25 @@ function initRendererWindow() {
             }
         });
 
+        settingsBox = new SettingsBox({
+            isMobileDevice: isMobileDevice(),
+            orientableDevice: orientableDevice,
+            openHandler: function () {
+                paused = true;
+                plane.stop();
+                betaSlider.disable();
+            },
+            closeHandler: function () {
+                paused = false;
+                plane.start();
+                betaSlider.enable();
+            }
+        });
+
+        return settingsBox.getPromise();
+    }).then(function () {
+//        console.log('main 2 ready');
+
         renderer.setFlightModel(plane);
 
         renderer.setBeta(betaSlider.getBeta());
@@ -307,7 +252,8 @@ function initRendererWindow() {
             document.body.innerHTML = "";
             Detector.addGetWebGLMessage();
         } else {
-            document.body.innerHTML = error;
+//            document.body.innerHTML = error;
+            document.body.innerHTML = "unknown error";
         }    
     });
 }

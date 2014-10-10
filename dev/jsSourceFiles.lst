@@ -13,4 +13,5 @@ Renderer.js
 KeyHandler.js
 OrientableDevice.js
 Timer.js
+SettingsBox.js
 main.js

@@ -65,7 +65,7 @@ function Renderer() {
         },
 
         init = function () {
-            console.log('DEBUG: Renderer init');
+//            console.log('DEBUG: Renderer init');
 
             glRenderer.setClearColor(0x446600, 1);
 
@@ -78,11 +78,11 @@ function Renderer() {
                 world.getPromise(), 
                 cabin.getPromise()
             ).then(function(worldResponse, cabinResponse) {
-                console.log('DEBUG: Renderer: world and cabin response received');
+//                console.log('DEBUG: Renderer: world and cabin response received');
                 observer = new Observer();
                 return observer.getPromise();
             }).done(function(observerResponse) {
-                console.log('DEBUG: Renderer: observer response received');
+//                console.log('DEBUG: Renderer: observer response received');
                 covariantMaterial = new CovariantMaterial();
 
                 glRenderer.render(world.getScene(), world.getTopviewCamera(), world.getTopviewImage(), true);
@@ -96,10 +96,10 @@ function Renderer() {
 
                 self.updateViewport();
 
-                console.log('DEBUG: Renderer resolve');
+//                console.log('DEBUG: Renderer resolve');
                 deferred.resolve();
             }).fail(function(error) {
-                console.log('DEBUG: Renderer reject');
+//                console.log('DEBUG: Renderer reject');
                 deferred.reject(error);                
             })
         };

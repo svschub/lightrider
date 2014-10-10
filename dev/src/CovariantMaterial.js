@@ -14,14 +14,14 @@ function CovariantMaterial () {
                 dopplerShiftTable,
 
                 init = function () {
-                    console.log('DEBUG: CovariantMaterial init');
+//                    console.log('DEBUG: CovariantMaterial init');
                     deferred = new $.Deferred();
 
                     $.when(
                         AsyncLoader.get("Shaders/covariantLambert.vs"),
                         AsyncLoader.get("Shaders/covariantLambert.fs")
                     ).then(function(vsResponse, fsResponse) {
-                        console.log('DEBUG: CovariantMaterial ready');
+//                        console.log('DEBUG: CovariantMaterial ready');
                         vertexShaderCode = vsResponse;
                         fragmentShaderCode = fsResponse;
 
@@ -51,10 +51,10 @@ function CovariantMaterial () {
 
                         relativityUniforms.dopplerShift.value = dopplerShiftTable.getTexture();
 
-                        console.log('DEBUG: CovariantMaterial resolve');
+//                        console.log('DEBUG: CovariantMaterial resolve');
                         deferred.resolve();
                     }).fail(function(error) {
-                        console.log('DEBUG: CovariantMaterial reject');
+//                        console.log('DEBUG: CovariantMaterial reject');
                         deferred.reject(error); 
                     });
                 },

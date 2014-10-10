@@ -236,7 +236,7 @@ function World() {
                     }
 
                     do {
-                        console.log('subdividing ' + numOfFaces + ' faces with ' + geometry.vertices.length + ' vertices...');
+//                        console.log('subdividing ' + numOfFaces + ' faces with ' + geometry.vertices.length + ' vertices...');
 
                         facesToSubdivide = facesToSubdivideNext;
                         numOfFacesToSubdivide = numOfFacesToSubdivideNext;
@@ -287,19 +287,19 @@ function World() {
                             }
                         }
 
-                        console.log(numOfFaces + ' faces with '  + geometry.vertices.length + ' vertices after subdivision...');
+//                        console.log(numOfFaces + ' faces with '  + geometry.vertices.length + ' vertices after subdivision...');
                     } while (numOfFacesToSubdivideNext > 0);
 
                     geometry.mergeVertices();
-                    console.log(geometry.faces.length + ' faces with '  + geometry.vertices.length + ' vertices after merging vertices...');
+//                    console.log(geometry.faces.length + ' faces with '  + geometry.vertices.length + ' vertices after merging vertices...');
                 }
             });
 
-            console.log('edge length between ' + Math.sqrt(minEdgeLengthSqInScene) + ' and ' + Math.sqrt(maxEdgeLengthSqInScene));
+//            console.log('edge length between ' + Math.sqrt(minEdgeLengthSqInScene) + ' and ' + Math.sqrt(maxEdgeLengthSqInScene));
         },
 
         init = function () {
-            console.log('DEBUG: World init');
+//            console.log('DEBUG: World init');
 
             deferred = new $.Deferred();
 
@@ -314,26 +314,26 @@ function World() {
                 worldLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/world.x3d');
                 return worldLoader.getPromise();
             }).done(function(worldLoaderResponse) {
-                console.log('DEBUG: World ready');
+//                console.log('DEBUG: World ready');
                 scene = worldLoader.getScene();
                 scene.traverse(function(child) {
                     child.frustumCulled = false;
                 });
 
                 world = worldLoader.getNode('world_TRANSFORM');
-                if (world) {
-                    console.log('DEBUG: world_TRANSFORM found');
-                }
+//                if (world) {
+//                    console.log('DEBUG: world_TRANSFORM found');
+//                }
                 world.scale = new THREE.Vector3(10, 10, 10);
                 subdivideFaces(world, 2.0);
 
                 sceneBoundingBox = computeBoundingBox(scene);
                 topviewScene = createTopviewSceneFromBoundingBox(sceneBoundingBox);
 
-                console.log('DEBUG: World resolve');
+//                console.log('DEBUG: World resolve');
                 deferred.resolve();
             }).fail(function(error) {
-                console.log('DEBUG: World reject');
+//                console.log('DEBUG: World reject');
                 deferred.reject(error);
             });
         };
