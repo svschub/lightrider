@@ -130,7 +130,8 @@ function Renderer() {
     };
 
     self.updateViewport = function () {
-        var canvas = $("#renderContainer > canvas"),
+        var pageContent = $("#pageContent"),
+            canvas = $("#renderContainer > canvas"),
             overlay = $("#renderOverlay"),
             windowWidth = $(window).width(),
             windowHeight = $(window).height(),
@@ -152,7 +153,8 @@ function Renderer() {
 
         calculateWidgetScaleRatio(canvasWidth, canvasHeight);
 
-        $("#pageContent").css("width", canvasWidth.toFixed(0) + "px");
+        pageContent.css("width", canvasWidth.toFixed(0) + "px");
+        pageContent.css("height", canvasHeight.toFixed(0) + "px");
 
         overlay.css("width", canvasWidth.toFixed(0) + "px");
         overlay.css("height", canvasHeight.toFixed(0) + "px");

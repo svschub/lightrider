@@ -18,7 +18,7 @@ function SettingsBox(properties) {
                     is_mobile: isMobileDevice ? 1 : 0
                 },
                 success: function(response) {
-                    $("#settings_box").html(response);
+                    $("#settings_content").html(response);
 
                     $("#open_settings_box_button").bind("click", function(event) {
                         event.preventDefault();
@@ -60,13 +60,11 @@ function SettingsBox(properties) {
         $("#how_to_fly_instructions").removeClass("hidden");
         $("#center_mobile_device").addClass("hidden");
 
-        $("#settings_box").css("display", "block");
-        $("#settings_box_background").css("display", "block");
+        $("#settings_content").fadeIn();
     };
         
     self.close = function () {
-        $("#settings_box").css("display", "none");
-        $("#settings_box_background").css("display", "none");
+        $("#settings_content").fadeOut();
 
         closeHandler();
     };

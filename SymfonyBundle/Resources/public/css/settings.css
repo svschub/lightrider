@@ -1,25 +1,5 @@
-.red {
-    color: #800000;
-}
-
-#settings_box_background {
-    display: none;
-    position: absolute;
-    margin: 0;
-    padding: 0;
-    top: 0%;
-    left: 0%;
-    width: 100%;
-    height: 100%;
-    background-color: black;
-    z-index: 1000;
-    -moz-opacity: 0.8;
-    opacity: .80;
-    filter: alpha(opacity=80);
-}
-
 #settings_box {
-    display: none;
+    display: block;
     position: absolute;
     margin: 0;
     padding: 0;
@@ -29,7 +9,7 @@
     height: 80%;
     border: 4px solid #3399bb;
     background-color: white;
-    z-index: 1001;
+    z-index: 101;
     overflow: hidden;
 }
 

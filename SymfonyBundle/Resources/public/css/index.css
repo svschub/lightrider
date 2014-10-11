@@ -6,6 +6,10 @@
     color: yellow;
 }
 
+.red {
+    color: #800000;
+}
+
 .verticalSmallSpace {
     display: block;
     height: 10px;
@@ -47,6 +51,7 @@ body {
 }
 
 #pageContent {
+    position: relative;
     margin-left: auto;
     margin-right: auto;
     padding: 0;
@@ -219,7 +224,6 @@ body {
     top: -37px;
 }
 
-
 #open_settings_box_button {
     display: block;
     margin: 2px;
@@ -239,4 +243,28 @@ body {
     text-decoration: none;
     color: #ffff00;
     cursor: pointer;
+}
+
+#settings_content {
+    display: none;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+div.opaque_background {
+    display: block;
+    position: absolute;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    z-index: 100;
+    -moz-opacity: 0.8;
+    opacity: .80;
+    filter: alpha(opacity=80);
 }
