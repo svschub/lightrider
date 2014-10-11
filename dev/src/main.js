@@ -129,6 +129,7 @@ function initWidgets() {
     });
 
     dopplerCheckbox = new DopplerCheckbox({
+        isMobile: isMobile,
         widgetScaleRatio: renderer.getWidgetScaleRatio(),
         handleDopplerShiftRescaleSlider: function(value) {
             renderer.setDopplerShiftRescale(value);

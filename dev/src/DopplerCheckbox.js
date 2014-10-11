@@ -1,6 +1,8 @@
 function DopplerCheckbox(properties) {
     var self = this,
 
+        isMobile = properties.isMobile,
+
         dopplerTitle = $("#dopplerTitle"),
         dopplerCheckboxImage = $("#doppler_checkbox_image"),
         dopplerShiftRescaleSlider = $('#dopplerShiftRescaleSlider'),
@@ -54,16 +56,18 @@ function DopplerCheckbox(properties) {
                 }
             });
 
-            dopplerCheckboxImage.bind('mouseenter', function(event) {
-                isDopplerShiftRescaleScrollbarOnFocus = true;
-                if (checkboxEnableDopplerEffect.prop('checked')) {
-                    self.showDopplerShiftRescaleScrollbar();
-                }
-            });
+            if (!isMobile) {
+                dopplerCheckboxImage.bind('mouseenter', function(event) {
+                    isDopplerShiftRescaleScrollbarOnFocus = true;
+                    if (checkboxEnableDopplerEffect.prop('checked')) {
+                        self.showDopplerShiftRescaleScrollbar();
+                    }
+                });
 
-            dopplerCheckboxImage.bind('mouseleave', function(event) {
-                isDopplerShiftRescaleScrollbarOnFocus = false;
-            });
+                dopplerCheckboxImage.bind('mouseleave', function(event) {
+                    isDopplerShiftRescaleScrollbarOnFocus = false;
+                });
+            }
         },
  
         init = function () {
@@ -85,16 +89,18 @@ function DopplerCheckbox(properties) {
             sliderHandle = $("#dopplerShiftRescaleSlider > a.ui-slider-handle");
             sliderHandleTextLabel = $('#dopplerShiftRescaleSlider > a > span');
 
-            dopplerShiftRescaleScrollbar.bind('mouseenter', function(event) {
-                isDopplerShiftRescaleScrollbarOnFocus = true;
-                if (isDopplerShiftRescaleScrollbarVisible) {
-                    self.showDopplerShiftRescaleScrollbar(); 
-                }
-            });
+            if (!isMobile) {
+                dopplerShiftRescaleScrollbar.bind('mouseenter', function(event) {
+                    isDopplerShiftRescaleScrollbarOnFocus = true;
+                    if (isDopplerShiftRescaleScrollbarVisible) {
+                        self.showDopplerShiftRescaleScrollbar(); 
+                    }
+                });
 
-            dopplerShiftRescaleScrollbar.bind('mouseleave', function(event) {
-                isDopplerShiftRescaleScrollbarOnFocus = false;
-            });
+                dopplerShiftRescaleScrollbar.bind('mouseleave', function(event) {
+                    isDopplerShiftRescaleScrollbarOnFocus = false;
+                });
+            }
 
             setDopplerShiftRescaleValue(0.3);
 
