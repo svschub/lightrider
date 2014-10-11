@@ -8,6 +8,8 @@ function SettingsBox(properties) {
         closeHandler = properties.closeHandler,
         orientableDevice = properties.orientableDevice,
 
+        is_open = false,
+
         init = function () {
             deferred = new $.Deferred();
 
@@ -55,6 +57,8 @@ function SettingsBox(properties) {
         };
         
     self.open = function () {
+        is_open = true;
+
         openHandler();
 
         $("#how_to_fly_instructions").removeClass("hidden");
@@ -67,10 +71,16 @@ function SettingsBox(properties) {
         $("#settings_content").fadeOut();
 
         closeHandler();
+        
+        is_open = false;
     };
 
     self.getPromise = function () {
         return deferred.promise();
+    };
+
+    self.isOpen = function () {
+        return is_open;
     };
 
     init();     

@@ -85,10 +85,17 @@ function initOrientableDevice() {
     orientableDevice = new OrientableDevice();
 
     orientableDevice.bindUpdateOrientationHandler(function(orientation) {
-        // @todo orientation.angle, orientation.isPanoramaView
-        /**
-         * show warning message if in portrait mode
-         */
+        var warningsContent = $("#warnings_content");
+
+        if (!settingsBox.isOpen()) { 
+            if (!orientableDevice.isPanoramaView()) {
+                timer.pause();
+                warningsContent.show();
+            } else {
+                warningsContent.hide();
+                timer.restart();
+            }
+        }
     });
 
     orientableDevice.bindUpdateOrientationAnglesHandler(function(angles) {

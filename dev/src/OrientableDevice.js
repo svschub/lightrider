@@ -2,7 +2,7 @@ function OrientableDevice () {
     var self = this,
 
         orientation,
-        isPanoramaView,
+        isPanoramaView = null,
 
         deviceOrientationSupported,
         deviceMotionSupported,
@@ -49,18 +49,6 @@ function OrientableDevice () {
         accelerationTimeLast,
         speedBoost,
         accelerationSgn,
-
-        updateOrientation = function () {
-            orientation = window.orientation;
-            isPanoramaView = (orientation !== 0);
-
-            if (updateOrientationHandler !== null) {
-                updateOrientationHandler({
-                    angle: orientation,
-                    isPanoramaView: isPanoramaView,
-                });
-            }
-        },
 
         rad = function(deg) {
             return (Math.PI*deg/180.0);
@@ -168,7 +156,20 @@ function OrientableDevice () {
                 deviceOrientationSupported = true;
 
                 deviceOrientationHandler = function(event) {
+                    var isPanoramaViewNew;
+                            
                     calculateAngles(event);
+
+                    isPanoramaViewNew = (window.orientation !== 0) && Math.abs(rollAngle) < 0.35*Math.PI;
+
+                    if (updateOrientationHandler !== null &&
+                        isPanoramaView !== isPanoramaViewNew) {
+
+                        isPanoramaView = isPanoramaViewNew;
+                        updateOrientationHandler({
+                            isPanoramaView: isPanoramaView
+                        });
+                    }
 
                     if (updateOrientationAnglesHandler !== null) {
                         updateOrientationAnglesHandler({
@@ -183,10 +184,6 @@ function OrientableDevice () {
         },
 
         bindDeviceOrientationEvents = function () {
-            $(window).on("orientationchange", function () {
-                updateOrientation();
-            });
-
             deviceOrientationSupported = false;
             if (window.DeviceOrientationEvent) {
                 window.addEventListener("deviceorientation", function(event) {
@@ -299,8 +296,6 @@ function OrientableDevice () {
             va = new Array(max_records);
             vt = new Array(max_records);
 
-            updateOrientation();
-
             pitchAngle0 = 0;
             minPitchAngle = rad(10);
             maxPitchAngle = rad(50);
@@ -326,7 +321,7 @@ function OrientableDevice () {
     };
 
     self.isPanoramaView = function () {
-        return (window.orientation !== 0);
+        return isPanoramaView;
     };
 
     self.registerPitchAngle0 = function() {
