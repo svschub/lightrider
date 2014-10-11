@@ -84,7 +84,7 @@ function initKeyHandler() {
 function initOrientableDevice() {
     orientableDevice = new OrientableDevice();
 
-    orientableDevice.bindUpdateOrientationHandler(function(orientation) {
+    orientableDevice.addUpdateOrientationHandler(function(orientation) {
         var warningsContent = $("#warnings_content");
 
         if (!settingsBox.isOpen()) { 
@@ -98,15 +98,17 @@ function initOrientableDevice() {
         }
     });
 
-    orientableDevice.bindUpdateOrientationAnglesHandler(function(angles) {
+    orientableDevice.addUpdateOrientationAnglesHandler(function(angles) {
         if (!timer.isPaused() && 
-            orientableDevice.isPanoramaView()) {
+            orientableDevice.isPanoramaView() &&
+            angles.pitchAngleRaw < 0.0 &&
+            angles.pitchAngleRaw > -0.4*Math.PI) {
             flightModel.setPitchAngle(0.06*angles.boundedPitchAngle);
             flightModel.setRollAngle(-0.06*angles.boundedRollAngle);
         }
     });
 
-    orientableDevice.bindUpdateSpeedHandler(function(acceleration) {
+    orientableDevice.addUpdateSpeedHandler(function(acceleration) {
         if (!timer.isPaused() && 
             orientableDevice.isPanoramaView()) {
             flightModel.setAcceleration(-0.2*acceleration);

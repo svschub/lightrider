@@ -104,6 +104,10 @@
     cursor: pointer;
 }
 
+#settings_box div.button.warning {
+    display: none;
+}
+
 #settings_box div.centered_content {
     width: 220px;
     margin-left: auto;
@@ -130,6 +134,11 @@
 
 #panoramaView img {
     width: 100%;
+    border: 2px solid green;
+}
+
+#panoramaView img.warning {
+    border: 2px solid red;
 }
 
 #settings_box div.thumbnails {

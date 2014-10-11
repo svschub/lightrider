@@ -9,6 +9,11 @@ function SettingsBox(properties) {
         orientableDevice = properties.orientableDevice,
 
         is_open = false,
+        is_centering_mobile_device = false,
+
+        centerMobileDevice = function () {
+            is_centering_mobile_device = true;
+        },
 
         init = function () {
             deferred = new $.Deferred();
@@ -33,20 +38,43 @@ function SettingsBox(properties) {
 
                         $("#how_to_fly_instructions").addClass("hidden");
                         $("#center_mobile_device").removeClass("hidden");
+
+                        if (orientableDevice) {
+                            centerMobileDevice();
+                        }
                     });
 
                     $("#take_off_button").bind("click", function(event) {
                         event.preventDefault();
 
                         if (orientableDevice) {
-                            if (orientableDevice.isPanoramaView()) {
-                                orientableDevice.registerPitchAngle0();
-                                self.close(); 
-                            }
+                            orientableDevice.registerPitchAngle0();
+                            is_centering_mobile_device = false;
+                            self.close(); 
                         } else {
                             self.close(); 
                         }
                     });
+
+                    if (orientableDevice) {
+                        orientableDevice.addUpdateOrientationAnglesHandler(function(angles) {
+                            var img = $('#panoramaView img'),
+                                takeOffButton = $('#take_off_button');
+         
+                            if (is_centering_mobile_device) {
+                                if (orientableDevice.isPanoramaView() &&
+                                    angles.pitchAngleRaw < -0.125*Math.PI && 
+                                    angles.pitchAngleRaw > -0.25*Math.PI &&
+                                    Math.abs(angles.rollAngleRaw) < 0.05*Math.PI) {
+                                    img.removeClass('warning');
+                                    takeOffButton.removeClass('warning');
+                                } else {
+                                    img.addClass('warning');
+                                    takeOffButton.addClass('warning');
+                                }
+                            }
+                        });
+                    }
 
                     deferred.resolve(response);
                 },

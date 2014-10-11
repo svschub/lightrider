@@ -7,9 +7,9 @@ function OrientableDevice () {
         deviceOrientationSupported,
         deviceMotionSupported,
 
-        updateOrientationHandler = null,
-        updateOrientationAnglesHandler = null,
-        updateSpeedHandler = null,
+        updateOrientationHandlers = [],
+        updateOrientationAnglesHandlers = [],
+        updateSpeedHandlers = [],
 
         x0axis = new THREE.Vector3(1,0,0),
         y0axis = new THREE.Vector3(0,1,0),
@@ -162,23 +162,26 @@ function OrientableDevice () {
 
                     isPanoramaViewNew = (window.orientation !== 0) && Math.abs(rollAngle) < 0.35*Math.PI;
 
-                    if (updateOrientationHandler !== null &&
-                        isPanoramaView !== isPanoramaViewNew) {
-
+                    if (isPanoramaView !== isPanoramaViewNew) {
                         isPanoramaView = isPanoramaViewNew;
-                        updateOrientationHandler({
-                            isPanoramaView: isPanoramaView
+
+                        updateOrientationHandlers.forEach(function(handler) {
+                            handler({
+                                isPanoramaView: isPanoramaView
+                            });
                         });
                     }
 
-                    if (updateOrientationAnglesHandler !== null) {
-                        updateOrientationAnglesHandler({
+                    updateOrientationAnglesHandlers.forEach(function(handler) {
+                        handler({
+                            pitchAngleRaw: pitchAngle + pitchAngle0,
+                            rollAngleRaw: rollAngle + rollAngle0,
                             pitchAngle: pitchAngle,
                             rollAngle: rollAngle,
                             boundedPitchAngle: getBoundedAngle(pitchAngle, minPitchAngle, maxPitchAngle), 
                             boundedRollAngle: getBoundedAngle(rollAngle, minRollAngle, maxRollAngle),
                         });
-                    }
+                    });
                 }
             }
         },
@@ -243,9 +246,9 @@ function OrientableDevice () {
 
                 accelerationThresholdReached = true;
             } else {
-                if (updateSpeedHandler !== null) {
-                    updateSpeedHandler(0.001 * speedBoost);
-                }
+                updateSpeedHandlers.forEach(function(handler) {
+                    handler(0.001 * speedBoost);
+                });
 
                 if (speedBoost !== 0.0) {
                     speedBoost = 0.0;
@@ -332,16 +335,16 @@ function OrientableDevice () {
         rollAngle0 = rollAngle + rollAngle0;
     };
 
-    self.bindUpdateOrientationHandler = function(handler) {
-        updateOrientationHandler = handler;
+    self.addUpdateOrientationHandler = function(handler) {
+        updateOrientationHandlers.push(handler);
     };
 
-    self.bindUpdateOrientationAnglesHandler = function(handler) {
-        updateOrientationAnglesHandler = handler;
+    self.addUpdateOrientationAnglesHandler = function(handler) {
+        updateOrientationAnglesHandlers.push(handler);
     };
 
-    self.bindUpdateSpeedHandler = function(handler) {
-        updateSpeedHandler = handler;
+    self.addUpdateSpeedHandler = function(handler) {
+        updateSpeedHandlers.push(handler);
     };
 
     init();
