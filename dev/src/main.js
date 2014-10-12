@@ -141,20 +141,6 @@ function initWidgets() {
             covariantMaterial.disableDopplerEffect();
         }
     });
-
-    if (isMobile) {
-        initOrientableDevice();
-    } else {
-        initKeyHandler();
-    }
-
-    $(window).bind('resize', function () {
-        renderer.updateViewport();
-
-        updateWidgets();
-        
-        recentlyResized = true;
-    });
 }
 
 function updateWidgets() {
@@ -165,6 +151,17 @@ function updateWidgets() {
     dopplerCheckbox.update();
 
     rescaleCopyrightMessage();
+}
+
+function bindResizeWindowEvents() {
+    $(window).bind('resize', function () {
+        renderer.updateViewport();
+        settingsBox.updateViewport();
+
+        updateWidgets();
+
+        recentlyResized = true;
+    });
 }
 
 function animate() {
@@ -210,6 +207,12 @@ function initRendererWindow() {
             }
         });
 
+        if (isMobile) {
+            initOrientableDevice();
+        } else {
+            initKeyHandler();
+        }
+
         settingsBox = new SettingsBox({
             isMobileDevice: isMobileDevice(),
             orientableDevice: orientableDevice,
@@ -227,6 +230,8 @@ function initRendererWindow() {
         return settingsBox.getPromise();
     }).then(function () {
 //        console.log('main 2 ready');
+
+        bindResizeWindowEvents();
 
         renderer.setFlightModel(flightModel);
 
