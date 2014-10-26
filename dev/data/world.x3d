@@ -15,30 +15,6 @@
 		            groundColor="0.051 0.051 0.051"
 		            skyColor="0.051 0.051 0.051"
 		            />
-		<Transform DEF="Sun3_TRANSFORM"
-		           translation="-10.740661 2.234982 -14.943811"
-		           scale="1.000000 1.000000 1.000000"
-		           rotation="0.091618 -0.994379 -0.053067 2.446218"
-		           >
-			<DirectionalLight DEF="LA_Sun3"
-			                  ambientIntensity="0.0000"
-			                  color="0.3757 0.2830 0.2203"
-			                  intensity="0.5714"
-			                  direction="0.0000 -0.0000 -1.0000"
-			                  />
-		</Transform>
-		<Transform DEF="Sun2_TRANSFORM"
-		           translation="14.961346 6.655298 -7.187004"
-		           scale="1.000000 1.000000 1.000000"
-		           rotation="0.686107 0.491376 0.536477 2.747551"
-		           >
-			<DirectionalLight DEF="LA_Sun2"
-			                  ambientIntensity="0.0000"
-			                  color="0.2883 0.2872 0.2211"
-			                  intensity="0.5714"
-			                  direction="-0.0000 0.0000 -1.0000"
-			                  />
-		</Transform>
 		<Transform DEF="world_TRANSFORM"
 		           translation="0.000000 0.000000 0.000000"
 		           scale="1.000000 1.000000 1.000000"
@@ -47,17 +23,17 @@
 			<Transform DEF="portal_TRANSFORM"
 			           translation="-3.845081 7.540625 0.000030"
 			           scale="1.000000 1.000000 1.000000"
-			           rotation="0.000000 -0.000002 1.000000 2.743069"
+			           rotation="0.000002 0.000002 -1.000000 1.570796"
 			           >
 				<Transform DEF="portal_roof_TRANSFORM"
 				           translation="-0.000000 -0.067834 1.322072"
-				           scale="0.486637 1.040706 0.043419"
-				           rotation="-0.000000 -0.000000 -0.000000 0.000000"
+				           scale="0.486637 1.040705 0.043419"
+				           rotation="0.000000 0.000000 -0.000000 0.000000"
 				           >
 					<Transform DEF="portal_roof_ifs_TRANSFORM"
-					           translation="-0.000001 0.000000 0.000002"
+					           translation="-0.000000 0.000000 0.000003"
 					           scale="1.000000 1.000000 1.000000"
-					           rotation="0.000000 -0.000000 0.000000 0.000000"
+					           rotation="0.000000 0.000000 0.000000 0.000000"
 					           >
 						<Group DEF="group_ME_Cube_003">
 							<Shape>
@@ -117,14 +93,14 @@
 					</Transform>
 				</Transform>
 				<Transform DEF="portal_columns_TRANSFORM"
-				           translation="-0.000001 -1.011997 0.058225"
+				           translation="0.000000 -1.011998 0.058225"
 				           scale="0.664755 0.118193 0.048227"
-				           rotation="-0.000000 0.000000 -0.000000 0.000000"
+				           rotation="-0.000000 0.000000 0.000000 0.000000"
 				           >
 					<Transform DEF="portal_columns_ifs_TRANSFORM"
-					           translation="-0.000001 -0.000002 0.000000"
+					           translation="-0.000000 0.000001 -0.000000"
 					           scale="1.000000 1.000000 1.000000"
-					           rotation="-0.000000 0.000000 -0.000000 0.000000"
+					           rotation="0.000000 -0.000000 -0.000000 0.000000"
 					           >
 						<Group DEF="group_ME_Cube_002">
 							<Shape>
@@ -376,8 +352,32 @@
 			<DirectionalLight DEF="LA_Sun"
 			                  ambientIntensity="0.3000"
 			                  color="1.0000 1.0000 1.0000"
-			                  intensity="0.5714"
+			                  intensity="1.0"
 			                  direction="-0.0000 0.0000 -1.0000"
+			                  />
+		</Transform>
+		<Transform DEF="Sun2_TRANSFORM"
+		           translation="14.961346 6.655298 -7.187004"
+		           scale="1.000000 1.000000 1.000000"
+		           rotation="0.686107 0.491376 0.536477 2.747551"
+		           >
+			<DirectionalLight DEF="LA_Sun2"
+			                  ambientIntensity="0.0000"
+			                  color="0.2883 0.2872 0.2211"
+			                  intensity="0.75"
+			                  direction="-0.0000 0.0000 -1.0000"
+			                  />
+		</Transform>
+		<Transform DEF="Sun3_TRANSFORM"
+		           translation="-10.740661 2.234982 -14.943811"
+		           scale="1.000000 1.000000 1.000000"
+		           rotation="0.091618 -0.994379 -0.053067 2.446218"
+		           >
+			<DirectionalLight DEF="LA_Sun3"
+			                  ambientIntensity="0.0000"
+			                  color="0.3757 0.2830 0.2203"
+			                  intensity="0.7"
+			                  direction="0.0000 -0.0000 -1.0000"
 			                  />
 		</Transform>
 		<Transform DEF="Camera_TRANSFORM"
