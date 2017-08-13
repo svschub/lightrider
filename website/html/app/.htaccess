@@ -1,0 +1,14 @@
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+   # <IfModule mod_vhost_alias.c>
+   #     RewriteBase /
+   # </IfModule>
+
+  #  RewriteBase /
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^(.*)$ homepage2/web/app.php [QSA,L]
+
+</IfModule>

@@ -1,0 +1,4 @@
+lightrider:
+    resource: "@LightriderBundle/Resources/config/routing.yml"
+    prefix:   /
+
