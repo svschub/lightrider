@@ -1,6 +1,6 @@
 <?php
 
-namespace Homepage\LightriderBundle\Controller;
+namespace LightriderBundle\Controller;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -38,7 +38,7 @@ class SettingsController extends Controller
     private function renderDesktopSettings($request)
     {
         return $this->render(
-            'HomepageLightriderBundle:Settings:desktop_settings.html.twig', 
+            'LightriderBundle:Settings:desktop_settings.html.twig', 
              array()
         );
     }
@@ -46,7 +46,7 @@ class SettingsController extends Controller
     private function renderMobileSettings()
     {
         return $this->render(
-            'HomepageLightriderBundle:Settings:mobile_settings.html.twig', 
+            'LightriderBundle:Settings:mobile_settings.html.twig', 
              array()
         );
     }

@@ -1,16 +1,16 @@
-homepage_lightrider_objectloader:
+lightrider_objectloader:
     pattern:  /Lightrider/Objects/{scope}/{filename}
-    defaults: { _controller: HomepageLightriderBundle:ObjectLoader:index }
+    defaults: { _controller: LightriderBundle:ObjectLoader:index }
 
-hompeage_lightrider_settings:
+lightrider_settings:
     pattern:  /Lightrider/Settings/
-    defaults: { _controller: HomepageLightriderBundle:Settings:index }
+    defaults: { _controller: LightriderBundle:Settings:index }
 
-hompeage_lightrider_render_window:
+lightrider_render_window:
     pattern:  /Lightrider/RenderWindow/
-    defaults: { _controller: HomepageLightriderBundle:RenderWindow:index }
+    defaults: { _controller: LightriderBundle:RenderWindow:index }
     
-homepage_lightrider_preloader:
+lightrider_preloader:
     pattern:  /Lightrider/
-    defaults: { _controller: HomepageLightriderBundle:Preloader:index }
+    defaults: { _controller: LightriderBundle:Preloader:index }
 

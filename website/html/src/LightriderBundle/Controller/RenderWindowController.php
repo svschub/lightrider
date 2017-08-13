@@ -1,6 +1,6 @@
 <?php
 
-namespace Homepage\LightriderBundle\Controller;
+namespace LightriderBundle\Controller;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -12,7 +12,7 @@ class RenderWindowController extends Controller
     public function indexAction()
     {
         return $this->render(
-            'HomepageLightriderBundle:RenderWindow:index.html.twig', 
+            'LightriderBundle:RenderWindow:index.html.twig', 
              array()
         );
     }

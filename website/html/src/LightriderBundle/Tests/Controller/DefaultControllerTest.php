@@ -1,6 +1,6 @@
 <?php
 
-namespace Homepage\LightriderBundle\Tests\Controller;
+namespace LightriderBundle\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace Homepage\LightriderBundle\Controller;
+namespace LightriderBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,7 +44,7 @@ class ObjectLoaderController extends Controller {
     private function getObjectFilePath($requestedObjectScope, $requestedObjectName) {
         $kernel = $this->get('kernel');
 
-        $objectsFilePath = $kernel->locateResource('@HomepageLightriderBundle/Resources/data/objects.csv');
+        $objectsFilePath = $kernel->locateResource('@LightriderBundle/Resources/data/objects.csv');
 
         $relObjectPath = '';
         $objectsFile = fopen($objectsFilePath, 'r') or die("can not read objects");
@@ -63,7 +63,7 @@ class ObjectLoaderController extends Controller {
         fclose($objectsFile) or die("can not close objects file");
 
         if (!empty($relObjectPath)) {
-            $objectFilePath = $kernel->locateResource('@HomepageLightriderBundle/Resources/data/' . $relObjectPath);
+            $objectFilePath = $kernel->locateResource('@LightriderBundle/Resources/data/' . $relObjectPath);
         } else {
             $objectFilePath = null;
         }

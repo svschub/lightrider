@@ -1,6 +1,6 @@
 <?php
 
-namespace Homepage\LightriderBundle\Controller;
+namespace LightriderBundle\Controller;
 
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -12,7 +12,7 @@ class PreloaderController extends Controller
     public function indexAction(Request $request)
     {
         return $this->render(
-            'HomepageLightriderBundle:Preloader:index.html.twig', 
+            'LightriderBundle:Preloader:index.html.twig', 
              array(
                  'is_mobile' => $this->isMobileDevice($request) ? 1 : 0
              )
