@@ -1,9 +1,14 @@
+#!/usr/bin/env python
+
+import sys
+import os.path
 import csv
 import math
-import Image
 import numpy as np
 import pylab as pl
 from scipy import linalg
+from PIL import Image
+from optparse import OptionParser
 
 
 def save_dist(filename, dist):    
@@ -74,14 +79,15 @@ def integrate(response_dist, dist):
     return ret
 
 
-def get_shifted(wavelengths, responses, dist, shift):
+def get_shifted(wavelengths, responses, dist, shift, verbose=False, output_dir=''):
     n = len(wavelengths)
 
     dist_shifted = np.zeros(shape=(2,n))
     dist_shifted[0] = wavelengths*shift
     dist_shifted[1] = dist
     dist_ext = get_extended_distribution(dist_shifted, 1/shift) 
-    save_dist('test_ext_dist.lst', dist_ext)
+    if verbose:
+        save_dist(os.path.join(output_dir, 'test_ext_dist.lst'), dist_ext)
 
     response_dist = np.zeros(shape=(2,n))
     response_dist[0] = wavelengths
@@ -89,17 +95,20 @@ def get_shifted(wavelengths, responses, dist, shift):
     response_dist[1] = responses[0]
     response_dist_ext = get_extended_distribution(response_dist, shift)
     r = integrate(response_dist_ext, dist_ext)
-    save_dist('test_ext_r.lst', response_dist_ext)
+    if verbose:
+        save_dist(os.path.join(output_dir, 'test_ext_r.lst'), response_dist_ext)
 
     response_dist[1] = responses[1]
     response_dist_ext = get_extended_distribution(response_dist, shift)
     g = integrate(response_dist_ext, dist_ext)
-    save_dist('test_ext_g.lst', response_dist_ext)
+    if verbose:
+        save_dist(os.path.join(output_dir, 'test_ext_g.lst'), response_dist_ext)
 
     response_dist[1] = responses[2]
     response_dist_ext = get_extended_distribution(response_dist, shift)
     b = integrate(response_dist_ext, dist_ext)
-    save_dist('test_ext_b.lst', response_dist_ext)
+    if verbose:
+        save_dist(os.path.join(output_dir, 'test_ext_b.lst'), response_dist_ext)
 
     return r, g, b
 
@@ -116,7 +125,27 @@ def rescale(value, minval, maxval):
 
 
 if __name__ == "__main__":
-    data = np.loadtxt("rgb31.txt");    
+    parser = OptionParser()
+    parser.add_option("-r", "--response-functions", dest="response_functions_filename", help="response functions", metavar="FILE")
+    parser.add_option("-d", "--doppler-map", dest="doppler_map_filename", help="Doppler map", metavar="FILE")
+    parser.add_option("-v", "--verbose", action="store_true", dest="verbose", default=False, help="print distributions to files")
+
+    (options, args) = parser.parse_args()
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
+    if options.response_functions_filename is None or len(options.response_functions_filename) == 0:
+        parser.error("File with respone functions is missing, use --response-functions")
+
+    if options.doppler_map_filename is None or len(options.doppler_map_filename) == 0:
+        parser.error("Filename for the generated Doppler map is missing, use --doppler_map")
+
+    output_dir = os.path.dirname(os.path.abspath(options.doppler_map_filename))
+    print("writing output to %s" % (output_dir,))
+
+    data = np.loadtxt(options.response_functions_filename);    
     dlambda = 5
     wavelengths = data[:,0]
     responses = data[:,1:4].T
@@ -138,15 +167,18 @@ if __name__ == "__main__":
     pl.xlabel('Wavelength [nm]')
     pl.ylabel('Base Distribution')
     pl.legend(loc='upper right')
-#    pl.show()
-    pl.savefig('rgb_base_distributions.png')
+
+    if options.verbose:
+        pl.savefig(os.path.join(output_dir, 'rgb_base_distributions.png'))
 
     dist = np.zeros(shape=(len(wavelengths),4))
     dist[:,0] = wavelengths
     dist[:,1] = distributions[0]
     dist[:,2] = distributions[1]
     dist[:,3] = distributions[2]
-    np.savetxt('rgb_base_distributions.lst', dist)
+
+    if options.verbose:
+        np.savetxt(os.path.join(output_dir, 'rgb_base_distributions.lst'), dist)
 
     n = 512
     lambda_min = 380.0
@@ -169,7 +201,7 @@ if __name__ == "__main__":
  
         i = 0
         while (i < n):
-            r, g, b = get_shifted(wavelengths, responses, distributions[rgb_index], shifts[i])
+            r, g, b = get_shifted(wavelengths, responses, distributions[rgb_index], shifts[i], verbose=options.verbose, output_dir=output_dir)
      
             shifted_dist[rgb_index, i,0] = r
             shifted_dist[rgb_index, i,1] = g
@@ -185,14 +217,18 @@ if __name__ == "__main__":
         pl.xlabel('wavelength shift')
         pl.ylabel('shifted RGB values')
         pl.legend(loc='upper right')
-        pl.savefig('shifted_'+rgb_names[rgb_index]+'.png')
+
+        if options.verbose:
+            pl.savefig(os.path.join(output_dir, "shifted_%s.png" % (rgb_names[rgb_index],)))
         
         saved_xy = np.zeros(shape=(n,4))
         saved_xy[:,0] = shifts   
         saved_xy[:,1] = shifted_dist[rgb_index, :,0]   
         saved_xy[:,2] = shifted_dist[rgb_index, :,1]   
         saved_xy[:,3] = shifted_dist[rgb_index, :,2]   
-        np.savetxt('shifted_' + rgb_names[rgb_index] + '.lst', saved_xy)
+
+        if options.verbose:
+            np.savetxt(os.path.join(output_dir, "shifted_%s.lst" % (rgb_names[rgb_index],)), saved_xy)
 
         rgb_index = rgb_index + 1
  
@@ -208,7 +244,7 @@ if __name__ == "__main__":
     print "g between", (g_min, g_max), "range:", g_max - g_min     
     print "b between", (b_min, b_max), "range:", b_max - b_min     
  
-    with open('rgb_minmax.csv', 'wb') as csvfile:
+    with open(os.path.join(output_dir, 'rgb_minmax.csv'), 'wb') as csvfile:
         rgb_channels_minmax = [
             ['r', r_min, r_max, r_max - r_min],
             ['g', g_min, g_max, g_max - g_min],
@@ -241,9 +277,10 @@ if __name__ == "__main__":
             saved_xy[x,2] = int(rescale(shifted_dist[rgb_index, x,2], b_min, b_max))
             x = x + 1
             
-        np.savetxt('test_img_' + rgb_names[rgb_index] + '.lst', saved_xy)
+        if options.verbose:
+            np.savetxt(os.path.join(output_dir, "test_img_%s.lst" % (rgb_names[rgb_index],)), saved_xy)
  
         rgb_index = rgb_index + 1
  
     img = Image.fromarray(data, 'RGB')
-    img.save('DopplerMap.png')
+    img.save(options.doppler_map_filename)
