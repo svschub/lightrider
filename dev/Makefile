@@ -2,7 +2,7 @@ SYMFONY_JS=../website/html/src/LightriderBundle/Resources/public/js
 SYMFONY_DATA=../website/html/src/LightriderBundle/Resources/data
 
 JS_TARGETS=$(SYMFONY_JS)/lightrider.min.js $(SYMFONY_JS)/lightrider.debug.js $(SYMFONY_JS)/three.min.js $(SYMFONY_JS)/Detector.js $(SYMFONY_JS)/jquery.ui.touch-punch.js
-DATA_TARGETS=$(SYMFONY_DATA)/scene/cockpit.x3d $(SYMFONY_DATA)/scene/world.x3d $(SYMFONY_DATA)/scene/mobileDevice.x3d $(SYMFONY_DATA)/textures/textures.xml $(SYMFONY_DATA)/shaders/covariantLambert.vs $(SYMFONY_DATA)/shaders/covariantLambert.fs $(SYMFONY_DATA)/shaders/covariantHorizon.vs
+DATA_TARGETS=$(SYMFONY_DATA)/scene/cockpit.x3d $(SYMFONY_DATA)/scene/world.x3d $(SYMFONY_DATA)/scene/mobileDevice.x3d $(SYMFONY_DATA)/textures/textures.xml $(SYMFONY_DATA)/shaders/covariantLambert.vs $(SYMFONY_DATA)/shaders/covariantLambert.fs $(SYMFONY_DATA)/shaders/covariantHorizon.vs $(SYMFONY_DATA)/shaders/dopplerMap.png
 
 JS_SOURCES= \
   src/AsyncLoader.js \
@@ -63,3 +63,6 @@ $(SYMFONY_DATA)/shaders/covariantLambert.fs: data/covariantLambert.fs
 
 $(SYMFONY_DATA)/shaders/covariantHorizon.vs: data/covariantHorizon.vs
 	cat $< > $@
+
+$(SYMFONY_DATA)/shaders/dopplerMap.png: data/rgb31.txt
+	scripts/dopper_map.py --response-functions $< --doppler-map $@
