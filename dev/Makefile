@@ -65,4 +65,4 @@ $(SYMFONY_DATA)/shaders/covariantHorizon.vs: data/covariantHorizon.vs
 	cat $< > $@
 
 $(SYMFONY_DATA)/shaders/dopplerMap.png: data/rgb31.txt
-	scripts/dopper_map.py --response-functions $< --doppler-map $@
+	scripts/doppler_map.py --response-functions $< --doppler-map $@
