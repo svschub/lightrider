@@ -2,7 +2,7 @@
 
 import sys
 import os.path
-import csv
+import json
 import math
 import numpy as np
 import pylab as pl
@@ -244,18 +244,14 @@ if __name__ == "__main__":
     print "g between", (g_min, g_max), "range:", g_max - g_min     
     print "b between", (b_min, b_max), "range:", b_max - b_min     
  
-    with open(os.path.join(output_dir, 'rgb_minmax.csv'), 'wb') as csvfile:
-        rgb_channels_minmax = [
-            ['r', r_min, r_max, r_max - r_min],
-            ['g', g_min, g_max, g_max - g_min],
-            ['b', b_min, b_max, b_max - b_min],
-        ]
+    with open(os.path.join(output_dir, 'rgb_range.json'), 'w') as jsonfile:
+        rgb_channels_minmax = {
+            'r': { "min": r_min, "max": r_max, "range": r_max - r_min},
+            'g': { "min": g_min, "max": g_max, "range": g_max - g_min},
+            'b': { "min": b_min, "max": b_max, "range": b_max - b_min},
+        }
 
-        minmaxwriter = csv.writer(csvfile, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-        minmaxwriter.writerow(['channel', 'min', 'max', 'range'])
-        for channel_minmax in rgb_channels_minmax:
-            minmaxwriter.writerow(channel_minmax)
-
+        json.dump(rgb_channels_minmax, jsonfile, ensure_ascii=False)
  
     width = n
     unit_height = 16
