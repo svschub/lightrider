@@ -311,7 +311,7 @@ function World() {
             });
 
             $.when(covariantMaterial.getPromise()).then(function(covariantMaterialResponse) {
-                worldLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/world.x3d');
+                worldLoader.loadSceneFromX3d('/Objects/Scene/world.x3d');
                 return worldLoader.getPromise();
             }).done(function(worldLoaderResponse) {
 //                console.log('DEBUG: World ready');

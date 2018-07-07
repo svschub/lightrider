@@ -25,9 +25,9 @@ function Cabin() {
 
             cabinLoader = new X3d.SceneLoader();
 
-            cabinLoader.loadTextureTreeFromXml('/Lightrider/Objects/Textures/textures.xml');
+            cabinLoader.loadTextureTreeFromXml('/Objects/Textures/textures.xml');
 
-            cabinLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/cockpit.x3d');
+            cabinLoader.loadSceneFromX3d('/Objects/Scene/cockpit.x3d');
 
             $.when(cabinLoader.getPromise()).done(function () {
 //                console.log('DEBUG: Cabin ready');

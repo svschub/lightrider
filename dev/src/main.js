@@ -269,7 +269,7 @@ function initPreloader () {
     $('#loading_page').css('display', 'block');
     
     $.ajax({
-        url: '/Lightrider/RenderWindow',
+        url: '/RenderWindow',
         type: 'GET',
         data: {},
         success: function(response) {

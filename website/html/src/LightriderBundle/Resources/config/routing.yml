@@ -1,16 +1,15 @@
 lightrider_objectloader:
-    pattern:  /Lightrider/Objects/{scope}/{filename}
+    pattern:  /Objects/{scope}/{filename}
     defaults: { _controller: LightriderBundle:ObjectLoader:index }
 
 lightrider_settings:
-    pattern:  /Lightrider/Settings/
+    pattern:  /Settings/
     defaults: { _controller: LightriderBundle:Settings:index }
 
 lightrider_render_window:
-    pattern:  /Lightrider/RenderWindow/
+    pattern:  /RenderWindow/
     defaults: { _controller: LightriderBundle:RenderWindow:index }
     
 lightrider_preloader:
-    pattern:  /Lightrider/
+    pattern:  /
     defaults: { _controller: LightriderBundle:Preloader:index }
-

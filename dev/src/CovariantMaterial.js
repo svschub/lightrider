@@ -40,7 +40,7 @@ function CovariantMaterial () {
                         };
 
                         dopplerMap = THREE.ImageUtils.loadTexture(
-                            "/Lightrider/Objects/Shaders/dopplerMap.png", 
+                            "/Objects/Shaders/dopplerMap.png", 
                             THREE.UVMapping, 
                             function () {
                                 dopplerMap.needsUpdate = true;

@@ -29,7 +29,7 @@ function SettingsBox(properties) {
 
         loadSettingsBox = function () {
             return $.ajax({
-                url: '/Lightrider/Settings',
+                url: '/Settings',
                 type: 'GET',
                 data: {
                     is_mobile: isMobileDevice ? 1 : 0
@@ -42,7 +42,7 @@ function SettingsBox(properties) {
                 sceneLoader = new X3d.SceneLoader();
 
             if (isMobileDevice) {
-                sceneLoader.loadSceneFromX3d('/Lightrider/Objects/Scene/mobileDevice.x3d');
+                sceneLoader.loadSceneFromX3d('/Objects/Scene/mobileDevice.x3d');
                 $.when(sceneLoader.getPromise()).then(function () {
                     mobileDeviceScene = sceneLoader.getScene();
                     camera = sceneLoader.getCamera();

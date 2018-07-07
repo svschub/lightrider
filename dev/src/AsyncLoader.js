@@ -10,7 +10,7 @@ AsyncLoader.get = function(objectPath) {
         deferred.resolve(AsyncLoader.cache[objectPath]);
     } else {
         $.ajax({
-            url: "/Lightrider/Objects/" + objectPath,
+            url: "/Objects/" + objectPath,
             type: 'GET',
             data: {},
             success: function(response) {
