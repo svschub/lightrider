@@ -8,3 +8,4 @@ covariantLambert.vs,Shaders,shaders/covariantLambert.vs
 covariantLambert.fs,Shaders,shaders/covariantLambert.fs
 covariantHorizon.vs,Shaders,shaders/covariantHorizon.vs
 dopplerMap.png,Shaders,shaders/dopplerMap.png
+rgb_range.json,Shaders,shaders/rgb_range.json

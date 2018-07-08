@@ -85,6 +85,7 @@ class ObjectLoaderController extends Controller {
             'txt' => 'text/plain',
             'csv' => 'text/comma-separated-values',
             'htm,html' => 'text/html',
+            'json' => 'application/json',
             'xml' => 'application/xml', // 'text/xml'
             'x3d' => 'application/xml',
             'vs' => 'x-shader/x-vertex',

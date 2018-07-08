@@ -1,6 +1,8 @@
 function DopplerShiftTable () {
     var self = this,
 
+        deferred,
+
         tableSize = 512,
         isDopplerEffectEnabled = false,
         texture,
@@ -31,13 +33,13 @@ function DopplerShiftTable () {
             }
         },
 
-        setRgbBoundaryVectors = function () {
-            var rMin = -0.448615,
-                rMax = 1.55035,
-                gMin = -0.230001,
-                gMax = 1.02742,
-                bMin = -0.269253,
-                bMax = 1.13998;
+        setRgbBoundaryVectors = function (rgb_range) {
+            var rMin = rgb_range.r.min,
+                rMax = rgb_range.r.max,
+                gMin = rgb_range.g.min,
+                gMax = rgb_range.g.max,
+                bMin = rgb_range.b.min,
+                bMax = rgb_range.b.max;
 
             rgbMinVector = new THREE.Vector4(rMin, gMin, bMin, 0.0);
             rgbRangeVector = new THREE.Vector4(rMax-rMin, gMax-gMin, bMax-bMin, 1.0);
@@ -65,12 +67,22 @@ function DopplerShiftTable () {
         },
 
         init = function () {
-            createEmptyTexture();
+            deferred = new $.Deferred();
 
-            setRgbBoundaryVectors();
-            setShiftBoundaries();
+            $.when(
+                AsyncLoader.get("Shaders/rgb_range.json")
+            ).then(function(response) {
+                createEmptyTexture();
 
-            setInitialBoostParameters();
+                setRgbBoundaryVectors(response);
+                setShiftBoundaries();
+
+                setInitialBoostParameters();
+ 
+                deferred.resolve();
+            }).fail(function(error) {
+                deferred.reject(error); 
+            });
         },
 
         calculateNonrelativisticValues = function () {
@@ -119,6 +131,10 @@ function DopplerShiftTable () {
             }
             texture.needsUpdate = true;
         };
+
+    self.getPromise = function () {
+        return deferred.promise();
+    };
 
     self.getTexture = function () {
         return texture;
