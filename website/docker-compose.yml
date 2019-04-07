@@ -1,0 +1,12 @@
+version: '2'
+services:
+  webserver:
+    image: "lightrider:1.0"
+    build: .
+    ports:
+      - "8081:80"
+    volumes:
+      - symfony-cache:/var/www/html/app/cache
+
+volumes:
+   symfony-cache:
