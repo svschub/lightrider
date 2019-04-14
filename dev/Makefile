@@ -25,7 +25,7 @@ JS_SOURCES= \
   src/main.js
 
 
-.PHONY: clean install
+.PHONY: clean buildenv install website buildenv-image
 
 all: $(JS_TARGETS) $(DATA_TARGETS)
 
@@ -107,8 +107,14 @@ $(BUILD_DIR)/shaders/dopplerMap.png: data/rgb31.txt scripts/doppler_map.py
 clean:
 	rm -r $(BUILD_DIR)
 
+buildenv-image:
+	build.sh --force true
+
 install:
 	cp -r $(BUILD_DIR)/js $(WEBSITE_RESOURCES)/public/
 	cp -r $(BUILD_DIR)/scene $(WEBSITE_RESOURCES)/data/
 	cp -r $(BUILD_DIR)/textures $(WEBSITE_RESOURCES)/data/
 	cp -r $(BUILD_DIR)/shaders $(WEBSITE_RESOURCES)/data/
+
+website: install
+	cd ../website && docker-compose build
